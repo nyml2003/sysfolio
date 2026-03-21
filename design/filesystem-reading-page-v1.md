@@ -37,10 +37,16 @@
 1 期不改变 0.5 期的三栏骨架：
 
 - 左栏仍然是 `FileTree`
-- 中栏仍然是 `ReadingPane`
+- 中栏仍然是 `ContentPane`
 - 右栏仍然是 `ContextPanel`
 
 变化点只发生在左栏顶部的发现入口。
+
+其中 `ContentPane` 沿用 0.5 期定义的多态结构：
+
+- 首页节点进入 `HomeView`
+- 目录节点进入 `DirectoryView`
+- 文件节点进入 `DocumentView`
 
 ### 2.2 TreeDiscovery
 
@@ -85,6 +91,7 @@
 
 1 期的搜索仍然属于“树内搜索”，但匹配维度比 0.5 期更明确：
 
+- 首页节点名称
 - 文件名
 - 文件夹名
 - 文章标题
@@ -107,7 +114,10 @@
 - 标签与分类支持树状多选
 - 时间支持范围筛选
 - 类型和状态支持多选
+- 内容类型多选中补充 `home`
 - 每个筛选项展示命中数
+
+`home` 节点作为轻量特例参与查找时，只要求名称匹配与类型归类，不要求补齐复杂元数据。
 
 ## 4. 左栏表现
 
@@ -152,15 +162,18 @@
 - 你当前仍在阅读这篇文章
 - 但它不在当前搜索/筛选结果中
 
-## 5. 阅读区协同
+## 5. 内容区协同
 
-1 期继续保持阅读优先，不让发现能力替换主内容区。
+1 期继续保持内容区稳定，不让发现能力替换主内容区。
 
 固定规则：
 
-- `ReadingPane` 始终保留当前文章
-- 搜索和筛选不会自动切走正文
-- `ContextPanel` 不承载筛选器，只保留当前文章上下文
+- `ContentPane` 始终保留当前选中节点
+- 命中首页节点时，中心区进入 `HomeView`
+- 命中目录时，中心区进入 `DirectoryView`
+- 命中文件时，中心区进入 `DocumentView`
+- 搜索和筛选不会把中心区自动切成结果列表
+- `ContextPanel` 不承载筛选器，只保留当前节点上下文
 - 若当前文章不在命中结果中，只提示状态，不触发跳转
 
 这样可以同时满足：
@@ -183,12 +196,17 @@
 - `ActiveFilterChips`
 - `ResetActions`
 - `CurrentDocumentOutOfFilterNotice`
+- `ContentPane`
+- `HomeView`
+- `DirectoryView`
+- `DocumentView`
 
 0.5 期组件里需要修订的部分：
 
 - `TreeSearchField` 升级为 `TreeDiscovery`
 - `FileNode` 增加“命中 / 非命中 / 当前阅读但不命中”的状态
 - `ContextPanel` 可增加轻量发现状态摘要，但不扩权为筛选面板
+- `ContentPane` 保持首页态 / 目录态 / 文件态多视图，不增加独立结果页
 
 ## 7. 验收标准
 

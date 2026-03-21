@@ -50,7 +50,7 @@
 引导层包含：
 
 - `HintDot[FileTree]`
-- `HintDot[ReadingPane]`
+- `HintDot[ContentPane]`
 - `HintDot[PathBar]`
 - 单实例说明浮层 `HintPopover`
 
@@ -80,8 +80,9 @@
 ### 4.1 作用
 
 - 提示当前路径。
+- 承担全局面包屑。
 - 承担轻量返回语义。
-- 强化“当前已打开文件”的状态。
+- 强化“当前已选中节点”的状态。
 
 ### 4.2 外观
 
@@ -98,8 +99,8 @@
 ### 4.3 交互
 
 - 父级路径 hover 时仅改变文字颜色，不出现大面积底色。
-- 当前文件节点不可表现得像主按钮。
-- 当路径过长时，中间层级省略，保留根目录、上一级、当前文件。
+- 当前节点不可表现得像主按钮。
+- 当路径过长时，中间层级省略，保留根目录、上一级、当前节点。
 - 主题切换按钮放在路径栏最右侧，不侵入文件路径阅读顺序。
 
 ## 5. FileTree
@@ -227,30 +228,74 @@
 - 1 期中，搜索词与筛选条件共同作用于同一个目录结果集。
 - 非命中节点默认隐藏；若当前已打开文章不命中，则保留其特殊提示态而不是强制从树中消失。
 
-## 6. ReadingPane
+## 6. ContentPane
 
 ### 6.1 容器
 
 | 项目 | 规则 |
 | --- | --- |
 | 背景 | `canvas` |
-| 宽度 | `minmax(0, 820px)` |
+| 宽度 | `100%`，在中栏内居中 |
 | 水平内边距 | `32px` |
 | 垂直内边距 | `40px` 到 `48px` |
-| 正文测量宽度 | `60ch` 到 `80ch`，目标值 `72ch` |
+| 内容最大宽度 | 目录态与文件态共用稳定最大宽度，不在宽屏上无限拉伸 |
 
 ### 6.2 结构
 
-ReadingPane 由以下部分组成：
+`ContentPane` 由以下其中一种视图组成：
+
+- `HomeView`
+- `DirectoryView`
+- `DocumentView`
+- `FileTypeEmptyState`
+
+### 6.3 视图切换规则
+
+- 当前节点为 `home` 时，进入 `HomeView`。
+- 当前节点为 `folder` 时，进入 `DirectoryView`。
+- 当前节点为 `article` 时，进入 `DocumentView`。
+- 当前节点为未支持类型时，进入 `FileTypeEmptyState`。
+- 三种视图共用同一个中栏容器，只做轻量状态切换，不创建独立页面壳。
+
+### 6.4 HomeView
+
+`HomeView` 是轻量特例视图，用于承载首页节点的个性化内容。
+
+规则：
+
+- 不要求纳入复杂统一建模，只保留最小字段与少量手写内容块。
+- 允许出现作者介绍、精选入口、最近更新等轻量信息块。
+- 结构保持克制，不做强品牌化 landing page，不与 `DirectoryView` 抢层级。
+- 首页节点数量默认极少，通常只在根层级出现。
+
+### 6.5 DirectoryView
+
+`DirectoryView` 由以下部分组成：
+
+- `DirectoryHeader`
+- `DirectoryMeta`
+- `DirectoryChildren`
+
+规则：
+
+- 只展示当前目录的一层子项。
+- 子目录优先于文件，避免浏览顺序混乱。
+- 使用低干扰列表，不做大卡片墙。
+- 每个子项至少展示图标、名称、类型与简要说明或日期。
+- 点击子目录后进入下一级 `DirectoryView`；点击文章后切到 `DocumentView`。
+
+### 6.6 DocumentView
+
+`DocumentView` 由以下部分组成：
 
 - `DocumentHeader`
 - `ProgressRestoreNotice`
 - `ArticleBody`
 - `DocumentFooter`
 
-这三个区域之间使用明显的垂直节奏分隔，不靠粗线切断。
+这几个区域之间使用明显的垂直节奏分隔，不靠粗线切断。
 
-### 6.3 基础行为
+### 6.7 基础行为
 
 - 默认允许原生文本选择与复制。
 - 恢复阅读位置后，`ProgressRestoreNotice` 在顶部轻量出现，不遮挡正文。
@@ -263,6 +308,8 @@ ReadingPane 由以下部分组成：
 - 主标题
 - 元信息行
 - 摘要或导语
+
+`DocumentHeader` 的路径提示只保留轻量“所属目录”语义，不替代全局 `PathBar`。
 
 ### 7.2 外观规则
 
@@ -395,7 +442,21 @@ ReadingPane 由以下部分组成：
 
 ### 10.2 信息模块
 
-右栏按模块分组：
+右栏按当前视图分组：
+
+`HomeView`：
+
+- `HomeSummaryBlock`
+- `QuickEntryBlock`
+- `RecentUpdateBlock`
+
+`DirectoryView`：
+
+- `DirectorySummaryBlock`
+- `MetadataBlock`
+- `RelatedEntryBlock`
+
+`DocumentView`：
 
 - `TableOfContents`
 - `MetadataBlock`
@@ -411,6 +472,8 @@ ReadingPane 由以下部分组成：
 - `font-weight-semibold`
 - `text-muted`
 - 全大写可选，但中文环境下默认不用全大写风格模拟
+
+首页态与目录态下都不显示 `TableOfContents`，避免右栏重复制造“文档阅读中”的错觉。
 
 ## 11. TableOfContents
 
@@ -584,7 +647,7 @@ focus-visible 时只加外侧 focus ring，不做高饱和实心描边替换。
 
 - 隐藏 `ContextPanel` 为折叠抽屉。
 - `FileTree` 保留，但宽度可缩到 `240px`。
-- `ReadingPane` 内边距降到 `24px`。
+- `ContentPane` 内边距降到 `24px`。
 
 ### 18.2 手机
 

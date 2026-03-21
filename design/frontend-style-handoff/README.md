@@ -49,7 +49,10 @@
 - 命名偏业务，例如：
   - `.m-file-tree`
   - `.m-file-node`
-  - `.m-reading-pane`
+  - `.m-content-pane`
+  - `.m-home-view`
+  - `.m-directory-view`
+  - `.m-document-view`
   - `.m-context-panel`
 - 分子层内部可以 `@apply --u-*`
 
@@ -104,3 +107,10 @@
 ## 当前 handoff 的定位
 
 这不是最终前端代码，而是设计侧已经对齐工程约束后的样式基线。它的目标是减少前端在实现时重复做样式架构决策，而不是替代组件开发本身。
+
+当前版本已把中间主内容区拆成统一的 `ContentPane` 多态结构：
+
+- 首页节点使用 `.m-home-view`
+- 目录节点使用 `.m-directory-view`
+- 文件节点使用 `.m-document-view`
+- `PathBar` 保持全局面包屑，不跟中间区绑定
