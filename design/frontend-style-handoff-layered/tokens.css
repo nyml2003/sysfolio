@@ -72,6 +72,7 @@
     --sys-font-size-16: 1rem;
     --sys-font-size-18: 1.125rem;
     --sys-font-size-24: 1.5rem;
+    --sys-font-size-28: 1.75rem;
     --sys-font-size-32: 2rem;
     --sys-font-size-40: 2.5rem;
 
@@ -108,6 +109,11 @@
     --sys-border-width-1: 1px;
     --sys-border-width-2: 2px;
 
+    --sys-size-icon-button: 2.25rem;
+    --sys-size-tree-row: 2rem;
+    --sys-size-tree-toggle: 1.5rem;
+    --sys-size-tree-toggle-comfortable: 1.75rem;
+
     --sys-shadow-soft: 0 8px 24px rgb(67 58 48 / 8%);
     --sys-shadow-panel: 0 4px 12px rgb(67 58 48 / 5%);
     --sys-shadow-none: none;
@@ -118,6 +124,7 @@
     --sys-duration-overlay: 160ms;
     --sys-ease-standard: cubic-bezier(0.2, 0, 0, 1);
     --sys-ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --sys-size-hit-target-comfortable: 2.75rem;
 
     --sys-layout-max-width: 1600px;
     --sys-layout-left-rail: 280px;
@@ -133,22 +140,14 @@
     --sys-layout-pathbar-height: 48px;
     --sys-layout-header-offset: 64px;
     --sys-layout-tree-search-height: 36px;
-
-    --shell-left-bg: var(--sys-color-panel-alt);
-    --shell-right-bg: var(--sys-color-panel);
-    --path-bar-bg: var(--sys-color-panel-alt);
-    --path-bar-border: var(--sys-color-border-default);
-    --file-tree-bg: var(--sys-color-panel-alt);
-    --file-tree-node-bg-hover: var(--sys-color-surface-hover);
-    --file-tree-node-bg-active: var(--sys-color-current-soft);
-    --file-tree-node-border-active: var(--sys-color-current-rail);
-    --toc-item-bg-active: var(--sys-color-current-soft);
-    --toc-item-border-active: var(--sys-color-current-rail);
-    --tag-bg-default: var(--sys-color-panel-alt);
-    --tag-bg-article: var(--sys-color-accent-soft);
-    --tag-bg-game: var(--sys-color-warm-soft);
-    --tag-bg-media: var(--sys-color-info-soft);
-    --empty-state-bg: var(--sys-color-panel);
+    --sys-layout-tree-indent-step: var(--sys-space-12);
+    --sys-layout-tree-indent-step-compact: var(--sys-space-10);
+    --sys-layout-content-pad-inline: max(var(--sys-space-24), 4vw);
+    --sys-layout-content-pad-inline-compact: var(--sys-space-20);
+    --sys-layout-content-pad-block-start: var(--sys-space-40);
+    --sys-layout-content-pad-block-start-compact: var(--sys-space-32);
+    --sys-layout-content-pad-block-end: var(--sys-space-48);
+    --sys-layout-content-pad-block-end-compact: var(--sys-space-40);
   }
 
   [data-theme="dark"] {

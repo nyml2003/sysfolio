@@ -22,6 +22,8 @@
   放可复用结构模式，例如 app shell、reading pane、doc header、empty state。
 - `business.css`
   放当前产品语义更强的组件和视图，例如 path bar、file tree、home view、directory view、document view。
+- `component.css`
+  预留给 page edge / feature edge 级的编排和状态升级规则。
 - `index.css`
   统一定义 layer 顺序和导入关系。
 - `responsive-and-multi-input-strategy.md`
@@ -47,12 +49,14 @@
 - `patterns` 可以组合基础控件，并应优先承接 data-bearing 的 view state。
 - `business` 才承载产品概念、业务数据、状态计算和高语义结构。
 - `component` 负责 feature / page 级组合，以及状态影响范围和升级策略。
+- `patterns` 如果需要被 `business` 复用共享骨架，应输出共享契约，而不是直接持有业务 selector。
 
 ## 当前迁移策略
 
 - 保留 `--sys-*`、`--u-*` 和现有 `.m-*` selector。
 - 本轮先做文件拆分和职责归位，不做大规模重命名。
 - `molecular.css` 中的内容拆到 `primitives / patterns / business` 三层。
+- `tokens.css` 只保留纯语义变量，不再保留 `shell / path / file-tree / toc` 这类组件别名 token。
 
 ## 与旧目录的关系
 

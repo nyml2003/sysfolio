@@ -1,4 +1,4 @@
-import { startTransition, useEffect, useRef, useState } from "react";
+import { startTransition, useCallback, useEffect, useRef, useState } from "react";
 
 import type { RepositoryError } from "@/entities/content";
 import { useContentRepository } from "@/shared/data/repository";
@@ -37,7 +37,7 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
     loadingNodeIdsRef.current = loadingNodeIds;
   }, [loadingNodeIds]);
 
-  async function loadChildren(nodeId: string) {
+  const loadChildren = useCallback(async (nodeId: string) => {
     if (loadingNodeIdsRef.current.includes(nodeId)) {
       return;
     }
@@ -65,7 +65,7 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
         };
       });
     });
-  }
+  }, [repository]);
 
   useEffect(() => {
     let cancelled = false;
@@ -147,7 +147,7 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
     return () => {
       cancelled = true;
     };
-  }, [currentPath, repository, rootState]);
+  }, [currentPath, repository, rootState, loadChildren]);
 
   const rows =
     rootState.tag === "ready"

@@ -35,10 +35,6 @@
     @apply --u-tr-base;
   }
 
-  .m-button:hover {
-    transform: translateY(-1px);
-  }
-
   .m-button:active {
     transform: translateY(0);
   }
@@ -66,21 +62,10 @@
     color: var(--sys-color-text-inverse);
   }
 
-  .m-button--primary:hover {
-    border-color: var(--sys-color-accent-hover);
-    background: var(--sys-color-accent-hover);
-    color: var(--sys-color-text-inverse);
-  }
-
   .m-button--secondary {
     border: var(--sys-border-width-1) solid var(--sys-color-border-default);
     background: var(--sys-color-panel);
     color: var(--sys-color-text-secondary);
-  }
-
-  .m-button--secondary:hover {
-    background: var(--sys-color-surface-hover);
-    color: var(--sys-color-text-primary);
   }
 
   .m-tag {
@@ -89,7 +74,7 @@
     padding: var(--sys-space-4) var(--sys-space-10);
     border: var(--sys-border-width-1) solid var(--sys-color-border-default);
     border-radius: var(--sys-radius-pill);
-    background: var(--tag-bg-default);
+    background: var(--sys-color-panel-alt);
     color: var(--sys-color-text-secondary);
     font-family: var(--sys-font-ui);
     font-size: var(--sys-font-size-12);
@@ -97,23 +82,23 @@
   }
 
   .m-tag--article {
-    background: var(--tag-bg-article);
+    background: var(--sys-color-accent-soft);
     color: var(--sys-color-accent);
   }
 
   .m-tag--game {
-    background: var(--tag-bg-game);
+    background: var(--sys-color-warm-soft);
     color: var(--sys-color-warm);
   }
 
   .m-tag--media {
-    background: var(--tag-bg-media);
+    background: var(--sys-color-info-soft);
     color: var(--sys-color-info);
   }
 
   .m-footnote-popover {
     max-inline-size: 20rem;
-    padding: var(--sys-space-12) var(--sys-space-14);
+    padding: var(--sys-space-12) var(--sys-space-16);
     border: var(--sys-border-width-1) solid var(--sys-color-border-default);
     border-radius: var(--sys-radius-12);
     background: var(--sys-color-panel);
@@ -169,8 +154,43 @@
   }
 
   .m-inline-notice--info {
-    border-color: var(--sys-color-border-default);
-    background: var(--sys-color-panel);
-    color: var(--sys-color-text-secondary);
+    border-color: var(--sys-color-info);
+    background: var(--sys-color-info-soft);
+    color: var(--sys-color-text-primary);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .m-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .m-button--primary:hover {
+      border-color: var(--sys-color-accent-hover);
+      background: var(--sys-color-accent-hover);
+      color: var(--sys-color-text-inverse);
+    }
+
+    .m-button--secondary:hover {
+      background: var(--sys-color-surface-hover);
+      color: var(--sys-color-text-primary);
+    }
+  }
+
+  @media (pointer: coarse) {
+    .m-button {
+      min-block-size: var(--sys-size-hit-target-comfortable);
+      padding-inline: var(--sys-space-16);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .m-button {
+      transition-duration: 0.01ms;
+    }
+
+    .m-spinner,
+    .m-skeleton-block {
+      animation: none;
+    }
   }
 }

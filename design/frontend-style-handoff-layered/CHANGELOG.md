@@ -23,6 +23,10 @@
 - 新增 `toc-file-tree-reuse-boundary.md`，定义 TOC 与 File Tree 的共享 pattern 边界和业务拆分边界
 - 新增 `tree-navigation-pattern.md`，定义共享树形导航 pattern 的结构、状态、键盘规则和业务扩展边界
 - 重写 `page-view-state-strategy.md`，从页面级五态改为 view state 的分层承接策略
+- 补齐 `component.css`，让 `component` 层在目录和入口上都真实存在
+- 清理 `tokens.css` 中的组件别名 token，改回纯语义 token + 纯布局 token
+- 将 Tree Navigation 的共享骨架改为 pattern 契约，由 `business.css` 消费，不再由 `patterns.css` 直接持有 `TOC / FileTree` 的业务 selector
+- 收敛正文类视图的内边距规则，统一落到 layout token
 
 ### 文档收敛
 
@@ -72,11 +76,11 @@
 - `.m-progress-notice`
 - `.m-article-body`
 - `.m-code-block`
-- `.m-toc`
 - `.m-empty-state`
 
 `business.css`
 
+- `.m-toc`
 - `.m-path-bar`
 - `.m-theme-toggle`
 - `.m-file-tree`
@@ -89,7 +93,7 @@
 
 ### 本轮没有做的事
 
-- 没有修改现有 token 数值
+- 没有重绘现有核心色值方向
 - 没有大规模改 selector 命名
 - 没有重绘现有视觉风格
 - 没有新增完整基础组件库
