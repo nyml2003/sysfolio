@@ -1,8 +1,15 @@
-# SysFolio 通用组件样式指南 v1
+# SysFolio 通用组件样式指南
 
 ## 1. 使用原则
 
 这份文档定义首版文件系统式阅读页的通用组件外观与交互规则。
+
+版本约定：
+
+- `0.5 期`：阅读基线、轻量树搜索、三栏阅读壳
+- `1 期`：树内统一搜索与高级筛选增强
+
+除非特别说明，本文默认描述共享基线；涉及 `TreeDiscovery`、`FilterSection`、`ActiveFilterChips` 的部分属于 1 期增强。
 
 组件设计优先级：
 
@@ -106,7 +113,27 @@
 | 内边距 | `16px 12px` |
 | 滚动条 | 使用细滚动条，颜色接近 `text-faint` |
 
-### 5.1.1 TreeSearchField
+### 5.1.1 TreeDiscovery
+
+1 期将 0.5 期的 `TreeSearchField` 升级为统一的 `TreeDiscovery`。
+
+结构固定为：
+
+- `SearchInput`
+- `DiscoverySummary`
+- `FilterToggle`
+- `FilterSection`
+- `ActiveFilterChips`
+- `ResetActions`
+
+约束：
+
+- 搜索和筛选共用同一个结果集
+- 搜索框始终可见
+- 筛选区默认折叠
+- 已生效条件必须可见
+
+### 5.1.2 SearchInput
 
 | 项目 | 规则 |
 | --- | --- |
@@ -117,6 +144,41 @@
 | 字体 | `font-ui`, `13px` |
 | 占位文字 | `text-faint` |
 | 与节点列表间距 | `12px` |
+
+### 5.1.3 DiscoverySummary 与 ActiveFilterChips
+
+`DiscoverySummary`：
+
+- 使用 `font-ui`
+- 字号 `12px` 到 `13px`
+- 文本颜色使用 `text-muted`
+- 展示命中数和当前已启用条件数
+
+`ActiveFilterChips`：
+
+- 放在搜索输入与筛选区之间
+- 使用多行 wrap 布局
+- chip 采用轻量标签样式，但比普通 tag 更强调“可移除”
+- 同时提供“清除搜索”“清除筛选”“全部重置”
+
+### 5.1.4 FilterSection
+
+`FilterSection` 位于搜索框下方，以折叠区方式展开。
+
+规则：
+
+- 默认折叠
+- 展开后内部独立滚动
+- 最大高度使用 `tree-filter-max-height`
+- 分组之间以轻分隔线区分，不做厚重卡片堆叠
+
+支持的 1 期筛选组：
+
+- 标签
+- 分类
+- 时间
+- 内容类型
+- 状态
 
 ### 5.2 分区标题
 
@@ -151,6 +213,7 @@
 | disabled | transparent | text-faint | text-faint | 不响应 hover |
 | coming-soon | transparent | text-muted | text-muted | 右侧显示小状态点 |
 | search-match | search-highlight | search-highlight-text | icon-active | 命中字符高亮 |
+| current-out-of-filter | transparent | current-out-of-filter | current-out-of-filter | 当前阅读但不在结果中 |
 
 ### 5.5 使用规则
 
@@ -161,6 +224,8 @@
 - 默认展开前 2 层目录，第 3 层及更深层级折叠。
 - 首屏只加载前 2 层树节点；更深层节点在展开父目录时按需加载。
 - 搜索状态下自动展开命中节点祖先路径；清空搜索后回到默认展开策略。
+- 1 期中，搜索词与筛选条件共同作用于同一个目录结果集。
+- 非命中节点默认隐藏；若当前已打开文章不命中，则保留其特殊提示态而不是强制从树中消失。
 
 ## 6. ReadingPane
 
@@ -471,9 +536,9 @@ ReadingPane 由以下部分组成：
 - 页面里主按钮数量必须克制，正文页首屏最多 1 个。
 - 不用高饱和暖色做主按钮，避免打断阅读氛围。
 
-## 16. 输入与搜索框
+## 16. 输入、搜索与筛选框
 
-v1 已明确支持文件树搜索，因此输入框不再是预留样式，而是首屏实际组件。
+0.5 期已明确支持文件树搜索；1 期在同一入口里加入统一筛选能力。
 
 | 项目 | 规则 |
 | --- | --- |
@@ -491,6 +556,8 @@ focus-visible 时只加外侧 focus ring，不做高饱和实心描边替换。
 - 支持按文件夹名和文件名搜索。
 - 搜索结果中的命中字符使用 `search-highlight`。
 - 搜索时不改变正文区当前阅读状态。
+- 1 期中，搜索输入与筛选条件共享结果集。
+- 筛选项使用树状多选、范围筛选和 chip 回显。
 
 ## 17. FootnotePopover
 
