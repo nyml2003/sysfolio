@@ -13,8 +13,8 @@ import {
   GameIcon,
   HomeIcon,
   MediaIcon,
-  iconStyle,
 } from "@/shared/ui/primitives/Icon";
+import { iconStyle } from "@/shared/ui/primitives/Icon.style";
 import styles from "./FileTree.module.css";
 
 import { useFileTree } from "../hooks/useFileTree";

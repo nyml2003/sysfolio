@@ -1,5 +1,5 @@
 import { getThemeToggleAriaLabel } from "@/shared/lib/i18n/ui-copy";
-import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
+import { usePreferences } from "@/shared/store/preferences";
 import { MoonIcon, SunIcon } from "@/shared/ui/primitives/Icon";
 import styles from "./ThemeToggle.module.css";
 

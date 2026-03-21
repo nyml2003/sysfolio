@@ -1,4 +1,4 @@
-import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
+import { usePreferences } from "@/shared/store/preferences";
 
 import { getUiCopy } from "./ui-copy";
 

@@ -3,7 +3,7 @@ import { startTransition, useCallback, useEffect, useRef, useState } from "react
 import type { RepositoryError } from "@/entities/content";
 import { useContentRepository } from "@/shared/data/repository";
 import { idleState, loadingState, type ResourceState } from "@/shared/lib/resource/resource-state";
-import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
+import { usePreferences } from "@/shared/store/preferences";
 
 import {
   buildVisibleRows,

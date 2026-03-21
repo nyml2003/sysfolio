@@ -1,7 +1,5 @@
 import {
-  createContext,
   startTransition,
-  useContext,
   useEffect,
   useEffectEvent,
   useState,
@@ -15,21 +13,11 @@ import {
   type AppLocale,
 } from "@/shared/lib/i18n/locale.types";
 import { DEFAULT_THEME, type ThemePreference } from "@/shared/lib/theme/theme.types";
-
-type PreferencesContextValue = {
-  theme: ThemePreference;
-  toggleTheme: () => void;
-  locale: AppLocale;
-  toggleLocale: () => void;
-  onboardingVisible: boolean;
-  dismissOnboarding: () => void;
-};
+import { PreferencesContext } from "./preferences-context";
 
 type PreferencesProviderProps = {
   children: ReactNode;
 };
-
-const PreferencesContext = createContext<PreferencesContextValue | null>(null);
 
 export function PreferencesProvider({ children }: PreferencesProviderProps) {
   const repository = useContentRepository();
@@ -134,13 +122,4 @@ export function PreferencesProvider({ children }: PreferencesProviderProps) {
       {children}
     </PreferencesContext.Provider>
   );
-}
-
-export function usePreferences(): PreferencesContextValue {
-  const context = useContext(PreferencesContext);
-  if (context === null) {
-    throw new Error("PreferencesContext is missing.");
-  }
-
-  return context;
 }

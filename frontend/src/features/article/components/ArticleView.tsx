@@ -2,7 +2,7 @@ import type { ArticleDocument, ContentNode } from "@/entities/content";
 import { formatDate } from "@/shared/lib/date/format-date";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import { unwrapOr } from "@/shared/lib/monads/option";
-import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
+import { usePreferences } from "@/shared/store/preferences";
 import buttonStyles from "@/shared/ui/primitives/Button.module.css";
 
 import styles from "./ArticleView.module.css";

@@ -1,4 +1,4 @@
-import type { CSSProperties, SVGProps } from "react";
+import type { SVGProps } from "react";
 
 type IconProps = SVGProps<SVGSVGElement> & {
   size: number;
@@ -111,11 +111,4 @@ export function SunIcon(props: Omit<IconProps, "children">) {
       <path d="M4 20l1.8-1.8" />
     </IconBase>
   );
-}
-
-export function iconStyle(color: string): CSSProperties {
-  return {
-    color,
-    flexShrink: 0,
-  };
 }

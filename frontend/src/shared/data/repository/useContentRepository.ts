@@ -1,10 +1,7 @@
-import { createContext, useContext } from "react";
+import { useContext } from "react";
 
 import type { ContentRepository } from "./repository.types";
-
-const ContentRepositoryContext = createContext<ContentRepository | null>(null);
-
-export const ContentRepositoryProvider = ContentRepositoryContext.Provider;
+import { ContentRepositoryContext } from "./content-repository-context";
 
 export function useContentRepository(): ContentRepository {
   const repository = useContext(ContentRepositoryContext);

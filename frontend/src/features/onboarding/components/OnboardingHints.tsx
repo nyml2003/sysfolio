@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
-import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
+import { usePreferences } from "@/shared/store/preferences";
 
 import styles from "./OnboardingHints.module.css";
 

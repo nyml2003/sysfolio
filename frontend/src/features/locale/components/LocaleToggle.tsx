@@ -1,4 +1,4 @@
-import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
+import { usePreferences } from "@/shared/store/preferences";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 
 import styles from "./LocaleToggle.module.css";

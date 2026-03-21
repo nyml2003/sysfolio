@@ -6,7 +6,7 @@ import {
   type ContentRepository,
 } from "@/shared/data/repository";
 import { none, type Option, unwrapOr } from "@/shared/lib/monads/option";
-import { PreferencesProvider } from "@/shared/store/preferences/PreferencesProvider";
+import { PreferencesProvider } from "@/shared/store/preferences";
 
 type AppProvidersProps = {
   children: ReactNode;
