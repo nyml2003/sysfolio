@@ -1,0 +1,66 @@
+@layer primitives {
+  .m-tag {
+    @apply --u-row;
+    gap: var(--sys-space-4);
+    padding: var(--sys-space-4) var(--sys-space-10);
+    border: var(--sys-border-width-1) solid var(--sys-color-border-default);
+    border-radius: var(--sys-radius-pill);
+    background: var(--sys-color-panel-alt);
+    color: var(--sys-color-text-secondary);
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-12);
+    line-height: var(--sys-line-height-tight);
+  }
+
+  .m-tag--article {
+    background: var(--sys-color-accent-soft);
+    color: var(--sys-color-accent);
+  }
+
+  .m-tag--game {
+    background: var(--sys-color-warm-soft);
+    color: var(--sys-color-warm);
+  }
+
+  .m-tag--media {
+    background: var(--sys-color-info-soft);
+    color: var(--sys-color-info);
+  }
+
+  .m-badge {
+    @apply --u-row;
+    justify-content: center;
+    min-inline-size: 1.25rem;
+    min-block-size: 1.25rem;
+    padding-inline: var(--sys-space-6);
+    border-radius: var(--sys-radius-pill);
+    background: var(--sys-color-panel-strong);
+    color: var(--sys-color-text-primary);
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-11);
+    font-weight: var(--sys-font-weight-semibold);
+    line-height: 1;
+  }
+
+  .m-badge--accent {
+    background: var(--sys-color-accent);
+    color: var(--sys-color-text-inverse);
+  }
+
+  .m-avatar {
+    @apply --u-center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border-radius: 50%;
+    background: var(--sys-color-panel-strong);
+    color: var(--sys-color-text-primary);
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-12);
+    font-weight: var(--sys-font-weight-semibold);
+    line-height: 1;
+  }
+
+  .m-avatar--square {
+    border-radius: var(--sys-radius-8);
+  }
+}

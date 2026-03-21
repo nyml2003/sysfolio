@@ -6,22 +6,17 @@ import {
   useState,
   type RefObject,
 } from "react";
-import { animate, useMotionValue, useMotionValueEvent } from "motion/react";
 
 import type { ArticleDocument } from "@/entities/content";
 import { useContentRepository } from "@/shared/data/repository";
 
 import {
   TOC_ACTIVATION_LINE_RATIO,
-  TOC_TARGET_EPSILON,
-  getElementScrollTopWithinContainer,
-  getFirstTocHeadingId,
-  getTocActivationLine,
-  getTocHeadingElements,
-  hasScrollableTocContent,
-  isAtScrollBottom,
   type TocReadingState,
 } from "../model/toc-activation";
+import { useHeadingActivationObserver } from "./useHeadingActivationObserver";
+import { useHeadingLayout } from "./useHeadingLayout";
+import { useSmoothScroll } from "./useSmoothScroll";
 
 type UseArticleReadingOptions = {
   path: string;
@@ -37,21 +32,8 @@ type UseArticleReadingResult = {
 };
 
 const READING_PROGRESS_DEBOUNCE_MS = 180;
-const USER_SCROLL_INTENT_WINDOW_MS = 240;
-const PROGRAMMATIC_SCROLL_DURATION_S = 0.38;
+const USER_SCROLL_IDLE_MS = 140;
 const NAVIGATING_TIMEOUT_MS = 2_000;
-const SCROLL_SYNC_EPSILON = 1;
-
-function clampScrollTop(scrollContainer: HTMLElement, scrollTop: number): number {
-  return Math.max(
-    0,
-    Math.min(scrollTop, scrollContainer.scrollHeight - scrollContainer.clientHeight),
-  );
-}
-
-function getHeadingId(heading: HTMLElement): string {
-  return heading.dataset.tocId ?? "";
-}
 
 export function useArticleReading({
   path,
@@ -61,22 +43,25 @@ export function useArticleReading({
   const repository = useContentRepository();
   const [activeHeadingId, setActiveHeadingId] = useState("");
   const [restoreNoticeVisible, setRestoreNoticeVisible] = useState(false);
-  const scrollTopValue = useMotionValue(0);
+  const [tocState, setTocStateState] = useState<TocReadingState>("idle");
   const tocStateRef = useRef<TocReadingState>("idle");
+  const observedActiveHeadingIdRef = useRef("");
+  const bottomVisibleRef = useRef(false);
   const programmaticTargetIdRef = useRef("");
-  const programmaticScrollActiveRef = useRef(false);
-  const programmaticAnimationRef = useRef<{ stop: () => void } | null>(null);
-  const programmaticDomWriteRef = useRef(false);
-  const userScrollIntentAtRef = useRef(0);
   const saveTimeoutIdRef = useRef(0);
   const navigatingTimeoutIdRef = useRef(0);
-  const headingElementsRef = useRef<HTMLElement[]>([]);
-  const headingByIdRef = useRef<Map<string, HTMLElement>>(new Map());
-  const headingOffsetTopCacheRef = useRef<WeakMap<HTMLElement, number>>(new WeakMap());
-  const headingTargetScrollTopCacheRef = useRef<WeakMap<HTMLElement, number>>(new WeakMap());
+  const userScrollWatchFrameIdRef = useRef(0);
+  const lastObservedScrollTopRef = useRef(0);
+  const lastObservedScrollChangeAtRef = useRef(0);
+
+  const layout = useHeadingLayout({
+    enabled: document !== null,
+    scrollContainerRef,
+  });
 
   const setTocState = useEffectEvent((nextState: TocReadingState) => {
     tocStateRef.current = nextState;
+    setTocStateState((currentState) => (currentState === nextState ? currentState : nextState));
   });
 
   const setCurrentHeadingImmediate = useEffectEvent((headingId: string) => {
@@ -95,280 +80,200 @@ export function useArticleReading({
     });
   });
 
+  const clearSaveTimeout = useEffectEvent(() => {
+    window.clearTimeout(saveTimeoutIdRef.current);
+    saveTimeoutIdRef.current = 0;
+  });
+
   const clearNavigatingTimeout = useEffectEvent(() => {
     window.clearTimeout(navigatingTimeoutIdRef.current);
     navigatingTimeoutIdRef.current = 0;
   });
 
-  const stopProgrammaticScroll = useEffectEvent(() => {
-    clearNavigatingTimeout();
-    programmaticAnimationRef.current?.stop();
-    programmaticAnimationRef.current = null;
-    programmaticScrollActiveRef.current = false;
+  const stopUserScrollWatch = useEffectEvent(() => {
+    window.cancelAnimationFrame(userScrollWatchFrameIdRef.current);
+    userScrollWatchFrameIdRef.current = 0;
   });
 
-  const rebuildHeadingCache = useEffectEvent(() => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (scrollContainer === null) {
-      headingElementsRef.current = [];
-      headingByIdRef.current = new Map();
-      headingOffsetTopCacheRef.current = new WeakMap();
-      headingTargetScrollTopCacheRef.current = new WeakMap();
-      return;
-    }
-
-    const nextHeadingById = new Map<string, HTMLElement>();
-    const nextOffsetTopCache = new WeakMap<HTMLElement, number>();
-    const nextTargetScrollTopCache = new WeakMap<HTMLElement, number>();
-    const nextHeadings = getTocHeadingElements(scrollContainer).filter((heading) => {
-      return getHeadingId(heading) !== "";
-    });
-
-    for (const heading of nextHeadings) {
-      const headingId = getHeadingId(heading);
-      const offsetTop = getElementScrollTopWithinContainer(scrollContainer, heading);
-
-      nextHeadingById.set(headingId, heading);
-      nextOffsetTopCache.set(heading, offsetTop);
-      nextTargetScrollTopCache.set(
-        heading,
-        Math.max(0, offsetTop - scrollContainer.clientHeight * TOC_ACTIVATION_LINE_RATIO),
-      );
-    }
-
-    headingElementsRef.current = nextHeadings;
-    headingByIdRef.current = nextHeadingById;
-    headingOffsetTopCacheRef.current = nextOffsetTopCache;
-    headingTargetScrollTopCacheRef.current = nextTargetScrollTopCache;
-  });
-
-  const getHeadings = useEffectEvent(() => {
-    if (headingElementsRef.current.length === 0) {
-      rebuildHeadingCache();
-    }
-
-    return headingElementsRef.current;
-  });
-
-  const getHeadingElementById = useEffectEvent((headingId: string) => {
-    const heading = headingByIdRef.current.get(headingId) ?? null;
-
-    if (heading !== null) {
-      return heading;
-    }
-
-    rebuildHeadingCache();
-    return headingByIdRef.current.get(headingId) ?? null;
-  });
-
-  const getHeadingOffsetTop = useEffectEvent((heading: HTMLElement) => {
-    const cachedOffsetTop = headingOffsetTopCacheRef.current.get(heading);
-
-    if (cachedOffsetTop !== undefined) {
-      return cachedOffsetTop;
-    }
-
-    rebuildHeadingCache();
-    return headingOffsetTopCacheRef.current.get(heading) ?? 0;
-  });
-
-  const getHeadingTargetScrollTop = useEffectEvent((heading: HTMLElement) => {
-    const cachedTargetScrollTop = headingTargetScrollTopCacheRef.current.get(heading);
-
-    if (cachedTargetScrollTop !== undefined) {
-      return cachedTargetScrollTop;
-    }
-
-    rebuildHeadingCache();
-    return headingTargetScrollTopCacheRef.current.get(heading) ?? 0;
-  });
-
-  const getFirstHeadingId = useEffectEvent(() => getFirstTocHeadingId(getHeadings()));
-
-  const getReadingHeadingId = useEffectEvent(() => {
-    const scrollContainer = scrollContainerRef.current;
-    const headings = getHeadings();
-
-    if (scrollContainer === null || headings.length === 0) {
-      return "";
-    }
-
-    if (isAtScrollBottom(scrollContainer)) {
-      return getHeadingId(headings.at(-1) ?? headings[0]);
-    }
-
-    const activationLine = getTocActivationLine(scrollContainer);
-    let currentHeading = headings[0];
-
-    for (const heading of headings) {
-      if (getHeadingOffsetTop(heading) <= activationLine) {
-        currentHeading = heading;
-        continue;
+  const {
+    cancel: cancelSmoothScroll,
+    isProgrammaticScrolling,
+    scrollTo: smoothScrollTo,
+  } = useSmoothScroll({
+    onUserInteraction: () => {
+      if (document === null || !layout.hasScrollableContent()) {
+        return;
       }
 
-      break;
-    }
+      clearNavigatingTimeout();
 
-    return getHeadingId(currentHeading);
+      if (
+        tocStateRef.current === "initial" ||
+        tocStateRef.current === "navigating"
+      ) {
+        setTocState("reading");
+        setCurrentHeadingImmediate(
+          observedActiveHeadingIdRef.current ||
+            layout.getHeadingIdForCurrentScrollPosition() ||
+            layout.getFirstHeadingId(),
+        );
+      }
+
+      const scrollContainer = scrollContainerRef.current;
+
+      if (scrollContainer === null) {
+        return;
+      }
+
+      lastObservedScrollTopRef.current = scrollContainer.scrollTop;
+      lastObservedScrollChangeAtRef.current = performance.now();
+
+      if (userScrollWatchFrameIdRef.current !== 0) {
+        return;
+      }
+
+      const watchUserScroll = () => {
+        const nextScrollContainer = scrollContainerRef.current;
+
+        if (nextScrollContainer === null) {
+          stopUserScrollWatch();
+          return;
+        }
+
+        const currentScrollTop = nextScrollContainer.scrollTop;
+
+        if (Math.abs(currentScrollTop - lastObservedScrollTopRef.current) > 0.5) {
+          lastObservedScrollTopRef.current = currentScrollTop;
+          lastObservedScrollChangeAtRef.current = performance.now();
+
+          if (
+            tocStateRef.current === "initial" ||
+            tocStateRef.current === "navigating"
+          ) {
+            setTocState("reading");
+            setCurrentHeadingImmediate(
+              observedActiveHeadingIdRef.current ||
+                layout.getHeadingIdForCurrentScrollPosition() ||
+                layout.getFirstHeadingId(),
+            );
+          }
+        }
+
+        if (performance.now() - lastObservedScrollChangeAtRef.current >= USER_SCROLL_IDLE_MS) {
+          stopUserScrollWatch();
+          clearSaveTimeout();
+          saveTimeoutIdRef.current = window.setTimeout(() => {
+            const stableScrollContainer = scrollContainerRef.current;
+
+            if (stableScrollContainer === null) {
+              return;
+            }
+
+            void repository.saveReadingProgress(path, {
+              scrollTop: stableScrollContainer.scrollTop,
+              updatedAt: new Date().toISOString(),
+            });
+          }, READING_PROGRESS_DEBOUNCE_MS);
+          return;
+        }
+
+        userScrollWatchFrameIdRef.current = window.requestAnimationFrame(watchUserScroll);
+      };
+
+      userScrollWatchFrameIdRef.current = window.requestAnimationFrame(watchUserScroll);
+    },
+    scrollContainerRef,
   });
 
-  const isTargetReached = useEffectEvent((heading: HTMLElement) => {
-    const scrollContainer = scrollContainerRef.current;
+  const syncReadingHeading = useEffectEvent(() => {
+    const lastHeadingId = layout.getLastHeadingId();
 
-    if (scrollContainer === null) {
-      return true;
+    if (bottomVisibleRef.current && lastHeadingId !== "") {
+      setCurrentHeadingImmediate(lastHeadingId);
+      return;
     }
 
-    return (
-      Math.abs(scrollContainer.scrollTop - getHeadingTargetScrollTop(heading)) <=
-        TOC_TARGET_EPSILON || isAtScrollBottom(scrollContainer)
+    const observedHeadingId = observedActiveHeadingIdRef.current;
+
+    if (observedHeadingId !== "") {
+      setCurrentHeadingImmediate(observedHeadingId);
+      return;
+    }
+
+    setCurrentHeadingImmediate(
+      layout.getHeadingIdForCurrentScrollPosition() || layout.getFirstHeadingId(),
     );
-  });
-
-  const markUserScrollIntent = useEffectEvent(() => {
-    userScrollIntentAtRef.current = performance.now();
-
-    if (programmaticScrollActiveRef.current) {
-      stopProgrammaticScroll();
-    }
-  });
-
-  const hasRecentUserScrollIntent = useEffectEvent(() => {
-    return performance.now() - userScrollIntentAtRef.current <= USER_SCROLL_INTENT_WINDOW_MS;
-  });
-
-  const shouldEnterReadingFromInitial = useEffectEvent(() => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (scrollContainer === null) {
-      return false;
-    }
-
-    return hasRecentUserScrollIntent() || scrollContainer.scrollTop > 0;
-  });
-
-  const shouldEnterReadingFromNavigation = useEffectEvent(() => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (scrollContainer === null) {
-      return false;
-    }
-
-    if (hasRecentUserScrollIntent()) {
-      return true;
-    }
-
-    const targetHeadingId = programmaticTargetIdRef.current;
-
-    if (targetHeadingId === "") {
-      return false;
-    }
-
-    const targetHeading = getHeadingElementById(targetHeadingId);
-
-    return targetHeading !== null && !isTargetReached(targetHeading);
-  });
-
-  const scheduleReadingProgressSave = useEffectEvent(() => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (document === null || scrollContainer === null) {
-      return;
-    }
-
-    window.clearTimeout(saveTimeoutIdRef.current);
-    saveTimeoutIdRef.current = window.setTimeout(() => {
-      void repository.saveReadingProgress(path, {
-        scrollTop: scrollContainer.scrollTop,
-        updatedAt: new Date().toISOString(),
-      });
-    }, READING_PROGRESS_DEBOUNCE_MS);
-  });
-
-  const enterReadingState = useEffectEvent(() => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (document === null || scrollContainer === null) {
-      return;
-    }
-
-    if (!hasScrollableTocContent(scrollContainer)) {
-      setTocState("short_content");
-      setCurrentHeadingDeferred(getFirstHeadingId());
-      return;
-    }
-
-    setTocState("reading");
-    setCurrentHeadingImmediate(getReadingHeadingId());
   });
 
   const scheduleNavigatingTimeout = useEffectEvent(() => {
     clearNavigatingTimeout();
     navigatingTimeoutIdRef.current = window.setTimeout(() => {
-      if (tocStateRef.current !== "navigating" || !programmaticScrollActiveRef.current) {
+      if (tocStateRef.current !== "navigating") {
         return;
       }
 
-      stopProgrammaticScroll();
-      enterReadingState();
+      cancelSmoothScroll();
+      setTocState("reading");
+      syncReadingHeading();
     }, NAVIGATING_TIMEOUT_MS);
   });
 
-  const resetTocState = useEffectEvent(() => {
-    stopProgrammaticScroll();
-    window.clearTimeout(saveTimeoutIdRef.current);
+  const enterNavigatingState = useEffectEvent((headingId: string) => {
+    programmaticTargetIdRef.current = headingId;
+    setTocState("navigating");
+    setCurrentHeadingDeferred(headingId);
+    scheduleNavigatingTimeout();
+  });
+
+  const resetReadingState = useEffectEvent(() => {
+    clearSaveTimeout();
+    clearNavigatingTimeout();
+    stopUserScrollWatch();
+    cancelSmoothScroll();
+    observedActiveHeadingIdRef.current = "";
+    bottomVisibleRef.current = false;
     programmaticTargetIdRef.current = "";
-    userScrollIntentAtRef.current = 0;
-    headingElementsRef.current = [];
-    headingByIdRef.current = new Map();
-    headingOffsetTopCacheRef.current = new WeakMap();
-    headingTargetScrollTopCacheRef.current = new WeakMap();
     setTocState("idle");
     setRestoreNotice(false);
     setCurrentHeadingDeferred("");
   });
 
-  const reconcileLayoutState = useEffectEvent(() => {
-    const scrollContainer = scrollContainerRef.current;
+  useHeadingActivationObserver({
+    activationLineRatio: TOC_ACTIVATION_LINE_RATIO,
+    disabled:
+      document === null || tocState !== "reading" || isProgrammaticScrolling,
+    getBottomSentinel: () => layout.getBottomSentinel(),
+    getHeadings: () => layout.getHeadingMetrics().map((metric) => metric.element),
+    layoutVersion: layout.layoutVersion,
+    onActiveHeadingChange: (headingId) => {
+      observedActiveHeadingIdRef.current = headingId;
 
-    if (document === null || scrollContainer === null) {
-      return;
-    }
+      if (tocStateRef.current !== "reading" || bottomVisibleRef.current) {
+        return;
+      }
 
-    rebuildHeadingCache();
+      setCurrentHeadingImmediate(headingId);
+    },
+    onBottomVisibilityChange: (visible) => {
+      bottomVisibleRef.current = visible;
 
-    const firstHeadingId = getFirstHeadingId();
+      if (tocStateRef.current !== "reading") {
+        return;
+      }
 
-    if (firstHeadingId === "") {
-      return;
-    }
+      if (visible) {
+        const lastHeadingId = layout.getLastHeadingId();
 
-    if (!hasScrollableTocContent(scrollContainer)) {
-      stopProgrammaticScroll();
-      programmaticTargetIdRef.current = "";
-      setTocState("short_content");
-      setCurrentHeadingDeferred(firstHeadingId);
-      return;
-    }
+        if (lastHeadingId !== "") {
+          setCurrentHeadingImmediate(lastHeadingId);
+        }
 
-    if (tocStateRef.current === "short_content" || tocStateRef.current === "idle") {
-      setTocState("initial");
-      setCurrentHeadingDeferred(firstHeadingId);
-      return;
-    }
+        return;
+      }
 
-    if (tocStateRef.current === "initial") {
-      setCurrentHeadingDeferred(firstHeadingId);
-      return;
-    }
-
-    if (tocStateRef.current === "navigating") {
-      setCurrentHeadingDeferred(programmaticTargetIdRef.current || firstHeadingId);
-      return;
-    }
-
-    setCurrentHeadingDeferred(getReadingHeadingId());
+      syncReadingHeading();
+    },
+    scrollContainerRef,
   });
 
   const applyEntryState = useEffectEvent((requestedScrollTop: number) => {
@@ -378,9 +283,9 @@ export function useArticleReading({
       return;
     }
 
-    rebuildHeadingCache();
+    layout.refreshLayout();
 
-    const firstHeadingId = getFirstHeadingId();
+    const firstHeadingId = layout.getFirstHeadingId();
 
     if (firstHeadingId === "") {
       setTocState("idle");
@@ -388,8 +293,7 @@ export function useArticleReading({
       return;
     }
 
-    if (!hasScrollableTocContent(scrollContainer)) {
-      stopProgrammaticScroll();
+    if (!layout.hasScrollableContent()) {
       scrollContainer.scrollTop = 0;
       programmaticTargetIdRef.current = "";
       setTocState("short_content");
@@ -397,114 +301,19 @@ export function useArticleReading({
       return;
     }
 
-    const nextScrollTop = clampScrollTop(scrollContainer, requestedScrollTop);
+    if (requestedScrollTop > 0) {
+      scrollContainer.scrollTop = requestedScrollTop;
+      const restoredHeadingId =
+        layout.getHeadingIdForCurrentScrollPosition() || firstHeadingId;
 
-    if (nextScrollTop > 0) {
-      stopProgrammaticScroll();
-      scrollContainer.scrollTop = nextScrollTop;
-      programmaticTargetIdRef.current = getReadingHeadingId();
-      setTocState("navigating");
-      setCurrentHeadingDeferred(programmaticTargetIdRef.current);
+      observedActiveHeadingIdRef.current = restoredHeadingId;
+      enterNavigatingState(restoredHeadingId);
       return;
     }
 
     programmaticTargetIdRef.current = "";
-    stopProgrammaticScroll();
     setTocState("initial");
     setCurrentHeadingDeferred(firstHeadingId);
-  });
-
-  const syncProgrammaticScroll = useEffectEvent((latest: number) => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (scrollContainer === null) {
-      return;
-    }
-
-    const nextScrollTop = clampScrollTop(scrollContainer, latest);
-
-    if (Math.abs(scrollContainer.scrollTop - nextScrollTop) <= SCROLL_SYNC_EPSILON) {
-      return;
-    }
-
-    programmaticDomWriteRef.current = true;
-    scrollContainer.scrollTop = nextScrollTop;
-  });
-
-  const startProgrammaticScroll = useEffectEvent((targetScrollTop: number) => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (document === null || scrollContainer === null) {
-      return;
-    }
-
-    stopProgrammaticScroll();
-
-    const nextScrollTop = clampScrollTop(scrollContainer, targetScrollTop);
-
-    scrollTopValue.jump(scrollContainer.scrollTop);
-
-    if (Math.abs(nextScrollTop - scrollContainer.scrollTop) <= SCROLL_SYNC_EPSILON) {
-      syncProgrammaticScroll(nextScrollTop);
-      return;
-    }
-
-    programmaticScrollActiveRef.current = true;
-    scheduleNavigatingTimeout();
-    programmaticAnimationRef.current = animate(scrollTopValue, nextScrollTop, {
-      duration: PROGRAMMATIC_SCROLL_DURATION_S,
-      ease: [0.22, 1, 0.36, 1],
-    });
-  });
-
-  const handleReadingScroll = useEffectEvent(() => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (document === null || scrollContainer === null) {
-      return;
-    }
-
-    const firstHeadingId = getFirstHeadingId();
-
-    if (firstHeadingId === "") {
-      return;
-    }
-
-    if (programmaticScrollActiveRef.current) {
-      return;
-    }
-
-    if (!hasScrollableTocContent(scrollContainer)) {
-      if (tocStateRef.current !== "short_content") {
-        setTocState("short_content");
-      }
-
-      setCurrentHeadingImmediate(firstHeadingId);
-      scheduleReadingProgressSave();
-      return;
-    }
-
-    if (
-      tocStateRef.current === "navigating" &&
-      shouldEnterReadingFromNavigation()
-    ) {
-      setTocState("reading");
-      setCurrentHeadingImmediate(getReadingHeadingId());
-      scheduleReadingProgressSave();
-      return;
-    }
-
-    if (tocStateRef.current === "initial" && shouldEnterReadingFromInitial()) {
-      setTocState("reading");
-      setCurrentHeadingImmediate(getReadingHeadingId());
-      scheduleReadingProgressSave();
-      return;
-    }
-
-    if (tocStateRef.current === "reading") {
-      setCurrentHeadingImmediate(getReadingHeadingId());
-      scheduleReadingProgressSave();
-    }
   });
 
   const handleScrollToHeading = useEffectEvent((headingId: string) => {
@@ -514,26 +323,26 @@ export function useArticleReading({
       return;
     }
 
-    rebuildHeadingCache();
+    layout.refreshLayout();
 
-    const heading = getHeadingElementById(headingId);
+    const firstHeadingId = layout.getFirstHeadingId();
+    const heading = layout.getHeadingById(headingId);
 
-    if (heading === null) {
+    if (firstHeadingId === "" || heading === null) {
       return;
     }
 
-    if (!hasScrollableTocContent(scrollContainer) || tocStateRef.current === "short_content") {
-      stopProgrammaticScroll();
+    if (!layout.hasScrollableContent() || tocStateRef.current === "short_content") {
+      scrollContainer.scrollTop = layout.getHeadingTargetScrollTop(headingId);
       setTocState("short_content");
-      setCurrentHeadingDeferred(getFirstHeadingId());
-      scrollContainer.scrollTop = getHeadingTargetScrollTop(heading);
+      setCurrentHeadingDeferred(firstHeadingId);
       return;
     }
 
-    programmaticTargetIdRef.current = headingId;
-    setTocState("navigating");
-    setCurrentHeadingImmediate(headingId);
-    startProgrammaticScroll(getHeadingTargetScrollTop(heading));
+    observedActiveHeadingIdRef.current = "";
+    bottomVisibleRef.current = false;
+    enterNavigatingState(headingId);
+    smoothScrollTo(layout.getHeadingTargetScrollTop(headingId));
   });
 
   const handleScrollToTop = useEffectEvent(() => {
@@ -543,43 +352,27 @@ export function useArticleReading({
       return;
     }
 
-    rebuildHeadingCache();
+    layout.refreshLayout();
 
-    const firstHeadingId = getFirstHeadingId();
-    const isScrollable = hasScrollableTocContent(scrollContainer);
+    const firstHeadingId = layout.getFirstHeadingId();
 
-    programmaticTargetIdRef.current = firstHeadingId;
-    setTocState(isScrollable ? "navigating" : "short_content");
-    setCurrentHeadingDeferred(firstHeadingId);
+    if (firstHeadingId === "") {
+      return;
+    }
+
     setRestoreNotice(false);
 
-    if (!isScrollable) {
-      stopProgrammaticScroll();
+    if (!layout.hasScrollableContent()) {
       scrollContainer.scrollTop = 0;
+      setTocState("short_content");
+      setCurrentHeadingDeferred(firstHeadingId);
       return;
     }
 
-    startProgrammaticScroll(0);
-  });
-
-  useMotionValueEvent(scrollTopValue, "change", (latest) => {
-    if (!programmaticScrollActiveRef.current) {
-      return;
-    }
-
-    syncProgrammaticScroll(latest);
-  });
-
-  useMotionValueEvent(scrollTopValue, "animationComplete", () => {
-    clearNavigatingTimeout();
-    programmaticAnimationRef.current = null;
-    programmaticScrollActiveRef.current = false;
-  });
-
-  useMotionValueEvent(scrollTopValue, "animationCancel", () => {
-    clearNavigatingTimeout();
-    programmaticAnimationRef.current = null;
-    programmaticScrollActiveRef.current = false;
+    observedActiveHeadingIdRef.current = "";
+    bottomVisibleRef.current = false;
+    enterNavigatingState(firstHeadingId);
+    smoothScrollTo(0);
   });
 
   useEffect(() => {
@@ -587,7 +380,7 @@ export function useArticleReading({
     let frameId = 0;
 
     if (document === null) {
-      resetTocState();
+      resetReadingState();
       return undefined;
     }
 
@@ -598,7 +391,7 @@ export function useArticleReading({
         return;
       }
 
-      const nextScrollTop =
+      const restoredScrollTop =
         progressResource.tag === "ready" &&
         progressResource.value.tag === "some" &&
         progressResource.value.value.scrollTop > 0
@@ -610,9 +403,8 @@ export function useArticleReading({
           return;
         }
 
-        rebuildHeadingCache();
-        setRestoreNotice(nextScrollTop > 0);
-        applyEntryState(nextScrollTop);
+        setRestoreNotice(restoredScrollTop > 0);
+        applyEntryState(restoredScrollTop);
       });
     };
 
@@ -620,79 +412,12 @@ export function useArticleReading({
 
     return () => {
       cancelled = true;
-      stopProgrammaticScroll();
       window.cancelAnimationFrame(frameId);
-      window.clearTimeout(saveTimeoutIdRef.current);
+      resetReadingState();
     };
     // Effect Events are intentionally non-reactive here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [document, path, repository]);
-
-  useEffect(() => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (document === null || scrollContainer === null) {
-      return undefined;
-    }
-
-    rebuildHeadingCache();
-
-    const handleKeyboardIntent = (event: KeyboardEvent) => {
-      if (
-        event.key === "ArrowDown" ||
-        event.key === "ArrowUp" ||
-        event.key === "PageDown" ||
-        event.key === "PageUp" ||
-        event.key === "Home" ||
-        event.key === "End" ||
-        event.key === " "
-      ) {
-        markUserScrollIntent();
-      }
-    };
-
-    const handleNativeScroll = () => {
-      if (programmaticDomWriteRef.current) {
-        programmaticDomWriteRef.current = false;
-        return;
-      }
-
-      handleReadingScroll();
-    };
-
-    const resizeObserver = new ResizeObserver(() => {
-      rebuildHeadingCache();
-      reconcileLayoutState();
-    });
-    const articleBody = scrollContainer.querySelector<HTMLElement>("[data-article-body]");
-
-    resizeObserver.observe(scrollContainer);
-
-    if (articleBody !== null) {
-      resizeObserver.observe(articleBody);
-    }
-
-    scrollContainer.addEventListener("scroll", handleNativeScroll, { passive: true });
-    scrollContainer.addEventListener("wheel", markUserScrollIntent, { passive: true });
-    scrollContainer.addEventListener("touchstart", markUserScrollIntent, {
-      passive: true,
-    });
-    scrollContainer.addEventListener("pointerdown", markUserScrollIntent, {
-      passive: true,
-    });
-    window.addEventListener("keydown", handleKeyboardIntent);
-
-    return () => {
-      resizeObserver.disconnect();
-      scrollContainer.removeEventListener("scroll", handleNativeScroll);
-      scrollContainer.removeEventListener("wheel", markUserScrollIntent);
-      scrollContainer.removeEventListener("touchstart", markUserScrollIntent);
-      scrollContainer.removeEventListener("pointerdown", markUserScrollIntent);
-      window.removeEventListener("keydown", handleKeyboardIntent);
-    };
-    // Effect Events are intentionally non-reactive here.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [document, scrollContainerRef]);
 
   return {
     activeHeadingId,

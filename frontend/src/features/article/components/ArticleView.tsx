@@ -88,6 +88,11 @@ export function ArticleView({
               ))}
             </section>
           ))}
+          <div
+            aria-hidden="true"
+            className={styles.bottomSentinel}
+            data-toc-bottom-sentinel=""
+          />
         </div>
       </div>
     </article>

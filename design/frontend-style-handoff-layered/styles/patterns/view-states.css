@@ -1,0 +1,84 @@
+@layer patterns {
+  .m-loading-state {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sys-space-16);
+    padding: var(--sys-space-24);
+    border: var(--sys-border-width-1) solid var(--sys-color-border-default);
+    border-radius: var(--sys-radius-16);
+    background: var(--sys-color-panel);
+  }
+
+  .m-loading-state__header,
+  .m-loading-state__body,
+  .m-loading-state__footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sys-space-12);
+  }
+
+  .m-empty-state {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sys-space-16);
+    padding: var(--sys-space-32);
+    border: var(--sys-border-width-1) solid var(--sys-color-border-default);
+    border-radius: var(--sys-radius-16);
+    background: var(--sys-color-panel);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-empty-state__title {
+    margin: 0;
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-24);
+    font-weight: var(--sys-font-weight-semibold);
+  }
+
+  .m-empty-state__body {
+    max-inline-size: var(--sys-layout-reading-measure);
+    color: var(--sys-color-text-secondary);
+    font-family: var(--sys-font-body);
+    font-size: var(--sys-font-size-14);
+    line-height: var(--sys-line-height-body);
+  }
+
+  .m-empty-state__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sys-space-12);
+  }
+
+  .m-error-state {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sys-space-16);
+    padding: var(--sys-space-24);
+    border: var(--sys-border-width-1) solid var(--sys-color-danger);
+    border-radius: var(--sys-radius-16);
+    background: var(--sys-color-danger-soft);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-error-state__title {
+    margin: 0;
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-24);
+    font-weight: var(--sys-font-weight-semibold);
+    line-height: 1.15;
+  }
+
+  .m-error-state__body {
+    max-inline-size: var(--sys-layout-reading-measure);
+    color: var(--sys-color-text-secondary);
+    font-family: var(--sys-font-body);
+    font-size: var(--sys-font-size-14);
+    line-height: var(--sys-line-height-body);
+  }
+
+  .m-error-state__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sys-space-12);
+  }
+}

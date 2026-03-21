@@ -1,0 +1,94 @@
+@layer patterns {
+  .m-shell {
+    min-block-size: 100vh;
+    display: grid;
+    grid-template-rows: var(--sys-layout-pathbar-height) minmax(0, 1fr);
+    background: var(--sys-color-canvas);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-shell__body {
+    min-block-size: 0;
+    display: grid;
+    grid-template-columns:
+      var(--sys-layout-left-rail)
+      minmax(0, 1fr)
+      var(--sys-layout-right-rail);
+  }
+
+  .m-shell__left,
+  .m-shell__main,
+  .m-shell__right {
+    min-inline-size: 0;
+    min-block-size: 0;
+  }
+
+  .m-shell__left {
+    background: var(--sys-color-panel-alt);
+    border-inline-end: var(--sys-border-width-1) solid
+      var(--sys-color-border-default);
+    overflow: auto;
+  }
+
+  .m-shell__main {
+    display: flex;
+    justify-content: center;
+    overflow: auto;
+    background: var(--sys-color-canvas);
+  }
+
+  .m-shell__right {
+    background: var(--sys-color-panel);
+    border-inline-start: var(--sys-border-width-1) solid
+      var(--sys-color-border-default);
+    overflow: auto;
+  }
+
+  .m-content-pane,
+  .m-reading-pane {
+    inline-size: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .m-content-pane__inner,
+  .m-reading-pane__inner {
+    inline-size: min(100%, var(--sys-layout-reading-max));
+    min-inline-size: 0;
+    padding:
+      var(--sys-layout-content-pad-block-start)
+      var(--sys-layout-content-pad-inline)
+      var(--sys-layout-content-pad-block-end);
+  }
+
+  @media (width <= 1120px) {
+    .m-shell__body {
+      grid-template-columns: minmax(15rem, var(--sys-layout-left-rail)) minmax(
+          0,
+          1fr
+        );
+    }
+
+    .m-shell__right {
+      display: none;
+    }
+  }
+
+  @media (width <= 800px) {
+    .m-shell__body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .m-shell__left {
+      display: none;
+    }
+
+    .m-content-pane__inner,
+    .m-reading-pane__inner {
+      padding:
+        var(--sys-layout-content-pad-block-start-compact)
+        var(--sys-layout-content-pad-inline-compact)
+        var(--sys-layout-content-pad-block-end-compact);
+    }
+  }
+}

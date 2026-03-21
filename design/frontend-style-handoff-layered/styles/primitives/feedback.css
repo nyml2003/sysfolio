@@ -1,0 +1,108 @@
+@layer primitives {
+  @keyframes m-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes m-skeleton-shift {
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  .m-spinner {
+    inline-size: 1rem;
+    block-size: 1rem;
+    border: 2px solid var(--sys-color-border-default);
+    border-top-color: var(--sys-color-accent);
+    border-radius: 50%;
+    animation: m-spin 0.8s linear infinite;
+  }
+
+  .m-skeleton-block {
+    display: block;
+    min-block-size: 1rem;
+    border-radius: var(--sys-radius-8);
+    background:
+      linear-gradient(
+        90deg,
+        var(--sys-color-panel-strong) 0%,
+        var(--sys-color-panel) 48%,
+        var(--sys-color-panel-strong) 100%
+      );
+    background-size: 200% 100%;
+    animation: m-skeleton-shift 1.6s var(--sys-ease-standard) infinite;
+  }
+
+  .m-inline-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sys-space-8);
+    padding: var(--sys-space-10) var(--sys-space-12);
+    border: var(--sys-border-width-1) solid var(--sys-color-border-default);
+    border-radius: var(--sys-radius-8);
+    background: var(--sys-color-panel);
+    color: var(--sys-color-text-secondary);
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-13);
+    line-height: var(--sys-line-height-ui);
+  }
+
+  .m-inline-notice--error {
+    border-color: var(--sys-color-danger);
+    background: var(--sys-color-danger-soft);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-inline-notice--info {
+    border-color: var(--sys-color-info);
+    background: var(--sys-color-info-soft);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-inline-notice--success {
+    border-color: var(--sys-color-success);
+    background: var(--sys-color-success-soft);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-progress {
+    inline-size: 100%;
+    block-size: 0.5rem;
+    overflow: hidden;
+    border-radius: var(--sys-radius-pill);
+    background: var(--sys-color-panel-strong);
+  }
+
+  .m-progress__bar {
+    inline-size: var(--m-progress-value, 0%);
+    block-size: 100%;
+    border-radius: inherit;
+    background: var(--sys-color-accent);
+    @apply --u-tr-base;
+  }
+
+  .m-progress--success .m-progress__bar {
+    background: var(--sys-color-success);
+  }
+
+  .m-progress--danger .m-progress__bar {
+    background: var(--sys-color-danger);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .m-spinner,
+    .m-skeleton-block {
+      animation: none;
+    }
+
+    .m-progress__bar {
+      transition-duration: 0.01ms;
+    }
+  }
+}

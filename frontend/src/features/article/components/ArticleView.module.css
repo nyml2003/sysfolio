@@ -110,6 +110,11 @@
     font-size: var(--sys-font-size-16);
   }
 
+  .bottomSentinel {
+    block-size: 1px;
+    inline-size: 100%;
+  }
+
   @media (width <= 800px) {
     .inner {
       padding:

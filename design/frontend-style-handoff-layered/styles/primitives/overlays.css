@@ -1,0 +1,30 @@
+@layer primitives {
+  .m-surface-popover {
+    max-inline-size: 20rem;
+    padding: var(--sys-space-12) var(--sys-space-16);
+    border: var(--sys-border-width-1) solid var(--sys-color-border-default);
+    border-radius: var(--sys-radius-12);
+    background: var(--sys-color-panel);
+    box-shadow: var(--sys-shadow-soft);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-footnote-popover {
+    @apply --m-surface-popover;
+    font-family: var(--sys-font-body);
+    font-size: var(--sys-font-size-14);
+    line-height: var(--sys-line-height-body);
+  }
+
+  .m-tooltip {
+    max-inline-size: 16rem;
+    padding: var(--sys-space-8) var(--sys-space-10);
+    border-radius: var(--sys-radius-8);
+    background: var(--sys-color-text-primary);
+    color: var(--sys-color-text-inverse);
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-12);
+    line-height: var(--sys-line-height-ui);
+    box-shadow: var(--sys-shadow-panel);
+  }
+}

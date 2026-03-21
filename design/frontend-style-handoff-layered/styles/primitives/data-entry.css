@@ -1,0 +1,268 @@
+@layer primitives {
+  .m-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sys-space-8);
+  }
+
+  .m-field__label {
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-13);
+    font-weight: var(--sys-font-weight-medium);
+    line-height: var(--sys-line-height-ui);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-field__hint,
+  .m-field__message {
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-12);
+    line-height: var(--sys-line-height-ui);
+    color: var(--sys-color-text-muted);
+  }
+
+  .m-field__message--error {
+    color: var(--sys-color-danger);
+  }
+
+  .m-input,
+  .m-textarea,
+  .m-select-trigger {
+    inline-size: 100%;
+    min-inline-size: 0;
+    min-block-size: 2.5rem;
+    padding: var(--sys-space-10) var(--sys-space-12);
+    border: var(--sys-border-width-1) solid var(--sys-color-border-default);
+    border-radius: var(--sys-radius-8);
+    background: var(--sys-color-panel);
+    color: var(--sys-color-text-primary);
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-13);
+    line-height: var(--sys-line-height-ui);
+    @apply --u-tr-fast;
+  }
+
+  .m-textarea {
+    min-block-size: 6.5rem;
+    resize: vertical;
+  }
+
+  .m-input::placeholder,
+  .m-textarea::placeholder,
+  .m-select-trigger[data-placeholder="true"] {
+    color: var(--sys-color-text-faint);
+  }
+
+  .m-input:focus,
+  .m-textarea:focus {
+    outline: none;
+  }
+
+  .m-input:focus-visible,
+  .m-textarea:focus-visible,
+  .m-select-trigger:focus-visible {
+    @apply --u-focus;
+  }
+
+  .m-input.is-invalid,
+  .m-textarea.is-invalid,
+  .m-select-trigger.is-invalid {
+    border-color: var(--sys-color-danger);
+  }
+
+  .m-input:disabled,
+  .m-textarea:disabled,
+  .m-select-trigger.is-disabled,
+  .m-select-trigger[aria-disabled="true"] {
+    opacity: 0.64;
+    cursor: default;
+  }
+
+  .m-checkbox,
+  .m-radio {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--sys-space-8);
+    color: var(--sys-color-text-secondary);
+    cursor: pointer;
+    @apply --u-tr-fast;
+  }
+
+  .m-checkbox__control,
+  .m-radio__control {
+    position: relative;
+    flex: 0 0 auto;
+    inline-size: 1rem;
+    block-size: 1rem;
+    margin-block-start: 0.15rem;
+    border: var(--sys-border-width-1) solid var(--sys-color-border-strong);
+    background: var(--sys-color-panel);
+    @apply --u-tr-fast;
+  }
+
+  .m-checkbox__control {
+    border-radius: var(--sys-radius-4);
+  }
+
+  .m-radio__control {
+    border-radius: 50%;
+  }
+
+  .m-checkbox__control::after,
+  .m-radio__control::after {
+    content: "";
+    position: absolute;
+    inset: 50%;
+    opacity: 0;
+    @apply --u-tr-fast;
+  }
+
+  .m-checkbox__control::after {
+    inline-size: 0.35rem;
+    block-size: 0.65rem;
+    border-inline-end: 2px solid var(--sys-color-text-inverse);
+    border-block-end: 2px solid var(--sys-color-text-inverse);
+    transform: translate(-50%, -60%) rotate(45deg);
+  }
+
+  .m-radio__control::after {
+    inline-size: 0.45rem;
+    block-size: 0.45rem;
+    border-radius: 50%;
+    background: var(--sys-color-text-inverse);
+    transform: translate(-50%, -50%);
+  }
+
+  .m-checkbox__label,
+  .m-radio__label {
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-13);
+    line-height: var(--sys-line-height-ui);
+  }
+
+  .m-checkbox.is-checked .m-checkbox__control,
+  .m-checkbox[aria-checked="true"] .m-checkbox__control,
+  .m-radio.is-checked .m-radio__control,
+  .m-radio[aria-checked="true"] .m-radio__control {
+    border-color: var(--sys-color-accent);
+    background: var(--sys-color-accent);
+  }
+
+  .m-checkbox.is-checked .m-checkbox__control::after,
+  .m-checkbox[aria-checked="true"] .m-checkbox__control::after,
+  .m-radio.is-checked .m-radio__control::after,
+  .m-radio[aria-checked="true"] .m-radio__control::after {
+    opacity: 1;
+  }
+
+  .m-checkbox.is-disabled,
+  .m-checkbox[aria-disabled="true"],
+  .m-radio.is-disabled,
+  .m-radio[aria-disabled="true"] {
+    opacity: 0.56;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .m-switch {
+    position: relative;
+    inline-size: 2.5rem;
+    block-size: 1.5rem;
+    border: 0;
+    border-radius: var(--sys-radius-pill);
+    background: var(--sys-color-border-strong);
+    cursor: pointer;
+    @apply --u-tr-base;
+  }
+
+  .m-switch::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 2px;
+    inset-inline-start: 2px;
+    inline-size: calc(1.5rem - 4px);
+    block-size: calc(1.5rem - 4px);
+    border-radius: 50%;
+    background: var(--sys-color-text-inverse);
+    @apply --u-tr-base;
+  }
+
+  .m-switch.is-checked,
+  .m-switch[aria-checked="true"] {
+    background: var(--sys-color-accent);
+  }
+
+  .m-switch.is-checked::after,
+  .m-switch[aria-checked="true"]::after {
+    inset-inline-start: calc(100% - (1.5rem - 2px));
+  }
+
+  .m-switch:focus-visible {
+    @apply --u-focus;
+  }
+
+  .m-switch.is-disabled,
+  .m-switch[aria-disabled="true"] {
+    opacity: 0.56;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .m-input:hover,
+    .m-textarea:hover,
+    .m-select-trigger:hover,
+    .m-checkbox:hover .m-checkbox__control,
+    .m-radio:hover .m-radio__control,
+    .m-switch:hover {
+      border-color: var(--sys-color-border-strong);
+      background: var(--sys-color-surface-hover);
+    }
+
+    .m-switch.is-checked:hover,
+    .m-switch[aria-checked="true"]:hover {
+      background: var(--sys-color-accent-hover);
+    }
+  }
+
+  @media (pointer: coarse) {
+    .m-input,
+    .m-textarea,
+    .m-select-trigger {
+      min-block-size: var(--sys-size-hit-target-comfortable);
+    }
+
+    .m-checkbox,
+    .m-radio {
+      min-block-size: var(--sys-size-hit-target-comfortable);
+      align-items: center;
+    }
+
+    .m-switch {
+      inline-size: 2.875rem;
+      block-size: 1.75rem;
+    }
+
+    .m-switch::after {
+      inline-size: calc(1.75rem - 4px);
+      block-size: calc(1.75rem - 4px);
+    }
+
+    .m-switch.is-checked::after,
+    .m-switch[aria-checked="true"]::after {
+      inset-inline-start: calc(100% - (1.75rem - 2px));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .m-input,
+    .m-textarea,
+    .m-select-trigger,
+    .m-checkbox__control,
+    .m-radio__control,
+    .m-switch,
+    .m-switch::after {
+      transition-duration: 0.01ms;
+    }
+  }
+}
