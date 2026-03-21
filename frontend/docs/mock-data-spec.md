@@ -5,6 +5,9 @@
 - 不使用 `mockjs`
 - 使用 `TS fixtures + generator + in-memory repository`
 - 目标不是随机假数据，而是稳定、可复现、可测试的大规模结构化数据
+- 执行顺序先小后大：
+  - 先用一棵小而完整的树跑通三种渲染态
+  - 再补 generator 扩容到 `1000+`
 
 ## Data Sources
 
@@ -21,6 +24,9 @@
 
 ## Tree Scale
 
+- 第一阶段：
+  - 先构建一棵小而完整的样本树
+  - 能覆盖 `home / directory / article / empty / unsupported`
 - 目标规模：`1000+` 节点
 - 深度：`3-5` 层
 - 默认仅前两层立即可见
@@ -30,11 +36,11 @@
 
 - 节点种类：
   - `home`
+  - `folder`
   - `article`
   - `game`
   - `media`
   - `unknown`
-  - `folder`
 - 状态：
   - `available`
   - `coming_soon`
@@ -49,6 +55,16 @@
   - light / dark
   - 首次引导显示 / 已关闭
   - 已保存 / 未保存阅读进度
+
+## 0.5 Content Defaults
+
+- `HomeContent` 最小结构只有 `title`
+- 默认 `home` 样本标题使用：`"首页"`
+- `DirectoryContent` 必须至少覆盖：
+  - 普通目录
+  - 空目录
+  - 仅子目录目录
+  - 同时包含子目录和文章的目录
 
 ## Runtime Simulation
 

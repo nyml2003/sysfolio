@@ -9,8 +9,10 @@
 
 - 校正工程配置到 `pnpm`
 - 落样式基线
-- 落 repository、mock fixtures、generator
-- 落 `home` / `article` / 文件树 / 右栏 / 主题 / 引导
+- 先落 repository 与最小 mock fixtures
+- 先跑通 `home` / `directory` / `article` 三种渲染态
+- 再补 generator 扩容 mock 树规模
+- 再补主题 / 引导 / 右栏与偏好层
 
 ## Phase 1
 

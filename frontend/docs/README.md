@@ -6,17 +6,18 @@
 
 1. `architecture.md`
 2. `code-organization.md`
-3. `styling-system.md`
-4. `theme-mapping.md`
-5. `content-model.md`
-6. `repository-contract.md`
-7. `mock-data-spec.md`
-8. `search-and-tag-navigation.md`
-9. `state-management.md`
-10. `performance-rules.md`
-11. `testing-strategy.md`
-12. `dependencies.md`
-13. `implementation-phases.md`
+3. `option-result.md`
+4. `styling-system.md`
+5. `theme-mapping.md`
+6. `content-model.md`
+7. `repository-contract.md`
+8. `mock-data-spec.md`
+9. `search-and-tag-navigation.md`
+10. `state-management.md`
+11. `performance-rules.md`
+12. `testing-strategy.md`
+13. `dependencies.md`
+14. `implementation-phases.md`
 
 ## Repo Consensus
 

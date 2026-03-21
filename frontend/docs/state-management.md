@@ -5,7 +5,7 @@
 - 真正全局统一的状态才进全局 store / 全局 Provider
 - 复杂 feature 状态优先放动态创建的 Provider Context
 - 简单局部状态留在 hook / component
-- 不用 `Result`
+- 业务状态不用 `Result`
 - 不用 `null` / `undefined`
 - 可选值统一使用 `Option<T>`
 
@@ -25,6 +25,13 @@
 - 对前端 UI 来说，这种拆法会让 renderer、provider、selector 的分支判断更绕。
 - 因此业务层直接使用显式资源状态联合，而不是通用 `Result`。
 
+## Option / Result Rule
+
+- `Option<T>` 和 `Result<E, T>` 都是项目内 shared 基础工具类型。
+- 两者都必须是纯数据表示，并配套 helper。
+- `Option<T>` 可以进入业务层。
+- `Result<E, T>` 只用于工具方法和边界层，不进入业务 store、业务 props、业务 context 或 renderer 状态。
+
 ## Resource State Example
 
 - 文章资源建议表达成这种思路：
@@ -34,6 +41,7 @@
   - `empty`: 请求成功但没有内容
   - `error`: 请求失败
 - 这样 UI 可以直接一一映射到骨架屏、正文、空态、错误态，而不需要先解包 `Result` 再判断额外状态。
+- 统一运行时形状见 `architecture.md` 中的 `ResourceState<T, E>`。
 
 ## Global Scope
 

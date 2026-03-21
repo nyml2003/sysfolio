@@ -27,4 +27,4 @@
 - `loading / empty / error`
 - `Option<T>` 的边界分支
 - 大规模节点树下的按需加载
-- `home` / `article` 渲染路径
+- `home` / `directory` / `article` 渲染路径

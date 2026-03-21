@@ -32,6 +32,13 @@
 - 不允许把浏览器 API 或网络 API 原生空值直接传播到业务层。
 - 所有边界空值都必须先在 adapter 层归一化。
 
+## Option / Result Foundation
+
+- `Option<T>` 和 `Result<E, T>` 都应落在 `shared` 基础工具层。
+- 两者都必须是纯数据表示，并配套 helper 使用。
+- 处理 `Option/Result` 时优先使用 helper，不手写散乱判定。
+- `Result<E, T>` 不向前端业务层扩散，只用于工具方法和边界适配层。
+
 ## Enum Rule
 
 - 枚举允许，但推荐使用字符串常量或字面量联合来保持运行时数据简单。
