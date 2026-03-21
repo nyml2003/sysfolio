@@ -373,6 +373,7 @@
 这些内容的下一轮细化，已经单独整理到：
 
 - [visual-refinement-strategy.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/visual-refinement-strategy.md)
+- [visual-delivery-roadmap.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/visual-delivery-roadmap.md)
 
 ## 十二、当前方案的最终表达
 

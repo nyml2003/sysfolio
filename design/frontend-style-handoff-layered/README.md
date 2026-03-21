@@ -17,6 +17,8 @@
   基于 Ant Design 的组件总览检查 primitive 覆盖面，但按 SysFolio 的 6 层架构重划边界。
 - `visual-refinement-strategy.md`
   把当前视觉侧待设计项推进成可执行的细化方案，覆盖基础控件、状态矩阵、响应式行为、树导航层级、版式密度、深色主题和动效规则。
+- `visual-delivery-roadmap.md`
+  把视觉细化方案继续拆成前端可执行的交付顺序，明确每一轮改哪些文件、解决什么问题、怎样算完成。
 - `styles/`
   真实源码目录，所有 CSS 维护都应落在这里。
 - `styles/tokens.css`
