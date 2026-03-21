@@ -50,6 +50,14 @@
     appearance: none;
   }
 
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: default;
+  }
+
   input,
   textarea,
   select {

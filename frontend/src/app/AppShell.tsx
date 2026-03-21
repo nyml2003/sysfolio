@@ -121,7 +121,17 @@ function ShellRoute() {
               const heading = scrollContainer.querySelector<HTMLElement>(`#${headingId}`);
 
               if (heading !== null) {
-                heading.scrollIntoView({ behavior: "smooth", block: "start" });
+                const containerRect = scrollContainer.getBoundingClientRect();
+                const headingRect = heading.getBoundingClientRect();
+
+                scrollContainer.scrollTo({
+                  top:
+                    scrollContainer.scrollTop +
+                    headingRect.top -
+                    containerRect.top -
+                    24,
+                  behavior: "smooth",
+                });
               }
             }}
             resource={resource}

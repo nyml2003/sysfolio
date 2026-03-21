@@ -17,6 +17,7 @@
 - 新增新的入口文件 `index.css`
 - 新增新的分层说明文档 `README.md`
 - 新增 `responsive-and-multi-input-strategy.md`，补充响应式布局和多端交互设计约束
+- 新增 `toc-activation-strategy.md`，定义 TOC 当前项的激活线、到底兜底和正文底部留白策略
 
 ### 新分层
 

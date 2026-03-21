@@ -24,6 +24,8 @@
   统一定义 layer 顺序和导入关系。
 - `responsive-and-multi-input-strategy.md`
   说明这套 6 层架构如何支撑响应式布局和不同输入能力下的交互。
+- `toc-activation-strategy.md`
+  说明 TOC 在长文阅读中的激活规则，解决滚动到底但目录未到最后一项的问题。
 
 ## 依赖规则
 

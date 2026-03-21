@@ -1,7 +1,7 @@
 import {
   startTransition,
   useEffect,
-  useEffectEvent,
+  useRef,
   useState,
   type RefObject,
 } from "react";
@@ -29,8 +29,13 @@ export function useArticleReading({
 }: UseArticleReadingOptions): UseArticleReadingResult {
   const repository = useContentRepository();
   const [restoreNoticeVisible, setRestoreNoticeVisible] = useState(false);
+  const onActiveHeadingChangeRef = useRef(onActiveHeadingChange);
 
-  const syncActiveHeading = useEffectEvent(() => {
+  useEffect(() => {
+    onActiveHeadingChangeRef.current = onActiveHeadingChange;
+  }, [onActiveHeadingChange]);
+
+  function syncActiveHeading() {
     const scrollContainer = scrollContainerRef.current;
 
     if (scrollContainer === null) {
@@ -55,60 +60,54 @@ export function useArticleReading({
     const headingId = currentHeading.dataset.tocId;
 
     if (headingId !== undefined) {
-      onActiveHeadingChange(headingId);
+      onActiveHeadingChangeRef.current(headingId);
     }
-  });
+  }
 
-  const restoreReadingProgress = useEffectEvent(async () => {
-    const scrollContainer = scrollContainerRef.current;
+  useEffect(() => {
+    let cancelled = false;
+    let frameId = 0;
 
-    if (scrollContainer === null) {
-      return;
-    }
+    async function restoreReadingProgress() {
+      const scrollContainer = scrollContainerRef.current;
 
-    const progressResource = await repository.getSavedReadingProgress(path);
+      if (scrollContainer === null) {
+        return;
+      }
 
-    if (
-      progressResource.tag === "ready" &&
-      progressResource.value.tag === "some" &&
-      progressResource.value.value.scrollTop > 0
-    ) {
-      const nextScrollTop = progressResource.value.value.scrollTop;
+      const progressResource = await repository.getSavedReadingProgress(path);
 
-      window.requestAnimationFrame(() => {
+      if (cancelled) {
+        return;
+      }
+
+      const nextScrollTop =
+        progressResource.tag === "ready" &&
+        progressResource.value.tag === "some" &&
+        progressResource.value.value.scrollTop > 0
+          ? progressResource.value.value.scrollTop
+          : 0;
+
+      frameId = window.requestAnimationFrame(() => {
+        if (cancelled) {
+          return;
+        }
+
         scrollContainer.scrollTo({ top: nextScrollTop });
         startTransition(() => {
-          setRestoreNoticeVisible(true);
+          setRestoreNoticeVisible(nextScrollTop > 0);
         });
         syncActiveHeading();
       });
-
-      return;
     }
 
-    scrollContainer.scrollTo({ top: 0 });
-    startTransition(() => {
-      setRestoreNoticeVisible(false);
-    });
-    syncActiveHeading();
-  });
-
-  const persistReadingProgress = useEffectEvent(async () => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (scrollContainer === null) {
-      return;
-    }
-
-    await repository.saveReadingProgress(path, {
-      scrollTop: scrollContainer.scrollTop,
-      updatedAt: new Date().toISOString(),
-    });
-  });
-
-  useEffect(() => {
     void restoreReadingProgress();
-  }, [document.id, path, restoreReadingProgress]);
+
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [document.id, path, repository, scrollContainerRef]);
 
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
@@ -123,7 +122,10 @@ export function useArticleReading({
       syncActiveHeading();
       window.clearTimeout(timeoutId);
       timeoutId = window.setTimeout(() => {
-        void persistReadingProgress();
+        void repository.saveReadingProgress(path, {
+          scrollTop: scrollContainer.scrollTop,
+          updatedAt: new Date().toISOString(),
+        });
       }, 180);
     };
 
@@ -134,7 +136,7 @@ export function useArticleReading({
       window.clearTimeout(timeoutId);
       scrollContainer.removeEventListener("scroll", handleScroll);
     };
-  }, [document.id, path, persistReadingProgress, scrollContainerRef, syncActiveHeading]);
+  }, [document.id, path, repository, scrollContainerRef]);
 
   return {
     restoreNoticeVisible,
