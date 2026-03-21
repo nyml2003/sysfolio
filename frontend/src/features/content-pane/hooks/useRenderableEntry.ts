@@ -2,6 +2,7 @@ import { startTransition, useEffect, useState } from "react";
 
 import type { RenderableEntryPayload, RepositoryError } from "@/entities/content";
 import { useContentRepository } from "@/shared/data/repository";
+import { detachPromise } from "@/shared/lib/async/detach-promise";
 import { idleState, loadingState, type ResourceState } from "@/shared/lib/resource/resource-state";
 import { usePreferences } from "@/shared/store/preferences";
 
@@ -15,21 +16,24 @@ export function useRenderableEntry(
   );
 
   useEffect(() => {
-    let cancelled = false;
+    const abortController = new AbortController();
+    const loadRenderableEntry = async () => {
+      const nextResource = await repository.getRenderableEntryByPath(path);
 
-    setResource(loadingState());
-    void repository.getRenderableEntryByPath(path).then((nextResource) => {
-      if (cancelled) {
+      if (abortController.signal.aborted) {
         return;
       }
 
       startTransition(() => {
         setResource(nextResource);
       });
-    });
+    };
+
+    setResource(loadingState());
+    detachPromise(loadRenderableEntry());
 
     return () => {
-      cancelled = true;
+      abortController.abort();
     };
   }, [locale, path, repository]);
 

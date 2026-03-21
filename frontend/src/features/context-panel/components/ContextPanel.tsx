@@ -1,6 +1,10 @@
-import type { RenderableEntryPayload, RepositoryError } from "@/entities/content";
-import type { ReactNode } from "react";
+import type {
+  DirectoryChildSummary,
+  RenderableEntryPayload,
+  RepositoryError,
+} from "@/entities/content";
 import { isSome, none, unwrapOr } from "@/shared/lib/monads/option";
+import type { Option } from "@/shared/lib/monads/option";
 import type { ResourceState } from "@/shared/lib/resource/resource-state";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import buttonStyles from "@/shared/ui/primitives/Button.module.css";
@@ -13,6 +17,32 @@ type ContextPanelProps = {
   onNavigate: (path: string) => void;
   onScrollToHeading: (headingId: string) => void;
 };
+
+function renderParentSection(
+  parent: Option<DirectoryChildSummary>,
+  title: string,
+  backToLabel: (entryTitle: string) => string,
+  onNavigate: (path: string) => void,
+) {
+  if (!isSome(parent)) {
+    return null;
+  }
+
+  return (
+    <section className={styles.section}>
+      <div className={styles.title}>{title}</div>
+      <button
+        className={[buttonStyles.root, buttonStyles.secondary].join(" ")}
+        onClick={() => {
+          onNavigate(parent.value.path);
+        }}
+        type="button"
+      >
+        {backToLabel(parent.value.title)}
+      </button>
+    </section>
+  );
+}
 
 export function ContextPanel({
   resource,
@@ -40,26 +70,12 @@ export function ContextPanel({
     recentEntries: [],
     stats: none(),
   });
-  let parentSection: ReactNode = null;
-
-  if (isSome(context.parent)) {
-    const parentEntry = context.parent.value;
-
-    parentSection = (
-      <section className={styles.section}>
-        <div className={styles.title}>{copy.contextPanel.parentTitle}</div>
-        <button
-          className={[buttonStyles.root, buttonStyles.secondary].join(" ")}
-          onClick={() => {
-            onNavigate(parentEntry.path);
-          }}
-          type="button"
-        >
-          {copy.contextPanel.backTo(parentEntry.title)}
-        </button>
-      </section>
-    );
-  }
+  const parentSection = renderParentSection(
+    context.parent,
+    copy.contextPanel.parentTitle,
+    copy.contextPanel.backTo,
+    onNavigate,
+  );
 
   return (
     <aside className={styles.root}>

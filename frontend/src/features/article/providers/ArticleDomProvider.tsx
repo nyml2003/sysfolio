@@ -26,17 +26,31 @@ function areSameHeadingOrder(
   currentHeadingOrder: ReadonlyArray<string>,
   nextHeadingOrder: ReadonlyArray<string>,
 ): boolean {
-  if (currentHeadingOrder.length !== nextHeadingOrder.length) {
-    return false;
-  }
+  return (
+    currentHeadingOrder.length === nextHeadingOrder.length &&
+    currentHeadingOrder.every((headingId, index) => headingId === nextHeadingOrder[index])
+  );
+}
 
-  for (let index = 0; index < currentHeadingOrder.length; index += 1) {
-    if (currentHeadingOrder[index] !== nextHeadingOrder[index]) {
-      return false;
-    }
-  }
+function createAllowedHeadingIds(headingOrder: ReadonlyArray<string>): Record<string, true> {
+  return headingOrder.reduce<Record<string, true>>(
+    (currentIds, headingId) => ({
+      ...currentIds,
+      [headingId]: true,
+    }),
+    {},
+  );
+}
 
-  return true;
+function filterHeadingElementsByAllowedIds(
+  headingElementsById: Record<string, HTMLElement>,
+  allowedHeadingIds: Record<string, true>,
+): Record<string, HTMLElement> {
+  return Object.fromEntries(
+    Object.entries(headingElementsById).filter(
+      ([headingId]) => allowedHeadingIds[headingId] === true,
+    ),
+  ) as Record<string, HTMLElement>;
 }
 
 function toStableNodeOption(
@@ -80,26 +94,18 @@ export function ArticleDomProvider({ children }: ArticleDomProviderProps) {
         : [...nextHeadingOrder],
     );
 
-    const allowedHeadingIds: Record<string, true> = {};
-
-    for (const headingId of nextHeadingOrder) {
-      allowedHeadingIds[headingId] = true;
-    }
+    const allowedHeadingIds = createAllowedHeadingIds(nextHeadingOrder);
 
     setHeadingElementsById((currentHeadingElementsById) => {
-      let changed = false;
-      const nextHeadingElementsById: Record<string, HTMLElement> = {};
+      const nextHeadingElementsById = filterHeadingElementsByAllowedIds(
+        currentHeadingElementsById,
+        allowedHeadingIds,
+      );
 
-      for (const [headingId, element] of Object.entries(currentHeadingElementsById)) {
-        if (allowedHeadingIds[headingId] !== true) {
-          changed = true;
-          continue;
-        }
-
-        nextHeadingElementsById[headingId] = element;
-      }
-
-      return changed ? nextHeadingElementsById : currentHeadingElementsById;
+      return Object.keys(nextHeadingElementsById).length ===
+        Object.keys(currentHeadingElementsById).length
+        ? currentHeadingElementsById
+        : nextHeadingElementsById;
     });
   }, []);
 

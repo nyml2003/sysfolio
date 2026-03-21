@@ -1,5 +1,11 @@
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
+import {
+  getElementClientHeight,
+  getElementScrollHeight,
+  getElementScrollTop,
+  getElementScrollTopWithinContainer,
+} from "@/shared/lib/dom/scroll-element";
 import { fromNullable, isSome, none, some, type Option } from "@/shared/lib/monads/option";
 
 import { useResizeObserver } from "@/shared/lib/layout/useResizeObserver";
@@ -8,7 +14,6 @@ import { useArticleDom } from "../context/article-dom.context";
 import {
   TOC_ACTIVATION_LINE_RATIO,
   TOC_SCROLLABLE_EPSILON,
-  getElementScrollTopWithinContainer,
 } from "../model/toc-activation";
 
 type HeadingMetric = {
@@ -50,25 +55,31 @@ function areHeadingMetricsEqual(
   previousMetrics: HeadingMetric[],
   nextMetrics: HeadingMetric[],
 ): boolean {
-  if (previousMetrics.length !== nextMetrics.length) {
-    return false;
-  }
+  return (
+    previousMetrics.length === nextMetrics.length &&
+    previousMetrics.every((previousMetric, index) => {
+      const nextMetric = nextMetrics[index];
 
-  for (let index = 0; index < previousMetrics.length; index += 1) {
-    const previousMetric = previousMetrics[index];
-    const nextMetric = nextMetrics[index];
+      return (
+        nextMetric !== undefined &&
+        previousMetric.id === nextMetric.id &&
+        previousMetric.element === nextMetric.element &&
+        Math.abs(previousMetric.offsetTop - nextMetric.offsetTop) <= 0.5 &&
+        Math.abs(previousMetric.targetScrollTop - nextMetric.targetScrollTop) <= 0.5
+      );
+    })
+  );
+}
 
-    if (
-      previousMetric.id !== nextMetric.id ||
-      previousMetric.element !== nextMetric.element ||
-      Math.abs(previousMetric.offsetTop - nextMetric.offsetTop) > 0.5 ||
-      Math.abs(previousMetric.targetScrollTop - nextMetric.targetScrollTop) > 0.5
-    ) {
-      return false;
-    }
-  }
+function resolveHeadingIdForActivationLine(
+  headingMetrics: HeadingMetric[],
+  activationLine: number,
+): Option<string> {
+  const currentHeading = headingMetrics
+    .filter((metric) => metric.offsetTop <= activationLine)
+    .at(-1);
 
-  return true;
+  return currentHeading === undefined ? none() : some(currentHeading.id);
 }
 
 export function useHeadingLayout({
@@ -113,7 +124,7 @@ export function useHeadingLayout({
       );
       const targetScrollTop = Math.max(
         0,
-        offsetTop - scrollContainerElement.clientHeight * TOC_ACTIVATION_LINE_RATIO,
+        offsetTop - getElementClientHeight(scrollContainerElement) * TOC_ACTIVATION_LINE_RATIO,
       );
 
       nextMetrics.push({
@@ -154,7 +165,7 @@ export function useHeadingLayout({
 
   useResizeObserver({
     disabled: !enabled,
-    dependencyToken: isSome(articleBody) ? articleBody : scrollContainer,
+    dependencyToken: isSome(articleBody) ? articleBody.value : scrollContainer,
     getTargets: () => {
       return [scrollContainer, articleBody];
     },
@@ -189,7 +200,7 @@ export function useHeadingLayout({
     }
 
     return (
-      scrollContainer.value.scrollHeight - scrollContainer.value.clientHeight >
+      getElementScrollHeight(scrollContainer.value) - getElementClientHeight(scrollContainer.value) >
       TOC_SCROLLABLE_EPSILON
     );
   });
@@ -208,20 +219,13 @@ export function useHeadingLayout({
     }
 
     const activationLine =
-      scrollContainer.value.scrollTop +
-      scrollContainer.value.clientHeight * TOC_ACTIVATION_LINE_RATIO;
-    let currentHeadingId = firstHeadingMetric.id;
+      getElementScrollTop(scrollContainer.value) +
+      getElementClientHeight(scrollContainer.value) * TOC_ACTIVATION_LINE_RATIO;
 
-    for (const metric of headingMetrics) {
-      if (metric.offsetTop <= activationLine) {
-        currentHeadingId = metric.id;
-        continue;
-      }
-
-      break;
-    }
-
-    return currentHeadingId === undefined ? none() : some(currentHeadingId);
+    return resolveHeadingIdForActivationLine(
+      headingMetrics,
+      activationLine,
+    );
   });
 
   const getBottomSentinel = useEffectEvent(() => {

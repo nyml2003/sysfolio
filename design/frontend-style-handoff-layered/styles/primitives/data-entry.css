@@ -165,6 +165,8 @@
   }
 
   .m-switch {
+    --m-switch-thumb-shift: 1rem;
+
     position: relative;
     inline-size: 2.5rem;
     block-size: 1.5rem;
@@ -184,7 +186,8 @@
     block-size: calc(1.5rem - 4px);
     border-radius: 50%;
     background: var(--sys-color-text-inverse);
-    @apply --u-tr-base;
+    transform: translateX(0);
+    @apply --u-tr-state;
   }
 
   .m-switch.is-checked,
@@ -194,7 +197,7 @@
 
   .m-switch.is-checked::after,
   .m-switch[aria-checked="true"]::after {
-    inset-inline-start: calc(100% - (1.5rem - 2px));
+    transform: translateX(var(--m-switch-thumb-shift));
   }
 
   .m-switch:focus-visible {
@@ -239,6 +242,8 @@
     }
 
     .m-switch {
+      --m-switch-thumb-shift: 1.125rem;
+
       inline-size: 2.875rem;
       block-size: 1.75rem;
     }
@@ -246,11 +251,6 @@
     .m-switch::after {
       inline-size: calc(1.75rem - 4px);
       block-size: calc(1.75rem - 4px);
-    }
-
-    .m-switch.is-checked::after,
-    .m-switch[aria-checked="true"]::after {
-      inset-inline-start: calc(100% - (1.75rem - 2px));
     }
   }
 
@@ -262,7 +262,7 @@
     .m-radio__control,
     .m-switch,
     .m-switch::after {
-      transition-duration: 0.01ms;
+      transition-duration: var(--sys-motion-duration-reduced);
     }
   }
 }

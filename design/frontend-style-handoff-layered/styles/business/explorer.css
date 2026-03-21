@@ -102,6 +102,7 @@
 
   .m-file-node__toggle[aria-expanded="true"] {
     @apply --p-tree-toggle-expanded;
+    transform: rotate(90deg);
   }
 
   .m-file-node[data-depth="0"] {
@@ -194,7 +195,7 @@
   @media (prefers-reduced-motion: reduce) {
     .m-file-node,
     .m-file-node__toggle {
-      transition-duration: 0.01ms;
+      transition-duration: var(--sys-motion-duration-reduced);
     }
   }
 

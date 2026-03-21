@@ -5,7 +5,7 @@ import { isSome, type Option } from "@/shared/lib/monads/option";
 type UseResizeObserverOptions = {
   getTargets: () => ReadonlyArray<Option<Element>>;
   onResize: () => void;
-  dependencyToken: Option<unknown>;
+  dependencyToken: unknown;
   disabled: boolean;
 };
 
@@ -21,6 +21,11 @@ function collectObservedTargets(targets: ReadonlyArray<Option<Element>>): Elemen
   }
 
   return observedTargets;
+}
+
+function cancelResizeFrame(frameState: { current: number }) {
+  window.cancelAnimationFrame(frameState.current);
+  frameState.current = 0;
 }
 
 export function useResizeObserver({
@@ -40,14 +45,14 @@ export function useResizeObserver({
       return undefined;
     }
 
-    let frameId = 0;
+    const frameState = { current: 0 };
     const scheduleResize = () => {
-      if (frameId !== 0) {
+      if (frameState.current !== 0) {
         return;
       }
 
-      frameId = window.requestAnimationFrame(() => {
-        frameId = 0;
+      frameState.current = window.requestAnimationFrame(() => {
+        frameState.current = 0;
         onResizeRef.current();
       });
     };
@@ -60,7 +65,7 @@ export function useResizeObserver({
 
       return () => {
         window.removeEventListener("resize", scheduleResize);
-        window.cancelAnimationFrame(frameId);
+        cancelResizeFrame(frameState);
       };
     }
 
@@ -73,7 +78,7 @@ export function useResizeObserver({
     }
 
     return () => {
-      window.cancelAnimationFrame(frameId);
+      cancelResizeFrame(frameState);
 
       for (const target of observedTargets) {
         observer.unobserve(target);

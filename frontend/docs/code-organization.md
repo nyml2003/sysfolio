@@ -9,6 +9,12 @@
 - `shared/lib` 与 `entities` 不依赖 TSX。
 - 任何新增未约定的 class、抽象或共享能力，先报备再落代码。
 - 复杂 feature 状态优先拆成动态 Provider Context，而不是直接升级为全局 store。
+- 默认不用 `let`，优先只用 `const`。
+- 复杂流程不堆在一个函数里，优先拆成多个命名清晰的小函数。
+- 不允许写 `void + expression`。
+- 需要触发异步副作用时，使用显式命名 helper 包装，并明确错误处理或忽略策略。
+- 业务代码和业务 hooks 不直接访问 DOM API。
+- `document` / `window` / 事件监听 / observer / 滚动读写统一走 `shared/lib/dom` 或 `shared/lib/layout` 适配层。
 
 ## File Pattern
 

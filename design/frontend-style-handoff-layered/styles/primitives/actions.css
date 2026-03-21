@@ -26,11 +26,11 @@
     cursor: pointer;
     text-decoration: none;
     user-select: none;
-    @apply --u-tr-base;
+    @apply --u-tr-feedback-press;
   }
 
   .m-button:active {
-    transform: translateY(0);
+    transform: translateY(var(--sys-motion-distance-press));
   }
 
   .m-button:focus-visible {
@@ -82,7 +82,11 @@
     background: transparent;
     color: var(--sys-color-text-secondary);
     cursor: pointer;
-    @apply --u-tr-base;
+    @apply --u-tr-feedback-press;
+  }
+
+  .m-icon-button:active {
+    transform: translateY(var(--sys-motion-distance-press));
   }
 
   .m-icon-button:focus-visible {
@@ -108,10 +112,6 @@
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .m-button:hover {
-      transform: translateY(-1px);
-    }
-
     .m-button--primary:hover {
       border-color: var(--sys-color-accent-hover);
       background: var(--sys-color-accent-hover);
@@ -150,7 +150,12 @@
   @media (prefers-reduced-motion: reduce) {
     .m-button,
     .m-icon-button {
-      transition-duration: 0.01ms;
+      transition-duration: var(--sys-motion-duration-reduced);
+    }
+
+    .m-button:active,
+    .m-icon-button:active {
+      transform: none;
     }
   }
 }

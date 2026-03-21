@@ -9,6 +9,11 @@ import {
 
 import type { OnboardingState } from "@/entities/content";
 import { useContentRepository } from "@/shared/data/repository";
+import { detachPromise } from "@/shared/lib/async/detach-promise";
+import {
+  useDocumentElementAttribute,
+  useDocumentElementLanguage,
+} from "@/shared/lib/dom/useDocumentElementAttribute";
 import {
   DEFAULT_LOCALE,
   type AppLocale,
@@ -96,30 +101,25 @@ export function PreferencesProvider({ children }: PreferencesProviderProps) {
   });
 
   useEffect(() => {
-    void hydratePreferences();
+    detachPromise(hydratePreferences());
   }, [hydratePreferences]);
 
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
-
-  useEffect(() => {
-    document.documentElement.lang = locale;
-  }, [locale]);
+  useDocumentElementAttribute("data-theme", theme);
+  useDocumentElementLanguage(locale);
 
   const value = useMemo<PreferencesContextValue>(
     () => ({
       theme,
       locale,
       toggleTheme: () => {
-        void toggleTheme();
+        detachPromise(toggleTheme());
       },
       toggleLocale: () => {
-        void toggleLocale();
+        detachPromise(toggleLocale());
       },
       onboardingVisible: hydrated && !onboardingState.dismissed,
       dismissOnboarding: () => {
-        void dismissOnboarding();
+        detachPromise(dismissOnboarding());
       },
     }),
     [

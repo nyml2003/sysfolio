@@ -9,6 +9,14 @@ import {
 import type { ArticleDocument, RepositoryError } from "@/entities/content";
 import { useArticleDom } from "@/features/article/context/article-dom.context";
 import { useContentRepository } from "@/shared/data/repository";
+import { detachPromise } from "@/shared/lib/async/detach-promise";
+import {
+  cancelScheduledAnimationFrame,
+  clearScheduledTimeout,
+  scheduleAnimationFrame,
+  scheduleTimeout,
+} from "@/shared/lib/dom/browser-timing";
+import { getElementScrollTop, setElementScrollTop } from "@/shared/lib/dom/scroll-element";
 import { isSome, none, some, unwrapOr, type Option } from "@/shared/lib/monads/option";
 
 import {
@@ -94,17 +102,17 @@ export function useArticleReading({
   });
 
   const clearSaveTimeout = useEffectEvent(() => {
-    window.clearTimeout(saveTimeoutIdRef.current);
+    clearScheduledTimeout(saveTimeoutIdRef.current);
     saveTimeoutIdRef.current = 0;
   });
 
   const clearNavigatingTimeout = useEffectEvent(() => {
-    window.clearTimeout(navigatingTimeoutIdRef.current);
+    clearScheduledTimeout(navigatingTimeoutIdRef.current);
     navigatingTimeoutIdRef.current = 0;
   });
 
   const stopUserScrollWatch = useEffectEvent(() => {
-    window.cancelAnimationFrame(userScrollWatchFrameIdRef.current);
+    cancelScheduledAnimationFrame(userScrollWatchFrameIdRef.current);
     userScrollWatchFrameIdRef.current = 0;
   });
 
@@ -141,14 +149,14 @@ export function useArticleReading({
 
   const scheduleReadingProgressSave = useEffectEvent(() => {
     clearSaveTimeout();
-    saveTimeoutIdRef.current = window.setTimeout(() => {
+    saveTimeoutIdRef.current = scheduleTimeout(() => {
       saveTimeoutIdRef.current = 0;
 
       if (!isSome(scrollContainer)) {
         return;
       }
 
-      void saveReadingProgress(scrollContainer.value.scrollTop);
+      detachPromise(saveReadingProgress(getElementScrollTop(scrollContainer.value)));
     }, TOC_READING_PROGRESS_DEBOUNCE_MS);
   });
 
@@ -174,7 +182,7 @@ export function useArticleReading({
         setCurrentHeadingFromOptionImmediate(getResolvedHeadingId());
       }
 
-      lastObservedScrollTopRef.current = scrollContainer.value.scrollTop;
+      lastObservedScrollTopRef.current = getElementScrollTop(scrollContainer.value);
       lastObservedScrollChangeAtRef.current = performance.now();
 
       if (userScrollWatchFrameIdRef.current !== 0) {
@@ -187,7 +195,7 @@ export function useArticleReading({
           return;
         }
 
-        const currentScrollTop = scrollContainer.value.scrollTop;
+        const currentScrollTop = getElementScrollTop(scrollContainer.value);
 
         if (Math.abs(currentScrollTop - lastObservedScrollTopRef.current) > 0.5) {
           lastObservedScrollTopRef.current = currentScrollTop;
@@ -208,10 +216,10 @@ export function useArticleReading({
           return;
         }
 
-        userScrollWatchFrameIdRef.current = window.requestAnimationFrame(watchUserScroll);
+        userScrollWatchFrameIdRef.current = scheduleAnimationFrame(watchUserScroll);
       };
 
-      userScrollWatchFrameIdRef.current = window.requestAnimationFrame(watchUserScroll);
+      userScrollWatchFrameIdRef.current = scheduleAnimationFrame(watchUserScroll);
     }),
   });
 
@@ -228,7 +236,7 @@ export function useArticleReading({
 
   const scheduleNavigatingTimeout = useEffectEvent(() => {
     clearNavigatingTimeout();
-    navigatingTimeoutIdRef.current = window.setTimeout(() => {
+    navigatingTimeoutIdRef.current = scheduleTimeout(() => {
       navigatingTimeoutIdRef.current = 0;
 
       if (tocStateRef.current !== "navigating") {
@@ -310,7 +318,7 @@ export function useArticleReading({
     }
 
     if (!layout.hasScrollableContent()) {
-      scrollContainerElement.scrollTop = 0;
+      setElementScrollTop(scrollContainerElement, 0);
       setTocState("short_content");
       observedActiveHeadingIdRef.current = firstHeadingId;
       setCurrentHeadingDeferred(firstHeadingId.value);
@@ -318,7 +326,7 @@ export function useArticleReading({
     }
 
     if (requestedScrollTop > 0) {
-      scrollContainerElement.scrollTop = requestedScrollTop;
+      setElementScrollTop(scrollContainerElement, requestedScrollTop);
       const restoredHeadingId = layout.getHeadingIdForCurrentScrollPosition();
       observedActiveHeadingIdRef.current = restoredHeadingId;
       enterNavigatingState(unwrapOr(restoredHeadingId, firstHeadingId.value));
@@ -347,7 +355,10 @@ export function useArticleReading({
     }
 
     if (!layout.hasScrollableContent() || tocStateRef.current === "short_content") {
-      scrollContainerElement.scrollTop = layout.getHeadingTargetScrollTop(headingId);
+      setElementScrollTop(
+        scrollContainerElement,
+        layout.getHeadingTargetScrollTop(headingId),
+      );
       setTocState("short_content");
       observedActiveHeadingIdRef.current = firstHeadingId;
       setCurrentHeadingDeferred(firstHeadingId.value);
@@ -378,7 +389,7 @@ export function useArticleReading({
     setRestoreNotice(false);
 
     if (!layout.hasScrollableContent()) {
-      scrollContainerElement.scrollTop = 0;
+      setElementScrollTop(scrollContainerElement, 0);
       setTocState("short_content");
       observedActiveHeadingIdRef.current = firstHeadingId;
       setCurrentHeadingDeferred(firstHeadingId.value);
@@ -392,64 +403,60 @@ export function useArticleReading({
   });
 
   useEffect(() => {
-    let cancelled = false;
-    let frameId = 0;
+    const abortController = new AbortController();
+    const frameState = { current: 0 };
 
     if (!isSome(document)) {
       resetReadingState();
       return undefined;
     }
 
+    const scheduleApplyEntryState = (requestedScrollTop: number) => {
+      frameState.current = scheduleAnimationFrame(() => {
+        if (abortController.signal.aborted) {
+          return;
+        }
+
+        setRestoreNotice(requestedScrollTop > 0);
+        applyEntryState(requestedScrollTop);
+      });
+    };
+
     const restoreReadingProgress = async () => {
       try {
         const progressResource = await repository.getSavedReadingProgress(path);
 
-        if (cancelled) {
+        if (abortController.signal.aborted) {
           return;
         }
 
-        let restoredScrollTop = 0;
-
         if (progressResource.tag === "error") {
           reportRepositoryError("Failed to restore reading progress", progressResource.error);
-        } else if (
+        }
+
+        const restoredScrollTop =
           progressResource.tag === "ready" &&
           isSome(progressResource.value) &&
           progressResource.value.value.scrollTop > 0
-        ) {
-          restoredScrollTop = progressResource.value.value.scrollTop;
-        }
+            ? progressResource.value.value.scrollTop
+            : 0;
 
-        frameId = window.requestAnimationFrame(() => {
-          if (cancelled) {
-            return;
-          }
-
-          setRestoreNotice(restoredScrollTop > 0);
-          applyEntryState(restoredScrollTop);
-        });
+        scheduleApplyEntryState(restoredScrollTop);
       } catch (error) {
-        if (cancelled) {
+        if (abortController.signal.aborted) {
           return;
         }
 
         reportUnexpectedError("Unexpected reading progress restore failure", error);
-        frameId = window.requestAnimationFrame(() => {
-          if (cancelled) {
-            return;
-          }
-
-          setRestoreNotice(false);
-          applyEntryState(0);
-        });
+        scheduleApplyEntryState(0);
       }
     };
 
-    void restoreReadingProgress();
+    detachPromise(restoreReadingProgress());
 
     return () => {
-      cancelled = true;
-      window.cancelAnimationFrame(frameId);
+      abortController.abort();
+      cancelScheduledAnimationFrame(frameState.current);
       resetReadingState();
     };
     // Effect Events are intentionally non-reactive here.

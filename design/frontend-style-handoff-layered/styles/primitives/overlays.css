@@ -1,6 +1,17 @@
 @layer primitives {
   .m-surface-popover,
   .m-footnote-popover,
+  .m-tooltip,
+  .m-dropdown-surface {
+    --m-overlay-surface-offset: var(--sys-motion-distance-float);
+
+    opacity: 1;
+    transform: translateY(0);
+    @apply --u-tr-overlay-surface;
+  }
+
+  .m-surface-popover,
+  .m-footnote-popover,
   .m-dropdown-surface,
   .m-dialog-surface,
   .m-drawer-surface {
@@ -11,6 +22,12 @@
     background: var(--sys-color-panel);
     box-shadow: var(--sys-shadow-soft);
     color: var(--sys-color-text-primary);
+  }
+
+  .m-dialog-surface,
+  .m-drawer-surface {
+    opacity: 1;
+    @apply --u-tr-overlay-panel;
   }
 
   .m-footnote-popover {
@@ -27,13 +44,17 @@
   .m-dialog-surface {
     max-inline-size: min(100%, 36rem);
     padding: var(--sys-space-20) var(--sys-space-24);
+    transform: translateY(0);
   }
 
   .m-drawer-surface {
+    --m-drawer-offset-inline: var(--sys-motion-distance-panel);
+
     max-inline-size: min(100vw, 24rem);
     block-size: 100%;
     border-radius: 0;
     box-shadow: var(--sys-shadow-soft);
+    transform: translateX(0);
   }
 
   .m-tooltip {
@@ -46,6 +67,47 @@
     font-size: var(--sys-font-size-12);
     line-height: var(--sys-line-height-ui);
     box-shadow: var(--sys-shadow-panel);
+  }
+
+  .m-surface-popover[data-state="closed"],
+  .m-footnote-popover[data-state="closed"],
+  .m-tooltip[data-state="closed"],
+  .m-dropdown-surface[data-state="closed"] {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(var(--m-overlay-surface-offset));
+  }
+
+  .m-dialog-surface[data-state="closed"] {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(var(--sys-motion-distance-panel));
+  }
+
+  .m-drawer-surface[data-state="closed"] {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(var(--m-drawer-offset-inline));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .m-surface-popover,
+    .m-footnote-popover,
+    .m-tooltip,
+    .m-dropdown-surface,
+    .m-dialog-surface,
+    .m-drawer-surface {
+      transition-duration: var(--sys-motion-duration-reduced);
+    }
+
+    .m-surface-popover[data-state="closed"],
+    .m-footnote-popover[data-state="closed"],
+    .m-tooltip[data-state="closed"],
+    .m-dropdown-surface[data-state="closed"],
+    .m-dialog-surface[data-state="closed"],
+    .m-drawer-surface[data-state="closed"] {
+      transform: none;
+    }
   }
 
   @media (width <= 800px) {

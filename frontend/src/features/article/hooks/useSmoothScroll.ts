@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { animate, useMotionValue, useMotionValueEvent } from "motion/react";
 
+import { getWindowOption } from "@/shared/lib/dom/browser-globals";
+import {
+  getElementClientHeight,
+  getElementScrollHeight,
+  getElementScrollTop,
+  setElementScrollTop,
+} from "@/shared/lib/dom/scroll-element";
+import { useEventListener } from "@/shared/lib/dom/useEventListener";
 import { isSome, none, some, unwrapOr, type Option } from "@/shared/lib/monads/option";
 
 import { useArticleDom } from "../context/article-dom.context";
@@ -21,7 +29,7 @@ const DEFAULT_DURATION_SECONDS = 0.38;
 function clampScrollTop(scrollContainer: HTMLElement, scrollTop: number): number {
   return Math.max(
     0,
-    Math.min(scrollTop, scrollContainer.scrollHeight - scrollContainer.clientHeight),
+    Math.min(scrollTop, getElementScrollHeight(scrollContainer) - getElementClientHeight(scrollContainer)),
   );
 }
 
@@ -57,10 +65,10 @@ export function useSmoothScroll({
     const nextScrollTop = clampScrollTop(scrollContainerElement, targetScrollTop);
 
     cancel();
-    scrollTopValue.jump(scrollContainerElement.scrollTop);
+    scrollTopValue.jump(getElementScrollTop(scrollContainerElement));
 
-    if (Math.abs(nextScrollTop - scrollContainerElement.scrollTop) <= 1) {
-      scrollContainerElement.scrollTop = nextScrollTop;
+    if (Math.abs(nextScrollTop - getElementScrollTop(scrollContainerElement)) <= 1) {
+      setElementScrollTop(scrollContainerElement, nextScrollTop);
       return;
     }
 
@@ -78,7 +86,7 @@ export function useSmoothScroll({
       return;
     }
 
-    scrollContainer.value.scrollTop = clampScrollTop(scrollContainer.value, latest);
+    setElementScrollTop(scrollContainer.value, clampScrollTop(scrollContainer.value, latest));
   });
 
   useMotionValueEvent(scrollTopValue, "animationComplete", () => {
@@ -91,50 +99,65 @@ export function useSmoothScroll({
     setIsProgrammaticScrolling(false);
   });
 
-  useEffect(() => {
-    if (!isSome(scrollContainer)) {
-      return undefined;
+  const notifyUserInteraction = () => {
+    if (isSome(onUserInteractionRef.current)) {
+      onUserInteractionRef.current.value();
     }
 
-    const scrollContainerElement = scrollContainer.value;
-
-    const notifyUserInteraction = () => {
-      if (isSome(onUserInteractionRef.current)) {
-        onUserInteractionRef.current.value();
-      }
-
-      if (isSome(animationRef.current)) {
-        cancel();
-      }
-    };
-
-    const handleKeyboardInteraction = (event: KeyboardEvent) => {
-      if (
-        event.key === "ArrowDown" ||
-        event.key === "ArrowUp" ||
-        event.key === "PageDown" ||
-        event.key === "PageUp" ||
-        event.key === "Home" ||
-        event.key === "End" ||
-        event.key === " "
-      ) {
-        notifyUserInteraction();
-      }
-    };
-
-    scrollContainerElement.addEventListener("wheel", notifyUserInteraction, { passive: true });
-    scrollContainerElement.addEventListener("touchstart", notifyUserInteraction, {
-      passive: true,
-    });
-    window.addEventListener("keydown", handleKeyboardInteraction);
-
-    return () => {
-      scrollContainerElement.removeEventListener("wheel", notifyUserInteraction);
-      scrollContainerElement.removeEventListener("touchstart", notifyUserInteraction);
-      window.removeEventListener("keydown", handleKeyboardInteraction);
+    if (isSome(animationRef.current)) {
       cancel();
+    }
+  };
+
+  const handleKeyboardInteraction = (event: Event) => {
+    if (!(event instanceof KeyboardEvent)) {
+      return;
+    }
+
+    if (
+      event.key === "ArrowDown" ||
+      event.key === "ArrowUp" ||
+      event.key === "PageDown" ||
+      event.key === "PageUp" ||
+      event.key === "Home" ||
+      event.key === "End" ||
+      event.key === " "
+    ) {
+      notifyUserInteraction();
+    }
+  };
+
+  useEventListener({
+    target: scrollContainer,
+    type: "wheel",
+    listener: notifyUserInteraction,
+    options: { passive: true },
+    disabled: !isSome(scrollContainer),
+  });
+
+  useEventListener({
+    target: scrollContainer,
+    type: "touchstart",
+    listener: notifyUserInteraction,
+    options: { passive: true },
+    disabled: !isSome(scrollContainer),
+  });
+
+  useEventListener({
+    target: getWindowOption(),
+    type: "keydown",
+    listener: handleKeyboardInteraction,
+    options: undefined,
+    disabled: false,
+  });
+
+  useEffect(() => {
+    return () => {
+      if (isSome(animationRef.current)) {
+        animationRef.current.value.stop();
+      }
     };
-  }, [scrollContainer]);
+  }, []);
 
   return {
     isProgrammaticScrolling,

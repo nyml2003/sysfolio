@@ -32,9 +32,7 @@
     line-height: var(--sys-line-height-ui);
     color: var(--sys-color-text-secondary);
     white-space: nowrap;
-    transition:
-      color var(--sys-duration-fast) var(--sys-ease-standard),
-      opacity var(--sys-duration-fast) var(--sys-ease-standard);
+    @apply --u-tr-feedback;
   }
 
   .m-path-segment.is-current {
@@ -57,10 +55,11 @@
     background: transparent;
     color: var(--sys-color-text-secondary);
     cursor: pointer;
-    transition:
-      color var(--sys-duration-fast) var(--sys-ease-standard),
-      background var(--sys-duration-fast) var(--sys-ease-standard),
-      border-color var(--sys-duration-fast) var(--sys-ease-standard);
+    @apply --u-tr-feedback-press;
+  }
+
+  .m-theme-toggle:active {
+    transform: translateY(var(--sys-motion-distance-press));
   }
 
   .m-theme-toggle:focus-visible {
@@ -107,6 +106,7 @@
 
   .m-toc__toggle[aria-expanded="true"] {
     @apply --p-tree-toggle-expanded;
+    transform: rotate(90deg);
   }
 
   .m-toc__label {
@@ -146,8 +146,15 @@
 
   @media (prefers-reduced-motion: reduce) {
     .m-path-segment,
-    .m-theme-toggle {
-      transition-duration: 0.01ms;
+    .m-theme-toggle,
+    .m-toc__item,
+    .m-toc__row,
+    .m-toc__toggle {
+      transition-duration: var(--sys-motion-duration-reduced);
+    }
+
+    .m-theme-toggle:active {
+      transform: none;
     }
   }
 

@@ -110,10 +110,7 @@
     border-radius: var(--sys-radius-12);
     background: var(--sys-color-canvas-soft);
     color: var(--sys-color-text-primary);
-    transition:
-      color var(--sys-duration-fast) var(--sys-ease-standard),
-      background var(--sys-duration-fast) var(--sys-ease-standard),
-      border-color var(--sys-duration-fast) var(--sys-ease-standard);
+    @apply --u-tr-feedback;
   }
 
   .m-directory-entry:focus-visible,
@@ -192,7 +189,7 @@
   @media (prefers-reduced-motion: reduce) {
     .m-directory-entry,
     .m-home-view__entry {
-      transition-duration: 0.01ms;
+      transition-duration: var(--sys-motion-duration-reduced);
     }
   }
 

@@ -36,6 +36,13 @@
     --sys-color-danger-soft: #f3dde3;
     --sys-color-info: #7f94c1;
     --sys-color-info-soft: #e0e6f2;
+    --sys-color-warning: var(--sys-color-warm);
+    --sys-color-warning-soft: var(--sys-color-warm-soft);
+    --sys-color-destructive: var(--sys-color-danger);
+    --sys-color-destructive-soft: var(--sys-color-danger-soft);
+    --sys-color-drag-target: var(--sys-color-info);
+    --sys-color-drag-target-soft: var(--sys-color-info-soft);
+    --sys-color-reorder-guide: var(--sys-color-border-strong);
 
     --sys-color-link: #6679b4;
     --sys-color-link-hover: #586aa5;
@@ -51,6 +58,7 @@
     --sys-color-onboarding-dot-ring: rgb(251 243 222 / 82%);
     --sys-color-onboarding-popover: #f4e8d1;
     --sys-color-onboarding-scrim: rgb(67 58 48 / 8%);
+    --sys-color-overlay-scrim: rgb(67 58 48 / 12%);
 
     --sys-code-keyword: #8973c1;
     --sys-code-function: #7b8fcf;
@@ -124,6 +132,17 @@
     --sys-duration-overlay: 160ms;
     --sys-ease-standard: cubic-bezier(0.2, 0, 0, 1);
     --sys-ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --sys-motion-duration-feedback: var(--sys-duration-fast);
+    --sys-motion-duration-state: var(--sys-duration-base);
+    --sys-motion-duration-structure: 200ms;
+    --sys-motion-duration-overlay-surface: var(--sys-duration-overlay);
+    --sys-motion-duration-overlay-panel: 220ms;
+    --sys-motion-duration-attention: var(--sys-duration-slow);
+    --sys-motion-duration-reduced: 0.01ms;
+    --sys-motion-distance-press: 1px;
+    --sys-motion-distance-float: 4px;
+    --sys-motion-distance-panel: 8px;
+    --sys-motion-stagger-onboarding: 120ms;
     --sys-size-hit-target-comfortable: 2.75rem;
 
     --sys-layout-max-width: 1600px;
@@ -148,6 +167,11 @@
     --sys-layout-content-pad-block-start-compact: var(--sys-space-32);
     --sys-layout-content-pad-block-end: var(--sys-space-48);
     --sys-layout-content-pad-block-end-compact: var(--sys-space-40);
+    --sys-layout-overlay-nav-width: 24rem;
+    --sys-layout-overlay-panel-width: 22rem;
+    --sys-layout-overlay-sheet-height: 32rem;
+    --sys-z-overlay-scrim: 30;
+    --sys-z-overlay-panel: 40;
   }
 
   [data-theme="dark"] {
@@ -202,6 +226,7 @@
     --sys-color-onboarding-dot-ring: rgb(23 25 30 / 82%);
     --sys-color-onboarding-popover: #2a2e36;
     --sys-color-onboarding-scrim: rgb(23 25 30 / 18%);
+    --sys-color-overlay-scrim: rgb(23 25 30 / 28%);
 
     --sys-code-keyword: #c4a1f6;
     --sys-code-function: #97a9e1;

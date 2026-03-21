@@ -11,6 +11,7 @@ import { ContextPanel } from "@/features/context-panel/components/ContextPanel";
 import { FileTree } from "@/features/file-tree/components/FileTree";
 import { OnboardingHints } from "@/features/onboarding/components/OnboardingHints";
 import { PathBar } from "@/features/path-bar/components/PathBar";
+import { detachPromise } from "@/shared/lib/async/detach-promise";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import {
   fromNullable,
@@ -24,34 +25,46 @@ import styles from "./AppShell.module.css";
 
 function buildFallbackBreadcrumbs(path: string, homeTitle: string): BreadcrumbSegment[] {
   const segments = splitPathSegments(path);
-  const breadcrumbs: BreadcrumbSegment[] = [
-    {
-      id: "root",
-      title: "sysfolio",
-      path: ROOT_PATH,
+  const rootBreadcrumb: BreadcrumbSegment = {
+    id: "root",
+    title: "sysfolio",
+    path: ROOT_PATH,
+  };
+  const resolvedBreadcrumbs = segments.reduce<{
+    breadcrumbs: BreadcrumbSegment[];
+    currentSegments: string[];
+  }>(
+    (state, segment) => {
+      const currentSegments = [...state.currentSegments, segment];
+
+      return {
+        currentSegments,
+        breadcrumbs: [
+          ...state.breadcrumbs,
+          {
+            id: currentSegments.join("/"),
+            title: segment,
+            path: `/${currentSegments.join("/")}`,
+          },
+        ],
+      };
     },
-  ];
+    {
+      breadcrumbs: [rootBreadcrumb],
+      currentSegments: [],
+    },
+  );
 
-  let currentSegments: string[] = [];
-
-  for (const segment of segments) {
-    currentSegments = [...currentSegments, segment];
-    breadcrumbs.push({
-      id: currentSegments.join("/"),
-      title: segment,
-      path: `/${currentSegments.join("/")}`,
-    });
-  }
-
-  if (breadcrumbs.length === 1) {
-    breadcrumbs.push({
-      id: "home",
-      title: homeTitle,
-      path: ROOT_PATH,
-    });
-  }
-
-  return breadcrumbs;
+  return resolvedBreadcrumbs.breadcrumbs.length === 1
+    ? [
+        ...resolvedBreadcrumbs.breadcrumbs,
+        {
+          id: "home",
+          title: homeTitle,
+          path: ROOT_PATH,
+        },
+      ]
+    : resolvedBreadcrumbs.breadcrumbs;
 }
 
 type ShellContentProps = {
@@ -146,7 +159,7 @@ function ShellRoute() {
         currentPath={currentPath}
         fallbackBreadcrumbs={fallbackBreadcrumbs}
         onNavigate={(path) => {
-          void navigate(path);
+          detachPromise(navigate(path));
         }}
         resource={resource}
       />

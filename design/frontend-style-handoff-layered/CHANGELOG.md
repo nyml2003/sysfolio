@@ -33,6 +33,13 @@
 - 新增 `view-density-spec.md`，把 `Phase 4` 拆成可直接指导三类业务视图与状态容器密度的规范
 - 新增 `dark-theme-spec.md`，把 `Phase 5` 拆成可直接指导 dark theme token 复核与对象级检查的规范
 - 新增 `motion-spec.md`，把 `Phase 6` 拆成可直接指导动效权重、结构切换和 reduced motion 的规范
+- 在 `styles/tokens.css` 中补入 motion alias，包括 feedback / state / structure / overlay / reduced motion
+- 在 `styles/utilities.css` 中补入统一 transition helper，包括 `feedback / feedback-press / state / overlay`
+- 将按钮 hover 改回静态表面反馈，active 改为 `1px` press，不再做悬浮上抬
+- 让 `Switch` 的 thumb 改为可过渡位移，不再依赖跳变的 `inset-inline-start`
+- 让 `Tabs` 指示条、`Tree` toggle、`TOC` / `FileTree` 展开箭头和 `Progress` 宽度变化进入统一动效节奏
+- 为 `Popover / Tooltip / Dropdown / Dialog / Drawer` 补入基础 surface/panel transition 和 `data-state="closed"` 钩子
+- 将业务层和 primitive 层零散的 reduced motion 常量统一回收为 `--sys-motion-duration-reduced`
 - 修复 `styles/primitives/overlays.css` 中无效的 `@apply --m-surface-popover`
 - 补齐 `component.css`，让 `component` 层在目录和入口上都真实存在
 - 清理 `tokens.css` 中的组件别名 token，改回纯语义 token + 纯布局 token

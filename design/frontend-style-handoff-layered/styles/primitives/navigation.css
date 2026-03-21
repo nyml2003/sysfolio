@@ -104,7 +104,7 @@
     opacity: 0;
     transform: scaleX(0.4);
     transform-origin: center;
-    @apply --u-tr-fast;
+    @apply --u-tr-state;
   }
 
   .m-tabs-nav__item:focus-visible {
@@ -201,7 +201,7 @@
     .m-tabs-nav__item,
     .m-tabs-nav__item::after,
     .m-pagination__item {
-      transition-duration: 0.01ms;
+      transition-duration: var(--sys-motion-duration-reduced);
     }
   }
 }

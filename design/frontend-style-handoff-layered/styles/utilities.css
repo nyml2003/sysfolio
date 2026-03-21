@@ -205,19 +205,75 @@
       white-space: nowrap;
     };
 
+    --u-tr-feedback: {
+      transition:
+        color var(--sys-motion-duration-feedback) var(--sys-ease-standard),
+        background var(--sys-motion-duration-feedback) var(--sys-ease-standard),
+        border-color var(--sys-motion-duration-feedback)
+          var(--sys-ease-standard),
+        opacity var(--sys-motion-duration-feedback) var(--sys-ease-standard);
+    };
+    --u-tr-feedback-press: {
+      transition:
+        color var(--sys-motion-duration-feedback) var(--sys-ease-standard),
+        background var(--sys-motion-duration-feedback) var(--sys-ease-standard),
+        border-color var(--sys-motion-duration-feedback)
+          var(--sys-ease-standard),
+        opacity var(--sys-motion-duration-feedback) var(--sys-ease-standard),
+        transform var(--sys-motion-duration-feedback) var(--sys-ease-standard),
+        box-shadow var(--sys-motion-duration-feedback) var(--sys-ease-standard);
+    };
+    --u-tr-state: {
+      transition:
+        color var(--sys-motion-duration-state) var(--sys-ease-standard),
+        background var(--sys-motion-duration-state) var(--sys-ease-standard),
+        border-color var(--sys-motion-duration-state) var(--sys-ease-standard),
+        opacity var(--sys-motion-duration-state) var(--sys-ease-standard),
+        transform var(--sys-motion-duration-state) var(--sys-ease-standard),
+        box-shadow var(--sys-motion-duration-state) var(--sys-ease-standard);
+    };
+    --u-tr-structure: {
+      transition:
+        opacity var(--sys-motion-duration-structure) var(--sys-ease-emphasized),
+        transform var(--sys-motion-duration-structure)
+          var(--sys-ease-emphasized),
+        box-shadow var(--sys-motion-duration-structure)
+          var(--sys-ease-standard);
+    };
+    --u-tr-overlay-surface: {
+      transition:
+        opacity var(--sys-motion-duration-overlay-surface)
+          var(--sys-ease-emphasized),
+        transform var(--sys-motion-duration-overlay-surface)
+          var(--sys-ease-emphasized),
+        box-shadow var(--sys-motion-duration-overlay-surface)
+          var(--sys-ease-standard);
+    };
+    --u-tr-overlay-panel: {
+      transition:
+        opacity var(--sys-motion-duration-overlay-panel)
+          var(--sys-ease-emphasized),
+        transform var(--sys-motion-duration-overlay-panel)
+          var(--sys-ease-emphasized),
+        box-shadow var(--sys-motion-duration-overlay-panel)
+          var(--sys-ease-standard);
+    };
     --u-tr-fast: {
       transition:
-        color var(--sys-duration-fast) var(--sys-ease-standard),
-        background var(--sys-duration-fast) var(--sys-ease-standard),
-        border-color var(--sys-duration-fast) var(--sys-ease-standard);
+        color var(--sys-motion-duration-feedback) var(--sys-ease-standard),
+        background var(--sys-motion-duration-feedback) var(--sys-ease-standard),
+        border-color var(--sys-motion-duration-feedback)
+          var(--sys-ease-standard),
+        opacity var(--sys-motion-duration-feedback) var(--sys-ease-standard);
     };
     --u-tr-base: {
       transition:
-        color var(--sys-duration-base) var(--sys-ease-standard),
-        background var(--sys-duration-base) var(--sys-ease-standard),
-        border-color var(--sys-duration-base) var(--sys-ease-standard),
-        opacity var(--sys-duration-base) var(--sys-ease-standard),
-        transform var(--sys-duration-base) var(--sys-ease-standard);
+        color var(--sys-motion-duration-state) var(--sys-ease-standard),
+        background var(--sys-motion-duration-state) var(--sys-ease-standard),
+        border-color var(--sys-motion-duration-state) var(--sys-ease-standard),
+        opacity var(--sys-motion-duration-state) var(--sys-ease-standard),
+        transform var(--sys-motion-duration-state) var(--sys-ease-standard),
+        box-shadow var(--sys-motion-duration-state) var(--sys-ease-standard);
     };
     --u-focus: {
       outline: var(--sys-border-width-2) solid var(--sys-color-focus-ring);
@@ -411,6 +467,30 @@
 
   .u-tr-fast {
     @apply --u-tr-fast;
+  }
+
+  .u-tr-feedback {
+    @apply --u-tr-feedback;
+  }
+
+  .u-tr-feedback-press {
+    @apply --u-tr-feedback-press;
+  }
+
+  .u-tr-state {
+    @apply --u-tr-state;
+  }
+
+  .u-tr-structure {
+    @apply --u-tr-structure;
+  }
+
+  .u-tr-overlay-surface {
+    @apply --u-tr-overlay-surface;
+  }
+
+  .u-tr-overlay-panel {
+    @apply --u-tr-overlay-panel;
   }
 
   .u-tr-base {

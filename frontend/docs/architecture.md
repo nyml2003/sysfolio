@@ -28,6 +28,7 @@
    - tokens、atomic、molecular、primitives
 7. `shared/lib`
    - 纯 TS 模型与算法
+   - DOM hooks / browser adapter
 
 ## Runtime Flow
 
@@ -70,6 +71,8 @@
   - 高频查询辅助结构
 - 但 `Set` / `Map` 不应默认成为 repository 返回值、mock fixture、跨边界共享契约或需要持久化的业务数据形状。
 - 时间字段统一使用 ISO 字符串或时间戳。
+- 业务层不直接触碰 DOM / browser API。
+- 所有 DOM 读写、事件监听、observer、滚动测量和浏览器调度，统一收口到 `shared/lib/dom` 或 `shared/lib/layout`。
 
 ## Error And Loading Semantics
 

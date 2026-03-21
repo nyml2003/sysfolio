@@ -138,6 +138,8 @@
 - 全局 store / Context 都不直接读浏览器 API
 - 偏好读写通过 repository-style adapter 进入
 - 路由是路径和 query 的事实来源，除非需要跨 feature 协调，否则不复制到全局 store
+- 业务 hooks 不直接写 `document` / `window` / 监听器 / observer / 滚动 API
+- 这些能力通过通用 DOM hooks 适配层进入，再被 feature 组合
 
 ## Provider Rule
 

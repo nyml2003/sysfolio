@@ -84,7 +84,9 @@
     block-size: 100%;
     border-radius: inherit;
     background: var(--sys-color-accent);
-    @apply --u-tr-base;
+    transition:
+      inline-size var(--sys-motion-duration-state) var(--sys-ease-standard),
+      background var(--sys-motion-duration-feedback) var(--sys-ease-standard);
   }
 
   .m-progress--success .m-progress__bar {
@@ -102,7 +104,7 @@
     }
 
     .m-progress__bar {
-      transition-duration: 0.01ms;
+      transition-duration: var(--sys-motion-duration-reduced);
     }
   }
 }

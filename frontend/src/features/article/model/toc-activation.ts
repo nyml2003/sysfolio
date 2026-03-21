@@ -1,3 +1,10 @@
+import {
+  getElementClientHeight,
+  getElementScrollHeight,
+  getElementScrollTop,
+  getElementScrollTopWithinContainer as getDomElementScrollTopWithinContainer,
+} from "@/shared/lib/dom/scroll-element";
+
 export type TocReadingState =
   | "idle"
   | "initial"
@@ -18,16 +25,13 @@ export function getElementScrollTopWithinContainer(
   scrollContainer: HTMLElement,
   element: HTMLElement,
 ): number {
-  const containerRect = scrollContainer.getBoundingClientRect();
-  const elementRect = element.getBoundingClientRect();
-
-  return scrollContainer.scrollTop + elementRect.top - containerRect.top;
+  return getDomElementScrollTopWithinContainer(scrollContainer, element);
 }
 
 export function getTocActivationLine(scrollContainer: HTMLElement): number {
   return (
-    scrollContainer.scrollTop +
-    scrollContainer.clientHeight * TOC_ACTIVATION_LINE_RATIO
+    getElementScrollTop(scrollContainer) +
+    getElementClientHeight(scrollContainer) * TOC_ACTIVATION_LINE_RATIO
   );
 }
 
@@ -38,21 +42,21 @@ export function getTocTargetScrollTop(
   return Math.max(
     0,
     getElementScrollTopWithinContainer(scrollContainer, element) -
-      scrollContainer.clientHeight * TOC_ACTIVATION_LINE_RATIO,
+      getElementClientHeight(scrollContainer) * TOC_ACTIVATION_LINE_RATIO,
   );
 }
 
 export function hasScrollableTocContent(scrollContainer: HTMLElement): boolean {
   return (
-    scrollContainer.scrollHeight - scrollContainer.clientHeight >
+    getElementScrollHeight(scrollContainer) - getElementClientHeight(scrollContainer) >
     TOC_SCROLLABLE_EPSILON
   );
 }
 
 export function isAtScrollBottom(scrollContainer: HTMLElement): boolean {
   return (
-    scrollContainer.scrollTop + scrollContainer.clientHeight >=
-    scrollContainer.scrollHeight - TOC_BOTTOM_EPSILON
+    getElementScrollTop(scrollContainer) + getElementClientHeight(scrollContainer) >=
+    getElementScrollHeight(scrollContainer) - TOC_BOTTOM_EPSILON
   );
 }
 
@@ -61,7 +65,7 @@ export function isTocTargetScrollReached(
   element: HTMLElement,
 ): boolean {
   return (
-    Math.abs(scrollContainer.scrollTop - getTocTargetScrollTop(scrollContainer, element)) <=
+    Math.abs(getElementScrollTop(scrollContainer) - getTocTargetScrollTop(scrollContainer, element)) <=
       TOC_TARGET_EPSILON || isAtScrollBottom(scrollContainer)
   );
 }

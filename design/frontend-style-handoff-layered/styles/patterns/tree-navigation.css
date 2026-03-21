@@ -18,9 +18,11 @@
       font-size: var(--sys-font-size-13);
       line-height: var(--sys-line-height-ui);
       transition:
-        color var(--sys-duration-fast) var(--sys-ease-standard),
-        background var(--sys-duration-fast) var(--sys-ease-standard),
-        border-color var(--sys-duration-fast) var(--sys-ease-standard);
+        color var(--sys-motion-duration-feedback) var(--sys-ease-standard),
+        background var(--sys-motion-duration-feedback) var(--sys-ease-standard),
+        border-color var(--sys-motion-duration-feedback)
+          var(--sys-ease-standard),
+        box-shadow var(--sys-motion-duration-state) var(--sys-ease-standard);
     };
     --p-tree-row-inline: {
       display: flex;
@@ -54,9 +56,12 @@
       color: var(--sys-color-icon-default);
       cursor: pointer;
       transition:
-        color var(--sys-duration-fast) var(--sys-ease-standard),
-        background var(--sys-duration-fast) var(--sys-ease-standard),
-        border-color var(--sys-duration-fast) var(--sys-ease-standard);
+        color var(--sys-motion-duration-feedback) var(--sys-ease-standard),
+        background var(--sys-motion-duration-feedback) var(--sys-ease-standard),
+        border-color var(--sys-motion-duration-feedback)
+          var(--sys-ease-standard),
+        transform var(--sys-motion-duration-structure)
+          var(--sys-ease-standard);
     };
     --p-tree-toggle-hover: {
       background: var(--sys-color-surface-hover);
@@ -122,6 +127,7 @@
 
   .m-tree-nav__toggle[aria-expanded="true"] {
     @apply --p-tree-toggle-expanded;
+    transform: rotate(90deg);
   }
 
   .m-tree-nav__label {
@@ -156,7 +162,7 @@
   @media (prefers-reduced-motion: reduce) {
     .m-tree-nav__row,
     .m-tree-nav__toggle {
-      transition-duration: 0.01ms;
+      transition-duration: var(--sys-motion-duration-reduced);
     }
   }
 

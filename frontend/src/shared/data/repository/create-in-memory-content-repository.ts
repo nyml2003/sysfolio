@@ -483,10 +483,10 @@ export function createInMemoryContentRepository(
       );
     },
     async loadChildren(nodeId, page) {
-      void page;
       const locale = getResolvedLocale();
       const dataset = getDataset(locale);
       const node = getNodeById(dataset, nodeId);
+      const supportsRequestedPage = page === 1;
 
       if (isNone(node)) {
         return withLatency(
@@ -497,6 +497,16 @@ export function createInMemoryContentRepository(
                 : `节点 ${nodeId} 未找到。`,
             ),
           ),
+        );
+      }
+
+      if (!supportsRequestedPage) {
+        return withLatency(
+          readyState<ChildrenPagePayload, RepositoryError>({
+            parentId: nodeId,
+            nodes: [],
+            nextPage: none(),
+          }),
         );
       }
 

@@ -2,6 +2,7 @@ import { startTransition, useCallback, useEffect, useRef, useState } from "react
 
 import type { RepositoryError } from "@/entities/content";
 import { useContentRepository } from "@/shared/data/repository";
+import { detachPromise } from "@/shared/lib/async/detach-promise";
 import { idleState, loadingState, type ResourceState } from "@/shared/lib/resource/resource-state";
 import { usePreferences } from "@/shared/store/preferences";
 
@@ -22,6 +23,33 @@ type UseFileTreeResult = {
   expandedIds: string[];
   toggleNode: (nodeId: string) => void;
 };
+
+function getExpandedIdsForNode(node: TreeIndex["nodesById"][string]): string[] {
+  return node.kind === "folder" ? [...node.ancestorIds, node.id] : node.ancestorIds;
+}
+
+async function ensureNodeBranchLoaded(
+  currentNode: TreeIndex["nodesById"][string],
+  rootIndex: TreeIndex,
+  loadChildren: (nodeId: string) => Promise<void>,
+) {
+  for (const ancestorId of currentNode.ancestorIds) {
+    if (
+      ancestorId !== rootIndex.rootId &&
+      rootIndex.childrenByParentId[ancestorId] === undefined
+    ) {
+      await loadChildren(ancestorId);
+    }
+  }
+
+  if (
+    currentNode.kind === "folder" &&
+    currentNode.hasChildren &&
+    rootIndex.childrenByParentId[currentNode.id] === undefined
+  ) {
+    await loadChildren(currentNode.id);
+  }
+}
 
 export function useFileTree(currentPath: string): UseFileTreeResult {
   const repository = useContentRepository();
@@ -68,11 +96,11 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
   }, [repository]);
 
   useEffect(() => {
-    let cancelled = false;
+    const abortController = new AbortController();
+    const loadTreeRoot = async () => {
+      const treeRootResource = await repository.getTreeRoot();
 
-    setRootState(loadingState());
-    void repository.getTreeRoot().then((treeRootResource) => {
-      if (cancelled) {
+      if (abortController.signal.aborted) {
         return;
       }
 
@@ -90,10 +118,13 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
         });
         setExpandedIds(getDefaultExpandedIds(nextIndex));
       });
-    });
+    };
+
+    setRootState(loadingState());
+    detachPromise(loadTreeRoot());
 
     return () => {
-      cancelled = true;
+      abortController.abort();
     };
   }, [locale, repository]);
 
@@ -102,50 +133,33 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
       return;
     }
 
-    let cancelled = false;
+    const abortController = new AbortController();
+    const syncExpandedBranch = async () => {
+      const nodeResource = await repository.getNodeByPath(currentPath);
 
-    void repository.getNodeByPath(currentPath).then(async (nodeResource) => {
-      if (cancelled || nodeResource.tag !== "ready") {
+      if (abortController.signal.aborted || nodeResource.tag !== "ready") {
         return;
       }
 
       const currentNode = nodeResource.value;
 
-      for (const ancestorId of currentNode.ancestorIds) {
-        if (
-          ancestorId !== rootState.value.rootId &&
-          rootState.value.childrenByParentId[ancestorId] === undefined
-        ) {
-          await loadChildren(ancestorId);
-        }
-      }
+      await ensureNodeBranchLoaded(currentNode, rootState.value, loadChildren);
 
-      if (
-        currentNode.kind === "folder" &&
-        currentNode.hasChildren &&
-        rootState.value.childrenByParentId[currentNode.id] === undefined
-      ) {
-        await loadChildren(currentNode.id);
-      }
-
-      if (cancelled) {
+      if (abortController.signal.aborted) {
         return;
       }
 
       startTransition(() => {
         setExpandedIds((currentIds) =>
-          mergeExpandedIds(
-            currentIds,
-            currentNode.kind === "folder"
-              ? [...currentNode.ancestorIds, currentNode.id]
-              : currentNode.ancestorIds,
-          ),
+          mergeExpandedIds(currentIds, getExpandedIdsForNode(currentNode)),
         );
       });
-    });
+    };
+
+    detachPromise(syncExpandedBranch());
 
     return () => {
-      cancelled = true;
+      abortController.abort();
     };
   }, [currentPath, repository, rootState, loadChildren]);
 
@@ -166,7 +180,7 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
         rootState.value.nodesById[nodeId]?.hasChildren &&
         rootState.value.childrenByParentId[nodeId] === undefined
       ) {
-        void loadChildren(nodeId);
+        detachPromise(loadChildren(nodeId));
       }
 
       setExpandedIds((currentIds) => toggleExpanded(currentIds, nodeId));
