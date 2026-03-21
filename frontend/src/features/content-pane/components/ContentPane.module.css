@@ -96,6 +96,11 @@
     transform: translateY(-1px);
   }
 
+  .directoryEntry:focus-visible {
+    outline: var(--sys-border-width-2) solid var(--sys-color-focus-ring);
+    outline-offset: 2px;
+  }
+
   .directoryEntryComingSoon {
     color: var(--sys-color-text-muted);
   }

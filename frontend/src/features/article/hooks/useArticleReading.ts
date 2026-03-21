@@ -415,7 +415,7 @@ export function useArticleReading({
           reportRepositoryError("Failed to restore reading progress", progressResource.error);
         } else if (
           progressResource.tag === "ready" &&
-          progressResource.value.tag === "some" &&
+          isSome(progressResource.value) &&
           progressResource.value.value.scrollTop > 0
         ) {
           restoredScrollTop = progressResource.value.value.scrollTop;

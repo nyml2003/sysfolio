@@ -47,6 +47,11 @@
     color: var(--sys-color-text-primary);
   }
 
+  .segment:focus-visible {
+    outline: var(--sys-border-width-2) solid var(--sys-color-focus-ring);
+    outline-offset: 2px;
+  }
+
   .current {
     color: var(--sys-color-text-primary);
     font-weight: var(--sys-font-weight-semibold);

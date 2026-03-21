@@ -41,6 +41,10 @@
 
 先把基础组件的家族关系做稳，让前端后续继续补控件时有统一标准，而不是每补一个控件再单独找风格。
 
+详细规范见：
+
+- [primitive-visual-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/primitive-visual-spec.md)
+
 ### 范围
 
 - `styles/primitives/actions.css`

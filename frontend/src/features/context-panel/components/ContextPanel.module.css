@@ -55,6 +55,11 @@
     box-shadow: inset 2px 0 0 var(--sys-color-border-default);
   }
 
+  .tocItem:focus-visible {
+    outline: var(--sys-border-width-2) solid var(--sys-color-focus-ring);
+    outline-offset: 2px;
+  }
+
   .tocItemActive {
     background: var(--sys-color-surface-active);
     color: var(--sys-color-text-primary);

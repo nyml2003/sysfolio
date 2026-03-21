@@ -2,6 +2,7 @@ import {
   startTransition,
   useEffect,
   useEffectEvent,
+  useMemo,
   useState,
   type ReactNode,
 } from "react";
@@ -12,8 +13,12 @@ import {
   DEFAULT_LOCALE,
   type AppLocale,
 } from "@/shared/lib/i18n/locale.types";
+import { some } from "@/shared/lib/monads/option";
 import { DEFAULT_THEME, type ThemePreference } from "@/shared/lib/theme/theme.types";
-import { PreferencesContext } from "./preferences-context";
+import {
+  PreferencesContext,
+  type PreferencesContextValue,
+} from "./preferences-context";
 
 type PreferencesProviderProps = {
   children: ReactNode;
@@ -102,23 +107,35 @@ export function PreferencesProvider({ children }: PreferencesProviderProps) {
     document.documentElement.lang = locale;
   }, [locale]);
 
+  const value = useMemo<PreferencesContextValue>(
+    () => ({
+      theme,
+      locale,
+      toggleTheme: () => {
+        void toggleTheme();
+      },
+      toggleLocale: () => {
+        void toggleLocale();
+      },
+      onboardingVisible: hydrated && !onboardingState.dismissed,
+      dismissOnboarding: () => {
+        void dismissOnboarding();
+      },
+    }),
+    [
+      dismissOnboarding,
+      hydrated,
+      locale,
+      onboardingState.dismissed,
+      theme,
+      toggleLocale,
+      toggleTheme,
+    ],
+  );
+  const contextValue = useMemo(() => some(value), [value]);
+
   return (
-    <PreferencesContext.Provider
-      value={{
-        theme,
-        locale,
-        toggleTheme: () => {
-          void toggleTheme();
-        },
-        toggleLocale: () => {
-          void toggleLocale();
-        },
-        onboardingVisible: hydrated && !onboardingState.dismissed,
-        dismissOnboarding: () => {
-          void dismissOnboarding();
-        },
-      }}
-    >
+    <PreferencesContext.Provider value={contextValue}>
       {children}
     </PreferencesContext.Provider>
   );

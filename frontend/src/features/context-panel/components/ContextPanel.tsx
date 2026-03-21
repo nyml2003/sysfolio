@@ -1,5 +1,6 @@
 import type { RenderableEntryPayload, RepositoryError } from "@/entities/content";
-import { none, unwrapOr } from "@/shared/lib/monads/option";
+import type { ReactNode } from "react";
+import { isSome, none, unwrapOr } from "@/shared/lib/monads/option";
 import type { ResourceState } from "@/shared/lib/resource/resource-state";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import buttonStyles from "@/shared/ui/primitives/Button.module.css";
@@ -39,7 +40,26 @@ export function ContextPanel({
     recentEntries: [],
     stats: none(),
   });
-  const parentEntry = context.parent.tag === "some" ? context.parent.value : null;
+  let parentSection: ReactNode = null;
+
+  if (isSome(context.parent)) {
+    const parentEntry = context.parent.value;
+
+    parentSection = (
+      <section className={styles.section}>
+        <div className={styles.title}>{copy.contextPanel.parentTitle}</div>
+        <button
+          className={[buttonStyles.root, buttonStyles.secondary].join(" ")}
+          onClick={() => {
+            onNavigate(parentEntry.path);
+          }}
+          type="button"
+        >
+          {copy.contextPanel.backTo(parentEntry.title)}
+        </button>
+      </section>
+    );
+  }
 
   return (
     <aside className={styles.root}>
@@ -49,6 +69,7 @@ export function ContextPanel({
           <div className={styles.toc}>
             {resource.value.content.toc.map((item) => (
               <button
+                aria-current={item.id === activeHeadingId ? "location" : false}
                 className={[
                   styles.tocItem,
                   item.id === activeHeadingId ? styles.tocItemActive : "",
@@ -68,7 +89,7 @@ export function ContextPanel({
         </section>
       ) : null}
 
-      {context.stats.tag === "some" ? (
+      {isSome(context.stats) ? (
         <section className={styles.section}>
           <div className={styles.title}>{copy.contextPanel.directoryStatsTitle}</div>
           <div>{copy.common.itemCount(context.stats.value.childCount)}</div>
@@ -77,20 +98,7 @@ export function ContextPanel({
         </section>
       ) : null}
 
-      {parentEntry === null ? null : (
-        <section className={styles.section}>
-          <div className={styles.title}>{copy.contextPanel.parentTitle}</div>
-          <button
-            className={[buttonStyles.root, buttonStyles.secondary].join(" ")}
-            onClick={() => {
-              onNavigate(parentEntry.path);
-            }}
-            type="button"
-          >
-            {copy.contextPanel.backTo(parentEntry.title)}
-          </button>
-        </section>
-      )}
+      {parentSection}
 
       {context.recentEntries.length > 0 ? (
         <section className={styles.section}>

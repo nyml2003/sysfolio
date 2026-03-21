@@ -28,6 +28,8 @@ type UiCopy = {
     ariaLabel: string;
     title: string;
     loading: string;
+    expandDirectory: (title: string) => string;
+    collapseDirectory: (title: string) => string;
   };
   article: {
     publishedAt: (formattedDate: string) => string;
@@ -128,6 +130,12 @@ const uiCopyByLocale: Record<AppLocale, UiCopy> = {
       ariaLabel: "文件树",
       title: "文件树",
       loading: "正在展开目录视图…",
+      expandDirectory(title) {
+        return `展开 ${title}`;
+      },
+      collapseDirectory(title) {
+        return `折叠 ${title}`;
+      },
     },
     article: {
       publishedAt(formattedDate) {
@@ -230,6 +238,12 @@ const uiCopyByLocale: Record<AppLocale, UiCopy> = {
       ariaLabel: "File tree",
       title: "Filesystem",
       loading: "Expanding the directory view…",
+      expandDirectory(title) {
+        return `Expand ${title}`;
+      },
+      collapseDirectory(title) {
+        return `Collapse ${title}`;
+      },
     },
     article: {
       publishedAt(formattedDate) {

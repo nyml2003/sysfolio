@@ -23,7 +23,16 @@ import {
   type ResourceState,
 } from "@/shared/lib/resource/resource-state";
 import { type ThemePreference } from "@/shared/lib/theme/theme.types";
-import { isSome, none, some, unwrapOr, type Option } from "@/shared/lib/monads/option";
+import {
+  fromNullable,
+  isNone,
+  isSome,
+  none,
+  some,
+  unwrapOr,
+  type Option,
+} from "@/shared/lib/monads/option";
+import { isErr } from "@/shared/lib/monads/result";
 import {
   createMockContentFixtures,
   ROOT_NODE_ID,
@@ -234,7 +243,7 @@ export function createInMemoryContentRepository(
   function getResolvedLocale(): AppLocale {
     const result = browserPreferencesAdapter.getLocalePreference();
 
-    return result.tag === "err" ? DEFAULT_LOCALE : result.value;
+    return isErr(result) ? DEFAULT_LOCALE : result.value;
   }
 
   function getDataset(locale: AppLocale = getResolvedLocale()): LocalizedRepositoryData {
@@ -252,8 +261,8 @@ export function createInMemoryContentRepository(
   function getNodeById(
     dataset: LocalizedRepositoryData,
     nodeId: string,
-  ): ContentNode | null {
-    return dataset.nodeById[nodeId] ?? null;
+  ): Option<ContentNode> {
+    return fromNullable(dataset.nodeById[nodeId]);
   }
 
   function getChildren(
@@ -264,9 +273,11 @@ export function createInMemoryContentRepository(
     const childIds = dataset.childrenByParentId[parentId] ?? [];
 
     return sortNodes(
-      childIds
-        .map((childId) => getNodeById(dataset, childId))
-        .filter((node): node is ContentNode => node !== null),
+      childIds.flatMap((childId) => {
+        const child = getNodeById(dataset, childId);
+
+        return isSome(child) ? [child.value] : [];
+      }),
       locale,
     );
   }
@@ -323,11 +334,11 @@ export function createInMemoryContentRepository(
 
       const ancestor = getNodeById(dataset, ancestorId);
 
-      if (ancestor !== null) {
+      if (isSome(ancestor)) {
         breadcrumbs.push({
-          id: ancestor.id,
-          title: ancestor.title,
-          path: getNodePath(ancestor),
+          id: ancestor.value.id,
+          title: ancestor.value.title,
+          path: getNodePath(ancestor.value),
         });
       }
     }
@@ -346,14 +357,14 @@ export function createInMemoryContentRepository(
     node: ContentNode,
     locale: AppLocale,
   ): ContextInfo {
-    const parentNode =
+    const parentNode: Option<ContentNode> =
       isSome(node.parentId) && node.parentId.value !== ROOT_NODE_ID
         ? getNodeById(dataset, node.parentId.value)
-        : null;
+        : none();
     const siblingSummaries =
-      parentNode === null
+      !isSome(parentNode)
         ? []
-        : getChildren(dataset, parentNode.id, locale)
+        : getChildren(dataset, parentNode.value.id, locale)
             .filter((child) => child.id !== node.id)
             .map((child) => toSummary(dataset, child, locale))
             .slice(0, 4);
@@ -366,8 +377,7 @@ export function createInMemoryContentRepository(
 
     return {
       breadcrumbs: buildBreadcrumbs(dataset, node),
-      parent:
-        parentNode === null ? none() : some(toSummary(dataset, parentNode, locale)),
+      parent: isSome(parentNode) ? some(toSummary(dataset, parentNode.value, locale)) : none(),
       siblings: siblingSummaries,
       recentEntries,
       stats:
@@ -381,29 +391,33 @@ export function createInMemoryContentRepository(
     dataset: LocalizedRepositoryData,
     node: ContentNode,
     locale: AppLocale,
-  ): RenderableContent | null {
+  ): Option<RenderableContent> {
     if (node.kind === "home" && isSome(node.documentId)) {
-      return dataset.homeContents[node.documentId.value] ?? null;
+      return fromNullable(dataset.homeContents[node.documentId.value]);
     }
 
     if (node.kind === "folder") {
-      return buildDirectoryContent(dataset, node, locale);
+      return some(buildDirectoryContent(dataset, node, locale));
     }
 
     if (node.kind === "article" && isSome(node.documentId)) {
-      return dataset.articleDocuments[node.documentId.value] ?? null;
+      return fromNullable(dataset.articleDocuments[node.documentId.value]);
     }
 
     if (node.kind === "game" || node.kind === "media") {
       const parentPath =
         isSome(node.parentId) && node.parentId.value !== ROOT_NODE_ID
-          ? getNodePath(dataset.nodeById[node.parentId.value])
+          ? (() => {
+              const parentNode = getNodeById(dataset, node.parentId.value);
+
+              return isSome(parentNode) ? getNodePath(parentNode.value) : ROOT_PATH;
+            })()
           : ROOT_PATH;
 
-      return toUnsupportedContent(locale, node, parentPath);
+      return some(toUnsupportedContent(locale, node, parentPath));
     }
 
-    return null;
+    return none();
   }
 
   async function getRenderableEntry(
@@ -428,7 +442,7 @@ export function createInMemoryContentRepository(
 
     const content = getRenderableContent(dataset, node, locale);
 
-    if (content === null) {
+    if (isNone(content)) {
       return withLatency(
         emptyState(
           some(
@@ -443,7 +457,7 @@ export function createInMemoryContentRepository(
     return withLatency(
       readyState({
         node,
-        content,
+        content: content.value,
         context: some(buildContextInfo(dataset, node, locale)),
       }),
     );
@@ -474,7 +488,7 @@ export function createInMemoryContentRepository(
       const dataset = getDataset(locale);
       const node = getNodeById(dataset, nodeId);
 
-      if (node === null) {
+      if (isNone(node)) {
         return withLatency(
           errorState(
             notFound(
@@ -534,7 +548,7 @@ export function createInMemoryContentRepository(
       const dataset = getDataset(locale);
       const node = getNodeById(dataset, nodeId);
 
-      if (node === null || node.kind !== "folder") {
+      if (isNone(node) || node.value.kind !== "folder") {
         return withLatency(
           errorState(
             notFound(
@@ -548,7 +562,7 @@ export function createInMemoryContentRepository(
 
       return withLatency(
         readyState<DirectoryContent, RepositoryError>(
-          buildDirectoryContent(dataset, node, locale),
+          buildDirectoryContent(dataset, node.value, locale),
         ),
       );
     },
@@ -594,42 +608,42 @@ export function createInMemoryContentRepository(
     async getThemePreference() {
       const result = browserPreferencesAdapter.getThemePreference();
 
-      return result.tag === "err"
+      return isErr(result)
         ? withLatency(errorState(result.error))
         : withLatency(readyState<ThemePreference, RepositoryError>(result.value));
     },
     async setThemePreference(theme) {
       const result = browserPreferencesAdapter.setThemePreference(theme);
 
-      return result.tag === "err"
+      return isErr(result)
         ? withLatency(errorState(result.error))
         : withLatency(readyState<ThemePreference, RepositoryError>(result.value));
     },
     async getLocalePreference() {
       const result = browserPreferencesAdapter.getLocalePreference();
 
-      return result.tag === "err"
+      return isErr(result)
         ? withLatency(errorState(result.error))
         : withLatency(readyState(result.value));
     },
     async setLocalePreference(locale) {
       const result = browserPreferencesAdapter.setLocalePreference(locale);
 
-      return result.tag === "err"
+      return isErr(result)
         ? withLatency(errorState(result.error))
         : withLatency(readyState(result.value));
     },
     async getOnboardingState() {
       const result = browserPreferencesAdapter.getOnboardingState();
 
-      return result.tag === "err"
+      return isErr(result)
         ? withLatency(errorState(result.error))
         : withLatency(readyState<OnboardingState, RepositoryError>(result.value));
     },
     async dismissOnboarding() {
       const result = browserPreferencesAdapter.dismissOnboarding();
 
-      return result.tag === "err"
+      return isErr(result)
         ? withLatency(errorState(result.error))
         : withLatency(readyState<OnboardingState, RepositoryError>(result.value));
     },
@@ -637,7 +651,7 @@ export function createInMemoryContentRepository(
       const normalizedPath = normalizePath(path);
       const result = browserPreferencesAdapter.getSavedReadingProgress(normalizedPath);
 
-      return result.tag === "err"
+      return isErr(result)
         ? withLatency(errorState(result.error))
         : withLatency(readyState(result.value));
     },
@@ -648,7 +662,7 @@ export function createInMemoryContentRepository(
         position,
       );
 
-      return result.tag === "err"
+      return isErr(result)
         ? withLatency(errorState(result.error))
         : withLatency(readyState(result.value));
     },

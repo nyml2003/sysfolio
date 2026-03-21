@@ -47,6 +47,7 @@ export function PathBar({ breadcrumbs, isLoading, onNavigate }: PathBarProps) {
                 />
               ) : (
                 <button
+                  aria-current={isCurrent ? "page" : false}
                   className={[styles.segment, isCurrent ? styles.current : ""]
                     .filter(Boolean)
                     .join(" ")}

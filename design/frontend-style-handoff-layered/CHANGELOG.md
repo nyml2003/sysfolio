@@ -27,6 +27,7 @@
 - 新增 `primitive-inventory.md`，整理 primitive 覆盖边界和组件清单
 - 新增 `visual-refinement-strategy.md`，把视觉侧待设计项推进成详细设计规范
 - 新增 `visual-delivery-roadmap.md`，把视觉规范继续拆成前端执行顺序和阶段验收标准
+- 新增 `primitive-visual-spec.md`，把 `Phase 1` 拆成可直接指导 CSS 调整的 primitive 视觉规范
 - 修复 `styles/primitives/overlays.css` 中无效的 `@apply --m-surface-popover`
 - 补齐 `component.css`，让 `component` 层在目录和入口上都真实存在
 - 清理 `tokens.css` 中的组件别名 token，改回纯语义 token + 纯布局 token

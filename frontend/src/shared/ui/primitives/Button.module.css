@@ -10,6 +10,17 @@
     font-family: var(--sys-font-ui);
     font-size: var(--sys-font-size-13);
     font-weight: var(--sys-font-weight-medium);
+    transition:
+      color var(--sys-duration-fast) var(--sys-ease-standard),
+      background var(--sys-duration-fast) var(--sys-ease-standard),
+      border-color var(--sys-duration-fast) var(--sys-ease-standard),
+      box-shadow var(--sys-duration-fast) var(--sys-ease-standard),
+      transform var(--sys-duration-fast) var(--sys-ease-standard);
+  }
+
+  .root:focus-visible {
+    outline: var(--sys-border-width-2) solid var(--sys-color-focus-ring);
+    outline-offset: 2px;
   }
 
   .primary {
@@ -18,9 +29,21 @@
     color: var(--sys-color-text-inverse);
   }
 
+  .primary:hover {
+    background: var(--sys-color-accent-hover);
+    border-color: var(--sys-color-accent-hover);
+    transform: translateY(-1px);
+  }
+
   .secondary {
     border: var(--sys-border-width-1) solid var(--sys-color-border-default);
     background: transparent;
     color: var(--sys-color-text-secondary);
+  }
+
+  .secondary:hover {
+    background: var(--sys-color-surface-hover);
+    border-color: var(--sys-color-border-strong);
+    color: var(--sys-color-text-primary);
   }
 }

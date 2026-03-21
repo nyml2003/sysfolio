@@ -12,7 +12,13 @@ import { FileTree } from "@/features/file-tree/components/FileTree";
 import { OnboardingHints } from "@/features/onboarding/components/OnboardingHints";
 import { PathBar } from "@/features/path-bar/components/PathBar";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
-import { fromNullable, none, some, type Option } from "@/shared/lib/monads/option";
+import {
+  fromNullable,
+  isSome,
+  none,
+  some,
+  type Option,
+} from "@/shared/lib/monads/option";
 import { ROOT_PATH, normalizePath, splitPathSegments } from "@/shared/lib/path/content-path";
 import styles from "./AppShell.module.css";
 
@@ -83,7 +89,7 @@ function ShellContent({
     });
 
   const breadcrumbs =
-    resource.tag === "ready" && resource.value.context.tag === "some"
+    resource.tag === "ready" && isSome(resource.value.context)
       ? resource.value.context.value.breadcrumbs
       : fallbackBreadcrumbs;
   const pathBarLoading = resource.tag === "idle" || resource.tag === "loading";

@@ -69,7 +69,7 @@
     color: var(--sys-color-text-primary);
   }
 
-  .row:focus-visible {
+  .row:focus-within {
     outline: var(--sys-border-width-2) solid var(--sys-color-focus-ring);
     outline-offset: 2px;
   }
@@ -103,6 +103,11 @@
     font-size: var(--sys-font-size-13);
     line-height: var(--sys-line-height-ui);
     text-align: left;
+  }
+
+  .trigger:focus-visible,
+  .label:focus-visible {
+    outline: none;
   }
 
   .statusDot {

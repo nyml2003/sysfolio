@@ -2,7 +2,7 @@ import type { ContextInfo, RenderableEntryPayload, RepositoryError } from "@/ent
 import { ArticleView } from "@/features/article/components/ArticleView";
 import { HomeView } from "@/features/home/components/HomeView";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
-import { none, unwrapOr } from "@/shared/lib/monads/option";
+import { isSome, none, unwrapOr } from "@/shared/lib/monads/option";
 import { ROOT_PATH } from "@/shared/lib/path/content-path";
 import type { ResourceState } from "@/shared/lib/resource/resource-state";
 import buttonStyles from "@/shared/ui/primitives/Button.module.css";
@@ -79,7 +79,7 @@ function renderDirectoryView(
               <div className={styles.directoryEntryTitle}>{entry.title}</div>
               <div className={styles.directoryEntryMeta}>
                 <span>{copy.common.kindLabel(entry.kind)}</span>
-                {entry.readingMinutes.tag === "some" ? (
+                {isSome(entry.readingMinutes) ? (
                   <span>{copy.common.minuteCount(entry.readingMinutes.value)}</span>
                 ) : null}
               </div>
@@ -102,7 +102,7 @@ function renderUnsupportedState(
   copy: ReturnType<typeof useUiCopy>,
 ) {
   const fallbackPath =
-    context.parent.tag === "some"
+    isSome(context.parent)
       ? context.parent.value.path
       : context.breadcrumbs.length > 0
         ? context.breadcrumbs[0].path

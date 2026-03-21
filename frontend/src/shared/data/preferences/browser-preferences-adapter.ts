@@ -1,7 +1,7 @@
 import type { OnboardingState, ReadingProgress, RepositoryError } from "@/entities/content";
-import { none, some } from "@/shared/lib/monads/option";
+import { isNone, isSome, none, some } from "@/shared/lib/monads/option";
 import type { Option } from "@/shared/lib/monads/option";
-import { err, ok } from "@/shared/lib/monads/result";
+import { err, isErr, ok } from "@/shared/lib/monads/result";
 import type { Result } from "@/shared/lib/monads/result";
 import { DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@/shared/lib/i18n/locale.types";
 import { DEFAULT_THEME } from "@/shared/lib/theme/theme.types";
@@ -111,69 +111,69 @@ export function createBrowserPreferencesAdapter(): PreferencesAdapter {
     getThemePreference() {
       const storedThemeResult = readStorage(THEME_KEY);
 
-      if (storedThemeResult.tag === "err") {
+      if (isErr(storedThemeResult)) {
         return storedThemeResult;
       }
 
-      return storedThemeResult.value.tag === "some"
+      return isSome(storedThemeResult.value)
         ? ok(parseTheme(storedThemeResult.value.value))
         : ok(DEFAULT_THEME);
     },
     setThemePreference(theme) {
       const writeResult = writeStorage(THEME_KEY, theme);
 
-      return writeResult.tag === "err" ? writeResult : ok(theme);
+      return isErr(writeResult) ? writeResult : ok(theme);
     },
     getLocalePreference() {
       const storedLocaleResult = readStorage(LOCALE_KEY);
 
-      if (storedLocaleResult.tag === "err") {
+      if (isErr(storedLocaleResult)) {
         return storedLocaleResult;
       }
 
-      return storedLocaleResult.value.tag === "some"
+      return isSome(storedLocaleResult.value)
         ? ok(parseLocale(storedLocaleResult.value.value))
         : ok(DEFAULT_LOCALE);
     },
     setLocalePreference(locale) {
       const writeResult = writeStorage(LOCALE_KEY, locale);
 
-      return writeResult.tag === "err" ? writeResult : ok(locale);
+      return isErr(writeResult) ? writeResult : ok(locale);
     },
     getOnboardingState() {
       const storedStateResult = readStorage(ONBOARDING_KEY);
 
-      if (storedStateResult.tag === "err") {
+      if (isErr(storedStateResult)) {
         return storedStateResult;
       }
 
       return ok({
         dismissed:
-          storedStateResult.value.tag === "some" &&
+          isSome(storedStateResult.value) &&
           storedStateResult.value.value === "dismissed",
       });
     },
     dismissOnboarding() {
       const writeResult = writeStorage(ONBOARDING_KEY, "dismissed");
 
-      return writeResult.tag === "err"
+      return isErr(writeResult)
         ? writeResult
         : ok({ dismissed: true });
     },
     getSavedReadingProgress(path) {
       const storedProgressResult = readStorage(READING_PROGRESS_KEY);
 
-      if (storedProgressResult.tag === "err") {
+      if (isErr(storedProgressResult)) {
         return storedProgressResult;
       }
 
-      if (storedProgressResult.value.tag === "none") {
+      if (isNone(storedProgressResult.value)) {
         return ok(none());
       }
 
       const parsedProgressResult = parseProgressMap(storedProgressResult.value.value);
 
-      if (parsedProgressResult.tag === "err") {
+      if (isErr(parsedProgressResult)) {
         return parsedProgressResult;
       }
 
@@ -184,16 +184,16 @@ export function createBrowserPreferencesAdapter(): PreferencesAdapter {
     saveReadingProgress(path, progress) {
       const storedProgressResult = readStorage(READING_PROGRESS_KEY);
 
-      if (storedProgressResult.tag === "err") {
+      if (isErr(storedProgressResult)) {
         return storedProgressResult;
       }
 
       const progressMapResult =
-        storedProgressResult.value.tag === "some"
+        isSome(storedProgressResult.value)
           ? parseProgressMap(storedProgressResult.value.value)
           : ok<Record<string, ReadingProgress>>({});
 
-      if (progressMapResult.tag === "err") {
+      if (isErr(progressMapResult)) {
         return progressMapResult;
       }
 
@@ -207,7 +207,7 @@ export function createBrowserPreferencesAdapter(): PreferencesAdapter {
         JSON.stringify(nextProgressMap),
       );
 
-      return writeResult.tag === "err" ? writeResult : ok(progress);
+      return isErr(writeResult) ? writeResult : ok(progress);
     },
   };
 }

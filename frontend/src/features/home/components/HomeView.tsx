@@ -1,6 +1,6 @@
 import type { ContextInfo, HomeContent } from "@/entities/content";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
-import { unwrapOr } from "@/shared/lib/monads/option";
+import { isSome, unwrapOr } from "@/shared/lib/monads/option";
 import { ArticleIcon, FolderIcon } from "@/shared/ui/primitives/Icon";
 import styles from "./HomeView.module.css";
 
@@ -44,7 +44,7 @@ export function HomeView({ content, context, onNavigate }: HomeViewProps) {
                 <div className={styles.entryTitle}>{entry.title}</div>
                 <div className={styles.entryMeta}>
                   <span>{copy.common.kindLabel(entry.kind)}</span>
-                  {entry.readingMinutes.tag === "some" ? (
+                  {isSome(entry.readingMinutes) ? (
                     <span>{copy.common.minuteCount(entry.readingMinutes.value)}</span>
                   ) : null}
                 </div>

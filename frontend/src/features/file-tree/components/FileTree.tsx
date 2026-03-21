@@ -1,8 +1,14 @@
-import { startTransition, useRef } from "react";
+import { startTransition, useCallback, useState } from "react";
 
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 import type { ContentNode } from "@/entities/content";
+import {
+  fromNullable,
+  isSome,
+  none,
+  type Option,
+} from "@/shared/lib/monads/option";
 import { ROOT_PATH, pathFromSegments } from "@/shared/lib/path/content-path";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import {
@@ -53,14 +59,34 @@ function renderNodeIcon(node: ContentNode) {
   return <ArticleIcon size={14} style={iconStyle(color)} />;
 }
 
+function toStableElementOption(
+  currentElement: Option<HTMLDivElement>,
+  nextElement: HTMLDivElement | null,
+): Option<HTMLDivElement> {
+  const nextOption = fromNullable(nextElement);
+
+  if (!isSome(nextOption)) {
+    return isSome(currentElement) ? none() : currentElement;
+  }
+
+  if (isSome(currentElement) && currentElement.value === nextOption.value) {
+    return currentElement;
+  }
+
+  return nextOption;
+}
+
 export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
-  const parentRef = useRef<HTMLDivElement | null>(null);
+  const [scrollElement, setScrollElement] = useState<Option<HTMLDivElement>>(none());
   const copy = useUiCopy();
   const { rows, rootState, loadingNodeIds, expandedIds, toggleNode } = useFileTree(currentPath);
+  const registerScrollElement = useCallback((node: HTMLDivElement | null) => {
+    setScrollElement((currentElement) => toStableElementOption(currentElement, node));
+  }, []);
   const virtualizer = useVirtualizer({
     count: rows.length,
     estimateSize: () => 36,
-    getScrollElement: () => parentRef.current,
+    getScrollElement: () => (isSome(scrollElement) ? scrollElement.value : null),
     overscan: 10,
   });
 
@@ -73,7 +99,11 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
       {rootState.tag === "loading" ? (
         <div className={styles.status}>{copy.fileTree.loading}</div>
       ) : null}
-      <div className={styles.list} ref={parentRef}>
+      <div
+        aria-busy={rootState.tag === "loading" || loadingNodeIds.length > 0}
+        className={styles.list}
+        ref={registerScrollElement}
+      >
         <div
           className={styles.viewport}
           style={{ height: `${virtualizer.getTotalSize()}px` }}
@@ -84,6 +114,7 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
             const isFolder = row.node.kind === "folder";
             const isLoading = loadingNodeIds.includes(row.node.id);
             const showDisclosure = isFolder && row.node.hasChildren;
+            const isExpanded = row.isExpanded || expandedIds.includes(row.node.id);
 
             return (
               <div
@@ -97,6 +128,14 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                 }}
               >
                 <button
+                  aria-expanded={showDisclosure ? isExpanded : undefined}
+                  aria-label={
+                    showDisclosure
+                      ? isExpanded
+                        ? copy.fileTree.collapseDirectory(row.node.title)
+                        : copy.fileTree.expandDirectory(row.node.title)
+                      : undefined
+                  }
                   className={styles.trigger}
                   disabled={!showDisclosure || isLoading}
                   onClick={() => {
@@ -109,7 +148,7 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                   type="button"
                 >
                   {showDisclosure ? (
-                    row.isExpanded || expandedIds.includes(row.node.id) ? (
+                    isExpanded ? (
                       <ChevronDownIcon size={12} />
                     ) : (
                       <ChevronRightIcon size={12} />
@@ -118,6 +157,7 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                 </button>
                 {renderNodeIcon(row.node)}
                 <button
+                  aria-current={row.isSelected ? "page" : false}
                   className={styles.label}
                   onClick={() => {
                     startTransition(() => {

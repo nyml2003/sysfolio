@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 
+import { some } from "@/shared/lib/monads/option";
 import type { ContentRepository } from "./repository.types";
 import { ContentRepositoryContext } from "./content-repository-context";
 
@@ -12,8 +13,10 @@ export function ContentRepositoryProvider({
   children,
   value,
 }: ContentRepositoryProviderProps) {
+  const contextValue = useMemo(() => some(value), [value]);
+
   return (
-    <ContentRepositoryContext.Provider value={value}>
+    <ContentRepositoryContext.Provider value={contextValue}>
       {children}
     </ContentRepositoryContext.Provider>
   );

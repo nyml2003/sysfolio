@@ -1,5 +1,6 @@
 import { createContext } from "react";
 
+import { none, type Option } from "@/shared/lib/monads/option";
 import type { AppLocale } from "@/shared/lib/i18n/locale.types";
 import type { ThemePreference } from "@/shared/lib/theme/theme.types";
 
@@ -12,4 +13,4 @@ export type PreferencesContextValue = {
   dismissOnboarding: () => void;
 };
 
-export const PreferencesContext = createContext<PreferencesContextValue | null>(null);
+export const PreferencesContext = createContext<Option<PreferencesContextValue>>(none());

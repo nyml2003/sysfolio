@@ -87,6 +87,11 @@
     transform: translateY(-1px);
   }
 
+  .entry:focus-visible {
+    outline: var(--sys-border-width-2) solid var(--sys-color-focus-ring);
+    outline-offset: 2px;
+  }
+
   .entryComingSoon {
     color: var(--sys-color-text-muted);
   }
