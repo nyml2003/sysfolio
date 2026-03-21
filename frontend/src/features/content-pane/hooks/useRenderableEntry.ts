@@ -3,11 +3,13 @@ import { startTransition, useEffect, useState } from "react";
 import type { RenderableEntryPayload, RepositoryError } from "@/entities/content";
 import { useContentRepository } from "@/shared/data/repository";
 import { idleState, loadingState, type ResourceState } from "@/shared/lib/resource/resource-state";
+import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
 
 export function useRenderableEntry(
   path: string,
 ): ResourceState<RenderableEntryPayload, RepositoryError> {
   const repository = useContentRepository();
+  const { locale } = usePreferences();
   const [resource, setResource] = useState<ResourceState<RenderableEntryPayload, RepositoryError>>(
     idleState(),
   );
@@ -29,7 +31,7 @@ export function useRenderableEntry(
     return () => {
       cancelled = true;
     };
-  }, [path, repository]);
+  }, [locale, path, repository]);
 
   return resource;
 }

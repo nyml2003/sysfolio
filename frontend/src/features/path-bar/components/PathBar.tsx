@@ -1,6 +1,8 @@
 import type { BreadcrumbSegment } from "@/entities/content";
 
+import { LocaleToggle } from "@/features/locale/components/LocaleToggle";
 import { ThemeToggle } from "@/features/theme/components/ThemeToggle";
+import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import styles from "./PathBar.module.css";
 
 type PathBarProps = {
@@ -18,11 +20,13 @@ function getSkeletonWidth(title: string, isCurrent: boolean): string {
 }
 
 export function PathBar({ breadcrumbs, isLoading, onNavigate }: PathBarProps) {
+  const copy = useUiCopy();
+
   return (
     <header className={styles.root}>
       <nav
         aria-busy={isLoading}
-        aria-label="当前路径"
+        aria-label={copy.pathBar.navLabel}
         className={styles.segments}
       >
         {breadcrumbs.map((segment, index) => {
@@ -63,6 +67,7 @@ export function PathBar({ breadcrumbs, isLoading, onNavigate }: PathBarProps) {
         })}
       </nav>
       <div className={styles.tools}>
+        <LocaleToggle />
         <ThemeToggle />
       </div>
     </header>

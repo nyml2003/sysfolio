@@ -26,6 +26,10 @@
   说明这套 6 层架构如何支撑响应式布局和不同输入能力下的交互。
 - `toc-activation-strategy.md`
   说明 TOC 在长文阅读中的激活规则，解决滚动到底但目录未到最后一项的问题。
+- `toc-file-tree-reuse-boundary.md`
+  说明 TOC 与 File Tree 应共享哪一层，不应共享哪一层。
+- `tree-navigation-pattern.md`
+  定义 TOC 与 File Tree 共享的树形导航模式层，包括结构、状态和交互边界。
 
 ## 依赖规则
 

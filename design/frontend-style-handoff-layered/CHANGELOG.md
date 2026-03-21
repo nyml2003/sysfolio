@@ -17,7 +17,9 @@
 - 新增新的入口文件 `index.css`
 - 新增新的分层说明文档 `README.md`
 - 新增 `responsive-and-multi-input-strategy.md`，补充响应式布局和多端交互设计约束
-- 新增 `toc-activation-strategy.md`，定义 TOC 当前项的激活线、到底兜底和正文底部留白策略
+- 新增 `toc-activation-strategy.md`，定义 TOC 当前项的轻量状态机、状态转移表、Mermaid 状态图、激活线、到底兜底和正文底部留白策略
+- 新增 `toc-file-tree-reuse-boundary.md`，定义 TOC 与 File Tree 的共享 pattern 边界和业务拆分边界
+- 新增 `tree-navigation-pattern.md`，定义共享树形导航 pattern 的结构、状态、键盘规则和业务扩展边界
 
 ### 新分层
 

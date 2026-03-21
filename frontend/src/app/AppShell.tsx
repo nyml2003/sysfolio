@@ -9,10 +9,12 @@ import { ContextPanel } from "@/features/context-panel/components/ContextPanel";
 import { FileTree } from "@/features/file-tree/components/FileTree";
 import { OnboardingHints } from "@/features/onboarding/components/OnboardingHints";
 import { PathBar } from "@/features/path-bar/components/PathBar";
+import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import { ROOT_PATH, normalizePath, splitPathSegments } from "@/shared/lib/path/content-path";
+import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
 import styles from "./AppShell.module.css";
 
-function buildFallbackBreadcrumbs(path: string): BreadcrumbSegment[] {
+function buildFallbackBreadcrumbs(path: string, homeTitle: string): BreadcrumbSegment[] {
   const segments = splitPathSegments(path);
   const breadcrumbs: BreadcrumbSegment[] = [
     {
@@ -36,7 +38,7 @@ function buildFallbackBreadcrumbs(path: string): BreadcrumbSegment[] {
   if (breadcrumbs.length === 1) {
     breadcrumbs.push({
       id: "home",
-      title: "首页",
+      title: homeTitle,
       path: ROOT_PATH,
     });
   }
@@ -47,9 +49,11 @@ function buildFallbackBreadcrumbs(path: string): BreadcrumbSegment[] {
 function ShellRoute() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { locale } = usePreferences();
+  const copy = useUiCopy();
   const currentPath = normalizePath(location.pathname);
   const resource = useRenderableEntry(currentPath);
-  const fallbackBreadcrumbs = buildFallbackBreadcrumbs(currentPath);
+  const fallbackBreadcrumbs = buildFallbackBreadcrumbs(currentPath, copy.common.homeTitle);
   const scrollContainerRef = useRef<HTMLElement | null>(null);
   const [activeHeadingId, setActiveHeadingId] = useState("");
 
@@ -57,7 +61,7 @@ function ShellRoute() {
     startTransition(() => {
       setActiveHeadingId("");
     });
-  }, [currentPath]);
+  }, [currentPath, locale]);
 
   useEffect(() => {
     if (resource.tag === "ready" && resource.value.content.kind === "article") {
@@ -83,7 +87,7 @@ function ShellRoute() {
         breadcrumbs={breadcrumbs}
         isLoading={pathBarLoading}
         onNavigate={(path) => {
-          navigate(path);
+          void navigate(path);
         }}
       />
       <div className={styles.body}>
@@ -91,7 +95,7 @@ function ShellRoute() {
           <FileTree
             currentPath={currentPath}
             onNavigate={(path) => {
-              navigate(path);
+              void navigate(path);
             }}
           />
         </div>
@@ -99,7 +103,7 @@ function ShellRoute() {
           <ContentPane
             onActiveHeadingChange={setActiveHeadingId}
             onNavigate={(path) => {
-              navigate(path);
+              void navigate(path);
             }}
             path={currentPath}
             resource={resource}
@@ -110,7 +114,7 @@ function ShellRoute() {
           <ContextPanel
             activeHeadingId={activeHeadingId}
             onNavigate={(path) => {
-              navigate(path);
+              void navigate(path);
             }}
             onScrollToHeading={(headingId) => {
               const scrollContainer = scrollContainerRef.current;

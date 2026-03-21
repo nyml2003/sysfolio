@@ -1,25 +1,23 @@
 import { useState } from "react";
 
+import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
 
 import styles from "./OnboardingHints.module.css";
 
-const tips = [
+const tipLayout = [
   {
     id: "tree",
-    label: "左侧浏览文件和目录。",
     dotStyle: { top: "25%", left: "13%" },
     popoverStyle: { top: "28%", left: "15%" },
   },
   {
     id: "content",
-    label: "中间查看首页、目录或阅读当前文件。",
     dotStyle: { top: "23%", left: "50%" },
     popoverStyle: { top: "26%", left: "52%" },
   },
   {
     id: "path",
-    label: "这里查看当前所在路径并切换主题。",
     dotStyle: { top: "6%", left: "53%" },
     popoverStyle: { top: "8%", left: "55%" },
   },
@@ -27,7 +25,14 @@ const tips = [
 
 export function OnboardingHints() {
   const { onboardingVisible, dismissOnboarding } = usePreferences();
+  const copy = useUiCopy();
   const [activeTipId, setActiveTipId] = useState<string>("tree");
+
+  const tips = [
+    { ...tipLayout[0], label: copy.onboarding.treeTip },
+    { ...tipLayout[1], label: copy.onboarding.contentTip },
+    { ...tipLayout[2], label: copy.onboarding.pathTip },
+  ] as const;
 
   if (!onboardingVisible) {
     return null;
@@ -72,7 +77,7 @@ export function OnboardingHints() {
           }}
           type="button"
         >
-          知道了
+          {copy.onboarding.dismiss}
         </button>
       </div>
     </div>

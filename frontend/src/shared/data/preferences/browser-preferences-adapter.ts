@@ -3,16 +3,20 @@ import { none, some } from "@/shared/lib/monads/option";
 import type { Option } from "@/shared/lib/monads/option";
 import { err, ok } from "@/shared/lib/monads/result";
 import type { Result } from "@/shared/lib/monads/result";
+import { DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@/shared/lib/i18n/locale.types";
 import { DEFAULT_THEME } from "@/shared/lib/theme/theme.types";
 import type { ThemePreference } from "@/shared/lib/theme/theme.types";
 
 const THEME_KEY = "sysfolio.theme";
+const LOCALE_KEY = "sysfolio.locale";
 const ONBOARDING_KEY = "sysfolio.onboarding";
 const READING_PROGRESS_KEY = "sysfolio.reading-progress";
 
 type PreferencesAdapter = {
   getThemePreference(): Result<RepositoryError, ThemePreference>;
   setThemePreference(theme: ThemePreference): Result<RepositoryError, ThemePreference>;
+  getLocalePreference(): Result<RepositoryError, AppLocale>;
+  setLocalePreference(locale: AppLocale): Result<RepositoryError, AppLocale>;
   getOnboardingState(): Result<RepositoryError, OnboardingState>;
   dismissOnboarding(): Result<RepositoryError, OnboardingState>;
   getSavedReadingProgress(path: string): Result<RepositoryError, Option<ReadingProgress>>;
@@ -59,6 +63,10 @@ function writeStorage(key: string, value: string): Result<RepositoryError, strin
 
 function parseTheme(raw: string): ThemePreference {
   return raw === "dark" ? "dark" : DEFAULT_THEME;
+}
+
+function parseLocale(raw: string): AppLocale {
+  return isAppLocale(raw) ? raw : DEFAULT_LOCALE;
 }
 
 function isReadingProgress(raw: unknown): raw is ReadingProgress {
@@ -115,6 +123,22 @@ export function createBrowserPreferencesAdapter(): PreferencesAdapter {
       const writeResult = writeStorage(THEME_KEY, theme);
 
       return writeResult.tag === "err" ? writeResult : ok(theme);
+    },
+    getLocalePreference() {
+      const storedLocaleResult = readStorage(LOCALE_KEY);
+
+      if (storedLocaleResult.tag === "err") {
+        return storedLocaleResult;
+      }
+
+      return storedLocaleResult.value.tag === "some"
+        ? ok(parseLocale(storedLocaleResult.value.value))
+        : ok(DEFAULT_LOCALE);
+    },
+    setLocalePreference(locale) {
+      const writeResult = writeStorage(LOCALE_KEY, locale);
+
+      return writeResult.tag === "err" ? writeResult : ok(locale);
     },
     getOnboardingState() {
       const storedStateResult = readStorage(ONBOARDING_KEY);

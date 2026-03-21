@@ -7,11 +7,26 @@ import type {
   HomeContent,
   NodeId,
 } from "@/entities/content";
+import type { AppLocale } from "@/shared/lib/i18n/locale.types";
 import type { Option } from "@/shared/lib/monads/option";
-import { none, some, unwrapOr } from "@/shared/lib/monads/option";
+import { isSome, none, some, unwrapOr } from "@/shared/lib/monads/option";
+
+import {
+  englishArticleDocuments,
+  englishDirectoryDescriptions,
+  englishHomeTitle,
+} from "./content.en";
 
 export const ROOT_NODE_ID = "root";
 export const ROOT_NODE_TITLE = "sysfolio";
+
+export type MockContentFixtures = {
+  rootNodeTitle: string;
+  contentNodes: ContentNode[];
+  homeContents: Record<DocumentId, HomeContent>;
+  directoryDescriptions: Record<NodeId, DirectoryContent["description"]>;
+  articleDocuments: Record<DocumentId, ArticleDocument>;
+};
 
 type NodeConfig = {
   id: NodeId;
@@ -670,3 +685,92 @@ export const mockArticleDocuments: Record<DocumentId, ArticleDocument> = {
     ],
   ),
 };
+
+function getLocalizedHomeContents(locale: AppLocale): Record<DocumentId, HomeContent> {
+  if (locale === "en-US") {
+    return {
+      ...mockHomeContents,
+      "home-doc": {
+        ...mockHomeContents["home-doc"],
+        title: englishHomeTitle,
+      },
+    };
+  }
+
+  return mockHomeContents;
+}
+
+function getLocalizedArticleDocuments(
+  locale: AppLocale,
+): Record<DocumentId, ArticleDocument> {
+  return locale === "en-US" ? englishArticleDocuments : mockArticleDocuments;
+}
+
+function getLocalizedDirectoryDescriptions(
+  locale: AppLocale,
+): Record<NodeId, DirectoryContent["description"]> {
+  if (locale === "en-US") {
+    return {
+      ...mockDirectoryDescriptions,
+      ...Object.fromEntries(
+        Object.entries(englishDirectoryDescriptions).map(([nodeId, description]) => [
+          nodeId,
+          some(description),
+        ]),
+      ),
+    };
+  }
+
+  return mockDirectoryDescriptions;
+}
+
+function getLocalizedContentNodes(
+  locale: AppLocale,
+  articleDocuments: Record<DocumentId, ArticleDocument>,
+  homeContents: Record<DocumentId, HomeContent>,
+): ContentNode[] {
+  if (locale !== "en-US") {
+    return mockContentNodes;
+  }
+
+  return mockContentNodes.map((node) => {
+    if (node.kind === "home" && isSome(node.documentId)) {
+      const localizedHome = homeContents[node.documentId.value];
+
+      return localizedHome === undefined
+        ? node
+        : {
+            ...node,
+            title: localizedHome.title,
+          };
+    }
+
+    if (node.kind === "article" && isSome(node.documentId)) {
+      const localizedArticle = articleDocuments[node.documentId.value];
+
+      return localizedArticle === undefined
+        ? node
+        : {
+            ...node,
+            title: localizedArticle.title,
+          };
+    }
+
+    return node;
+  });
+}
+
+export function createMockContentFixtures(locale: AppLocale): MockContentFixtures {
+  const homeContents = getLocalizedHomeContents(locale);
+  const articleDocuments = getLocalizedArticleDocuments(locale);
+  const directoryDescriptions = getLocalizedDirectoryDescriptions(locale);
+  const contentNodes = getLocalizedContentNodes(locale, articleDocuments, homeContents);
+
+  return {
+    rootNodeTitle: ROOT_NODE_TITLE,
+    contentNodes,
+    homeContents,
+    directoryDescriptions,
+    articleDocuments,
+  };
+}

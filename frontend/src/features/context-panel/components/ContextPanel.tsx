@@ -1,6 +1,7 @@
 import type { RenderableEntryPayload, RepositoryError } from "@/entities/content";
 import { none, unwrapOr } from "@/shared/lib/monads/option";
 import type { ResourceState } from "@/shared/lib/resource/resource-state";
+import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import buttonStyles from "@/shared/ui/primitives/Button.module.css";
 
 import styles from "./ContextPanel.module.css";
@@ -18,12 +19,14 @@ export function ContextPanel({
   onNavigate,
   onScrollToHeading,
 }: ContextPanelProps) {
+  const copy = useUiCopy();
+
   if (resource.tag !== "ready") {
     return (
       <aside className={styles.root}>
         <section className={styles.section}>
-          <div className={styles.title}>Context</div>
-          <div>上下文信息会在当前内容就绪后出现。</div>
+          <div className={styles.title}>{copy.contextPanel.placeholderTitle}</div>
+          <div>{copy.contextPanel.placeholderBody}</div>
         </section>
       </aside>
     );
@@ -42,7 +45,7 @@ export function ContextPanel({
     <aside className={styles.root}>
       {resource.value.content.kind === "article" ? (
         <section className={styles.section}>
-          <div className={styles.title}>Table Of Contents</div>
+          <div className={styles.title}>{copy.contextPanel.tocTitle}</div>
           <div className={styles.toc}>
             {resource.value.content.toc.map((item) => (
               <button
@@ -67,16 +70,16 @@ export function ContextPanel({
 
       {context.stats.tag === "some" ? (
         <section className={styles.section}>
-          <div className={styles.title}>Directory Stats</div>
-          <div>{context.stats.value.childCount} items</div>
-          <div>{context.stats.value.folderCount} folders</div>
-          <div>{context.stats.value.articleCount} articles</div>
+          <div className={styles.title}>{copy.contextPanel.directoryStatsTitle}</div>
+          <div>{copy.common.itemCount(context.stats.value.childCount)}</div>
+          <div>{copy.common.folderCount(context.stats.value.folderCount)}</div>
+          <div>{copy.common.articleCount(context.stats.value.articleCount)}</div>
         </section>
       ) : null}
 
       {parentEntry === null ? null : (
         <section className={styles.section}>
-          <div className={styles.title}>Parent</div>
+          <div className={styles.title}>{copy.contextPanel.parentTitle}</div>
           <button
             className={[buttonStyles.root, buttonStyles.secondary].join(" ")}
             onClick={() => {
@@ -84,14 +87,14 @@ export function ContextPanel({
             }}
             type="button"
           >
-            返回 {parentEntry.title}
+            {copy.contextPanel.backTo(parentEntry.title)}
           </button>
         </section>
       )}
 
       {context.recentEntries.length > 0 ? (
         <section className={styles.section}>
-          <div className={styles.title}>Recent</div>
+          <div className={styles.title}>{copy.contextPanel.recentTitle}</div>
           {context.recentEntries.map((entry) => (
             <button
               className={styles.tocItem}

@@ -4,6 +4,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 
 import type { ContentNode } from "@/entities/content";
 import { ROOT_PATH, pathFromSegments } from "@/shared/lib/path/content-path";
+import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import {
   ArticleIcon,
   ChevronDownIcon,
@@ -54,6 +55,7 @@ function renderNodeIcon(node: ContentNode) {
 
 export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
   const parentRef = useRef<HTMLDivElement | null>(null);
+  const copy = useUiCopy();
   const { rows, rootState, loadingNodeIds, expandedIds, toggleNode } = useFileTree(currentPath);
   const virtualizer = useVirtualizer({
     count: rows.length,
@@ -63,13 +65,13 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
   });
 
   return (
-    <aside className={styles.root} aria-label="文件树">
-      <div className={styles.title}>Filesystem</div>
+    <aside className={styles.root} aria-label={copy.fileTree.ariaLabel}>
+      <div className={styles.title}>{copy.fileTree.title}</div>
       {rootState.tag === "error" ? (
         <div className={styles.status}>{rootState.error.message}</div>
       ) : null}
       {rootState.tag === "loading" ? (
-        <div className={styles.status}>正在展开目录视图…</div>
+        <div className={styles.status}>{copy.fileTree.loading}</div>
       ) : null}
       <div className={styles.list} ref={parentRef}>
         <div

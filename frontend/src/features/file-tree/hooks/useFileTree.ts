@@ -3,6 +3,7 @@ import { startTransition, useEffect, useRef, useState } from "react";
 import type { RepositoryError } from "@/entities/content";
 import { useContentRepository } from "@/shared/data/repository";
 import { idleState, loadingState, type ResourceState } from "@/shared/lib/resource/resource-state";
+import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
 
 import {
   buildVisibleRows,
@@ -24,6 +25,7 @@ type UseFileTreeResult = {
 
 export function useFileTree(currentPath: string): UseFileTreeResult {
   const repository = useContentRepository();
+  const { locale } = usePreferences();
   const [rootState, setRootState] = useState<ResourceState<TreeIndex, RepositoryError>>(
     idleState(),
   );
@@ -93,7 +95,7 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
     return () => {
       cancelled = true;
     };
-  }, [repository]);
+  }, [locale, repository]);
 
   useEffect(() => {
     if (rootState.tag !== "ready") {

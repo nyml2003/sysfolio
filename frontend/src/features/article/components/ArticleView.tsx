@@ -2,7 +2,9 @@ import type { RefObject } from "react";
 
 import type { ArticleDocument, ContentNode } from "@/entities/content";
 import { formatDate } from "@/shared/lib/date/format-date";
+import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import { unwrapOr } from "@/shared/lib/monads/option";
+import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
 import buttonStyles from "@/shared/ui/primitives/Button.module.css";
 
 import { useArticleReading } from "../hooks/useArticleReading";
@@ -47,6 +49,8 @@ export function ArticleView({
   scrollContainerRef,
   onActiveHeadingChange,
 }: ArticleViewProps) {
+  const { locale } = usePreferences();
+  const copy = useUiCopy();
   const { restoreNoticeVisible, scrollToTop } = useArticleReading({
     path,
     document,
@@ -64,21 +68,25 @@ export function ArticleView({
           <div className={styles.eyebrow}>{document.eyebrow}</div>
           <h1 className={styles.title}>{document.title}</h1>
           <div className={styles.meta}>
-            {publishedAt === "" ? null : <span>发布于 {formatDate(publishedAt)}</span>}
-            {updatedAt === "" ? null : <span>更新于 {formatDate(updatedAt)}</span>}
-            {readingMinutes === 0 ? null : <span>{readingMinutes} min</span>}
+            {publishedAt === "" ? null : (
+              <span>{copy.article.publishedAt(formatDate(publishedAt, locale))}</span>
+            )}
+            {updatedAt === "" ? null : (
+              <span>{copy.article.updatedAt(formatDate(updatedAt, locale))}</span>
+            )}
+            {readingMinutes === 0 ? null : <span>{copy.common.minuteCount(readingMinutes)}</span>}
           </div>
           <div className={styles.summary}>{document.summary}</div>
         </header>
         {restoreNoticeVisible ? (
           <div className={styles.progressNotice}>
-            <span>已恢复到上次阅读位置。</span>
+            <span>{copy.article.restoreNotice}</span>
             <button
               className={[buttonStyles.root, buttonStyles.secondary].join(" ")}
               onClick={scrollToTop}
               type="button"
             >
-              回到顶部
+              {copy.article.scrollToTop}
             </button>
           </div>
         ) : null}

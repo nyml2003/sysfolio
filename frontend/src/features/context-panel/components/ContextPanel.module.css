@@ -38,6 +38,7 @@
     padding-inline: var(--sys-space-8);
     border-radius: var(--sys-radius-8);
     color: var(--sys-color-text-secondary);
+    background: transparent;
     font-family: var(--sys-font-ui);
     font-size: var(--sys-font-size-13);
     line-height: var(--sys-line-height-ui);
@@ -49,14 +50,14 @@
   }
 
   .tocItem:hover {
-    background: rgb(255 255 255 / 22%);
+    background: var(--sys-color-surface-hover);
     color: var(--sys-color-text-primary);
-    box-shadow: inset 2px 0 0 rgb(255 255 255 / 28%);
+    box-shadow: inset 2px 0 0 var(--sys-color-border-default);
   }
 
   .tocItemActive {
-    background: var(--sys-color-warm-soft);
+    background: var(--sys-color-surface-active);
     color: var(--sys-color-text-primary);
-    box-shadow: inset 2px 0 0 var(--sys-color-warm);
+    box-shadow: inset 2px 0 0 var(--sys-color-accent);
   }
 }

@@ -3,6 +3,7 @@ import type { RefObject } from "react";
 import type { ContextInfo, RenderableEntryPayload, RepositoryError } from "@/entities/content";
 import { ArticleView } from "@/features/article/components/ArticleView";
 import { HomeView } from "@/features/home/components/HomeView";
+import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import { none, unwrapOr } from "@/shared/lib/monads/option";
 import { ROOT_PATH } from "@/shared/lib/path/content-path";
 import type { ResourceState } from "@/shared/lib/resource/resource-state";
@@ -35,7 +36,11 @@ function renderDirectoryIcon(kind: string) {
   return <ArticleIcon size={16} />;
 }
 
-function renderDirectoryView(payload: RenderableEntryPayload, onNavigate: (path: string) => void) {
+function renderDirectoryView(
+  payload: RenderableEntryPayload,
+  onNavigate: (path: string) => void,
+  copy: ReturnType<typeof useUiCopy>,
+) {
   if (payload.content.kind !== "directory") {
     return null;
   }
@@ -44,7 +49,7 @@ function renderDirectoryView(payload: RenderableEntryPayload, onNavigate: (path:
     <section className={styles.directoryRoot}>
       <header className={styles.directoryHeader}>
         <div className={styles.directoryEyebrow}>
-          {payload.node.pathSegments.join(" / ") || "root"}
+          {payload.node.pathSegments.join(" / ") || copy.common.rootLabel}
         </div>
         <h1 className={styles.directoryTitle}>{payload.content.title}</h1>
         {unwrapOr(payload.content.description, "") === "" ? null : (
@@ -54,8 +59,8 @@ function renderDirectoryView(payload: RenderableEntryPayload, onNavigate: (path:
         )}
       </header>
       <div className={styles.directoryMeta}>
-        <span>{payload.content.children.length} items</span>
-        <span>目录和文章共用统一内容壳</span>
+        <span>{copy.common.itemCount(payload.content.children.length)}</span>
+        <span>{copy.contentPane.directorySharedMeta}</span>
       </div>
       <div className={styles.directoryList}>
         {payload.content.children.map((entry) => (
@@ -76,9 +81,9 @@ function renderDirectoryView(payload: RenderableEntryPayload, onNavigate: (path:
             <div className={styles.directoryEntryBody}>
               <div className={styles.directoryEntryTitle}>{entry.title}</div>
               <div className={styles.directoryEntryMeta}>
-                <span>{entry.kind === "folder" ? "目录" : entry.kind}</span>
+                <span>{copy.common.kindLabel(entry.kind)}</span>
                 {entry.readingMinutes.tag === "some" ? (
-                  <span>{entry.readingMinutes.value} min</span>
+                  <span>{copy.common.minuteCount(entry.readingMinutes.value)}</span>
                 ) : null}
               </div>
               {unwrapOr(entry.description, "") === "" ? null : (
@@ -94,7 +99,11 @@ function renderDirectoryView(payload: RenderableEntryPayload, onNavigate: (path:
   );
 }
 
-function renderUnsupportedState(context: ContextInfo, onNavigate: (path: string) => void) {
+function renderUnsupportedState(
+  context: ContextInfo,
+  onNavigate: (path: string) => void,
+  copy: ReturnType<typeof useUiCopy>,
+) {
   const fallbackPath =
     context.parent.tag === "some"
       ? context.parent.value.path
@@ -106,10 +115,8 @@ function renderUnsupportedState(context: ContextInfo, onNavigate: (path: string)
     <section className={styles.root}>
       <div className={styles.inner}>
         <div className={styles.emptyState}>
-          <h2 className={styles.emptyTitle}>正在搭建当前视图</h2>
-          <p>
-            这条路径已经进入统一 repository，但当前类型还没有正文阅读器。你可以先返回父级目录继续浏览。
-          </p>
+          <h2 className={styles.emptyTitle}>{copy.contentPane.unsupportedTitle}</h2>
+          <p>{copy.contentPane.unsupportedBody}</p>
           <button
             className={[buttonStyles.root, buttonStyles.secondary].join(" ")}
             onClick={() => {
@@ -117,7 +124,7 @@ function renderUnsupportedState(context: ContextInfo, onNavigate: (path: string)
             }}
             type="button"
           >
-            返回上一级
+            {copy.contentPane.backToParent}
           </button>
         </div>
       </div>
@@ -145,21 +152,23 @@ export function ContentPane({
   onNavigate,
   onActiveHeadingChange,
 }: ContentPaneProps) {
+  const copy = useUiCopy();
+
   if (resource.tag === "loading" || resource.tag === "idle") {
     return renderStatusState(
-      "正在读取内容",
-      "路径已经解析完成，当前正在从 repository 聚合渲染所需内容。",
+      copy.contentPane.loadingTitle,
+      copy.contentPane.loadingBody,
     );
   }
 
   if (resource.tag === "error") {
-    return renderStatusState("路径未命中", resource.error.message);
+    return renderStatusState(copy.contentPane.notFoundTitle, resource.error.message);
   }
 
   if (resource.tag === "empty") {
     return renderStatusState(
-      "当前内容为空",
-      unwrapOr(resource.reason, "这条路径暂时没有可渲染内容。"),
+      copy.contentPane.emptyTitle,
+      unwrapOr(resource.reason, copy.contentPane.defaultEmptyReason),
     );
   }
 
@@ -178,7 +187,7 @@ export function ContentPane({
   }
 
   if (resource.value.content.kind === "directory") {
-    return renderDirectoryView(resource.value, onNavigate);
+    return renderDirectoryView(resource.value, onNavigate, copy);
   }
 
   if (resource.value.content.kind === "article") {
@@ -193,5 +202,5 @@ export function ContentPane({
     );
   }
 
-  return renderUnsupportedState(context, onNavigate);
+  return renderUnsupportedState(context, onNavigate, copy);
 }

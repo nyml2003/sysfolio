@@ -13,6 +13,7 @@ import type {
 } from "@/entities/content";
 import type { Option } from "@/shared/lib/monads/option";
 import type { ResourceState } from "@/shared/lib/resource/resource-state";
+import type { AppLocale } from "@/shared/lib/i18n/locale.types";
 import type { ThemePreference } from "@/shared/lib/theme/theme.types";
 
 export interface ContentRepository {
@@ -39,6 +40,10 @@ export interface ContentRepository {
   setThemePreference(
     theme: ThemePreference,
   ): Promise<ResourceState<ThemePreference, RepositoryError>>;
+  getLocalePreference(): Promise<ResourceState<AppLocale, RepositoryError>>;
+  setLocalePreference(
+    locale: AppLocale,
+  ): Promise<ResourceState<AppLocale, RepositoryError>>;
   getOnboardingState(): Promise<ResourceState<OnboardingState, RepositoryError>>;
   dismissOnboarding(): Promise<ResourceState<OnboardingState, RepositoryError>>;
   getSavedReadingProgress(
