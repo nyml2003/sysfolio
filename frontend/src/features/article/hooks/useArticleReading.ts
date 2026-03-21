@@ -8,6 +8,11 @@ import {
 
 import type { ArticleDocument } from "@/entities/content";
 import { useContentRepository } from "@/shared/data/repository";
+import {
+  getElementScrollTopWithinContainer,
+  getTocActivationLine,
+  isAtScrollBottom,
+} from "../model/toc-activation";
 
 type UseArticleReadingOptions = {
   path: string;
@@ -50,12 +55,28 @@ export function useArticleReading({
       return;
     }
 
+    if (isAtScrollBottom(scrollContainer)) {
+      const lastHeadingId = headings.at(-1)?.dataset.tocId;
+
+      if (lastHeadingId !== undefined) {
+        onActiveHeadingChangeRef.current(lastHeadingId);
+      }
+
+      return;
+    }
+
+    const activationLine = getTocActivationLine(scrollContainer);
     let currentHeading = headings[0];
 
     for (const heading of headings) {
-      if (heading.offsetTop - scrollContainer.scrollTop <= 120) {
+      if (
+        getElementScrollTopWithinContainer(scrollContainer, heading) <= activationLine
+      ) {
         currentHeading = heading;
+        continue;
       }
+
+      break;
     }
     const headingId = currentHeading.dataset.tocId;
 

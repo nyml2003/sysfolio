@@ -73,6 +73,7 @@
 
   .body {
     max-inline-size: var(--sys-layout-reading-measure);
+    padding-block-end: clamp(var(--sys-space-48), 18vh, 10rem);
     color: var(--sys-color-text-primary);
     font-family: var(--sys-font-body);
     font-size: var(--sys-font-size-16);

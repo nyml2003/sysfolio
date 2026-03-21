@@ -4,6 +4,7 @@ import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import type { BreadcrumbSegment } from "@/entities/content";
 import { ContentPane } from "@/features/content-pane/components/ContentPane";
 import { useRenderableEntry } from "@/features/content-pane/hooks/useRenderableEntry";
+import { getTocTargetScrollTop } from "@/features/article/model/toc-activation";
 import { ContextPanel } from "@/features/context-panel/components/ContextPanel";
 import { FileTree } from "@/features/file-tree/components/FileTree";
 import { OnboardingHints } from "@/features/onboarding/components/OnboardingHints";
@@ -121,15 +122,8 @@ function ShellRoute() {
               const heading = scrollContainer.querySelector<HTMLElement>(`#${headingId}`);
 
               if (heading !== null) {
-                const containerRect = scrollContainer.getBoundingClientRect();
-                const headingRect = heading.getBoundingClientRect();
-
                 scrollContainer.scrollTo({
-                  top:
-                    scrollContainer.scrollTop +
-                    headingRect.top -
-                    containerRect.top -
-                    24,
+                  top: getTocTargetScrollTop(scrollContainer, heading),
                   behavior: "smooth",
                 });
               }

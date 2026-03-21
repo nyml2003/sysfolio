@@ -43,6 +43,8 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     background: transparent;
+    scrollbar-width: thin;
+    scrollbar-color: var(--sys-color-text-faint) transparent;
   }
 
   .right {
