@@ -1,0 +1,27 @@
+@layer component {
+  :global(.m-theme-toggle) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+    border: var(--sys-border-width-1) solid var(--sys-color-border-default);
+    border-radius: var(--sys-radius-8);
+    background: transparent;
+    color: var(--sys-color-text-secondary);
+    transition:
+      color var(--sys-duration-fast) var(--sys-ease-standard),
+      background var(--sys-duration-fast) var(--sys-ease-standard),
+      border-color var(--sys-duration-fast) var(--sys-ease-standard);
+  }
+
+  :global(.m-theme-toggle:hover) {
+    background: var(--sys-color-surface-hover);
+    color: var(--sys-color-text-primary);
+  }
+
+  :global(.m-theme-toggle:focus-visible) {
+    outline: var(--sys-border-width-2) solid var(--sys-color-focus-ring);
+    outline-offset: 2px;
+  }
+}

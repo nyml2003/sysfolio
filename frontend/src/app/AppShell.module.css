@@ -1,0 +1,69 @@
+@layer component {
+  :global(.m-shell) {
+    min-block-size: 100vh;
+    display: grid;
+    grid-template-rows: var(--sys-layout-pathbar-height) minmax(0, 1fr);
+    background: var(--sys-color-canvas);
+    color: var(--sys-color-text-primary);
+  }
+
+  :global(.m-shell__body) {
+    min-block-size: 0;
+    display: grid;
+    grid-template-columns:
+      var(--sys-layout-left-rail)
+      minmax(0, 1fr)
+      var(--sys-layout-right-rail);
+  }
+
+  :global(.m-shell__left),
+  :global(.m-shell__main),
+  :global(.m-shell__right) {
+    min-inline-size: 0;
+    min-block-size: 0;
+  }
+
+  :global(.m-shell__left) {
+    background: rgb(255 255 255 / 12%);
+    border-inline-end: var(--sys-border-width-1) solid
+      var(--sys-color-border-default);
+    overflow: auto;
+  }
+
+  :global(.m-shell__main) {
+    display: flex;
+    justify-content: center;
+    overflow: auto;
+    background: transparent;
+  }
+
+  :global(.m-shell__right) {
+    background: rgb(255 255 255 / 14%);
+    border-inline-start: var(--sys-border-width-1) solid
+      var(--sys-color-border-default);
+    overflow: auto;
+  }
+
+  @media (width <= 1120px) {
+    :global(.m-shell__body) {
+      grid-template-columns: minmax(15rem, var(--sys-layout-left-rail)) minmax(
+          0,
+          1fr
+        );
+    }
+
+    :global(.m-shell__right) {
+      display: none;
+    }
+  }
+
+  @media (width <= 800px) {
+    :global(.m-shell__body) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    :global(.m-shell__left) {
+      display: none;
+    }
+  }
+}
