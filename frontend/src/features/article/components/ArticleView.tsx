@@ -12,7 +12,7 @@ type ArticleViewProps = {
   path: string;
   node: ContentNode;
   document: ArticleDocument;
-  scrollContainerRef: RefObject<HTMLElement>;
+  scrollContainerRef: RefObject<HTMLElement | null>;
   onActiveHeadingChange: (headingId: string) => void;
 };
 

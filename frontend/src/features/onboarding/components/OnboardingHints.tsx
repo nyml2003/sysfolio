@@ -38,7 +38,6 @@ export function OnboardingHints() {
   return (
     <div
       className={styles.root}
-      onClick={dismissOnboarding}
       onKeyDown={(event) => {
         if (event.key === "Escape") {
           dismissOnboarding();
@@ -65,7 +64,16 @@ export function OnboardingHints() {
         }}
         style={activeTip.popoverStyle}
       >
-        {activeTip.label}
+        <div className={styles.popoverBody}>{activeTip.label}</div>
+        <button
+          className={styles.dismiss}
+          onClick={() => {
+            dismissOnboarding();
+          }}
+          type="button"
+        >
+          知道了
+        </button>
       </div>
     </div>
   );

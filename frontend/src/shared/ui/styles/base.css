@@ -1,17 +1,4 @@
 @layer component {
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-
-  html,
-  body,
-  #root {
-    margin: 0;
-    block-size: 100%;
-  }
-
   html {
     background: var(--sys-color-canvas);
   }
@@ -62,24 +49,6 @@
         transparent 11px
       );
     opacity: 1;
-  }
-
-  button,
-  input,
-  textarea,
-  select {
-    font: inherit;
-  }
-
-  button {
-    border: 0;
-    background: none;
-    color: inherit;
-  }
-
-  a {
-    color: inherit;
-    text-decoration: none;
   }
 
   ::selection {

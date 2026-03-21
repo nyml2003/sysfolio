@@ -48,6 +48,7 @@ function ShellRoute() {
   const navigate = useNavigate();
   const currentPath = normalizePath(location.pathname);
   const resource = useRenderableEntry(currentPath);
+  const fallbackBreadcrumbs = buildFallbackBreadcrumbs(currentPath);
   const scrollContainerRef = useRef<HTMLElement | null>(null);
   const [activeHeadingId, setActiveHeadingId] = useState("");
 
@@ -72,12 +73,14 @@ function ShellRoute() {
   const breadcrumbs =
     resource.tag === "ready" && resource.value.context.tag === "some"
       ? resource.value.context.value.breadcrumbs
-      : buildFallbackBreadcrumbs(currentPath);
+      : fallbackBreadcrumbs;
+  const pathBarLoading = resource.tag === "idle" || resource.tag === "loading";
 
   return (
     <div className={styles.root}>
       <PathBar
         breadcrumbs={breadcrumbs}
+        isLoading={pathBarLoading}
         onNavigate={(path) => {
           navigate(path);
         }}

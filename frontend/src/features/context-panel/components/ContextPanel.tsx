@@ -36,14 +36,10 @@ export function ContextPanel({
     recentEntries: [],
     stats: none(),
   });
+  const parentEntry = context.parent.tag === "some" ? context.parent.value : null;
 
   return (
     <aside className={styles.root}>
-      <section className={styles.section}>
-        <div className={styles.title}>Location</div>
-        <div>{context.breadcrumbs.map((item) => item.title).join(" / ")}</div>
-      </section>
-
       {resource.value.content.kind === "article" ? (
         <section className={styles.section}>
           <div className={styles.title}>Table Of Contents</div>
@@ -78,20 +74,20 @@ export function ContextPanel({
         </section>
       ) : null}
 
-      {context.parent.tag === "some" ? (
+      {parentEntry === null ? null : (
         <section className={styles.section}>
           <div className={styles.title}>Parent</div>
           <button
             className={[buttonStyles.root, buttonStyles.secondary].join(" ")}
             onClick={() => {
-              onNavigate(context.parent.value.path);
+              onNavigate(parentEntry.path);
             }}
             type="button"
           >
-            返回 {context.parent.value.title}
+            返回 {parentEntry.title}
           </button>
         </section>
-      ) : null}
+      )}
 
       {context.recentEntries.length > 0 ? (
         <section className={styles.section}>

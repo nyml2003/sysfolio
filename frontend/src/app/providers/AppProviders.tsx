@@ -18,7 +18,7 @@ export function AppProviders({ children, repository }: AppProvidersProps) {
     unwrapOr(
       repository,
       createInMemoryContentRepository({
-        latencyMs: none<number>(),
+        latencyMs: none(),
       }),
     ),
   );

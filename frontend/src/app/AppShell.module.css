@@ -33,7 +33,9 @@
   .main {
     display: flex;
     justify-content: center;
-    overflow: auto;
+    align-items: flex-start;
+    overflow-x: hidden;
+    overflow-y: auto;
     background: transparent;
   }
 

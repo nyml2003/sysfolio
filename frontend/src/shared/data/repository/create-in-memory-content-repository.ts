@@ -147,7 +147,7 @@ function toUnsupportedContent(node: ContentNode, parentPath: string): Unsupporte
 }
 
 export function createInMemoryContentRepository(
-  rawOptions: RepositoryOptionsInput = { latencyMs: none<number>() },
+  rawOptions: RepositoryOptionsInput = { latencyMs: none() },
 ): ContentRepository {
   const options = {
     latencyMs: unwrapOr(rawOptions.latencyMs, defaultRepositoryOptions.latencyMs),

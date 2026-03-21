@@ -51,13 +51,33 @@ function createNode(config: NodeConfig): ContentNode {
 }
 
 const emptyNodeMeta = {
-  status: none<ContentNode["status"]>(),
-  childrenCount: none<number>(),
-  documentId: none<DocumentId>(),
-  publishedAt: none<string>(),
-  updatedAt: none<string>(),
-  readingMinutes: none<number>(),
+  status: none(),
+  childrenCount: none(),
+  documentId: none(),
+  publishedAt: none(),
+  updatedAt: none(),
+  readingMinutes: none(),
 };
+
+const generatedTopLevelNodes: ContentNode[] = Array.from(
+  { length: 100 },
+  (_, index) => {
+    const order = index + 1;
+    const paddedOrder = String(order).padStart(3, "0");
+    const slug = `stack-${paddedOrder}`;
+
+    return createNode({
+      ...emptyNodeMeta,
+      id: `stack-${paddedOrder}`,
+      kind: "folder",
+      title: `Stack ${paddedOrder}`,
+      slug,
+      parentId: ROOT_NODE_ID,
+      ancestorIds: [ROOT_NODE_ID],
+      pathSegments: [slug],
+    });
+  },
+);
 
 function createArticle(
   id: DocumentId,
@@ -91,7 +111,7 @@ export const mockContentNodes: ContentNode[] = [
     parentId: none(),
     ancestorIds: [],
     pathSegments: [],
-    childrenCount: 5,
+    childrenCount: 5 + generatedTopLevelNodes.length,
     hasChildren: true,
     documentId: none(),
     publishedAt: none(),
@@ -153,6 +173,7 @@ export const mockContentNodes: ContentNode[] = [
     pathSegments: ["journal"],
     childrenCount: some(2),
   }),
+  ...generatedTopLevelNodes,
   createNode({
     ...emptyNodeMeta,
     id: "archive-essays",
@@ -294,7 +315,7 @@ export const mockContentNodes: ContentNode[] = [
     documentId: some("doc-tree-windowing"),
     publishedAt: some("2026-03-21T03:00:00.000Z"),
     updatedAt: some("2026-03-21T10:30:00.000Z"),
-    readingMinutes: some(9),
+    readingMinutes: some(16),
   }),
   createNode({
     ...emptyNodeMeta,
@@ -503,6 +524,7 @@ export const mockArticleDocuments: Record<DocumentId, ArticleDocument> = {
         level: 2,
         paragraphs: [
           "树组件最稳的做法，是把 nodes、expandedIds 和 loadedChildren 当原始状态，再在纯函数里推导 visibleRows。TSX 只消费结果，不直接重算整棵树。",
+          "这样做的副作用是，你必须明确哪些输入会改变可见行。只要 expandedIds、childrenByParentId 或 selectedPath 变化，就允许可见序列重算；其他样式态不应该顺手掺进来。",
         ],
       },
       {
@@ -519,6 +541,98 @@ export const mockArticleDocuments: Record<DocumentId, ArticleDocument> = {
         level: 3,
         paragraphs: [
           "如果用户直接打开四层深的文章，树需要先保证祖先节点被加载，再把当前路径展开并高亮，否则深链体验会立刻失真。",
+        ],
+      },
+      {
+        id: "tw-stable-identity",
+        title: "引用稳定比缓存数量更关键",
+        level: 2,
+        paragraphs: [
+          "很多窗口化 bug 不是算得慢，而是状态引用每次 render 都在变化。只要 effect 依赖里塞进了不稳定对象，视图就会重新加载、重新滚动、重新高亮。",
+          "因此 repository、tree index 和滚动容器这类边界对象，都应该优先保证 identity 稳定，再考虑进一步 memo。",
+        ],
+      },
+      {
+        id: "tw-effect-loops",
+        title: "effect 回路通常藏在同步修正里",
+        level: 3,
+        paragraphs: [
+          "最危险的写法不是明显的无限递归，而是 effect 里先读取派生状态，再为了修正它去 setState，最后又让同一个 effect 因为依赖变化再次触发。",
+          "树视图尤其容易出现这种回路，因为选中路径展开、异步补子节点和默认展开策略经常同时存在。",
+        ],
+      },
+      {
+        id: "tw-guard-loaded-branches",
+        title: "要先能判断一个分支是否已加载",
+        level: 4,
+        paragraphs: [
+          "如果没有一个明确的 loaded signal，你就只能通过 children.length 猜。问题是空目录和未加载目录在视觉上都可能表现成零个子项，这会让 effect 重复请求同一节点。",
+        ],
+      },
+      {
+        id: "tw-scroll-anchoring",
+        title: "展开后保持视觉锚点",
+        level: 2,
+        paragraphs: [
+          "用户点击一个节点展开时，最怕的是整个列表突然跳走。窗口化列表要么维持滚动锚点，要么至少保证被点击行在下一帧仍然留在视口里。",
+        ],
+      },
+      {
+        id: "tw-anchor-nearby",
+        title: "优先锚住交互发生点附近",
+        level: 3,
+        paragraphs: [
+          "实践里不需要追求绝对像素不动，先保证交互发生点附近稳定即可。这样既降低实现复杂度，也更符合用户对树结构展开的心理预期。",
+        ],
+      },
+      {
+        id: "tw-toc-as-diagnostic",
+        title: "长目录本身就是一个诊断器",
+        level: 2,
+        paragraphs: [
+          "文章 TOC 足够长时，右栏可以直接暴露 active heading 同步是否稳定。如果滚动几段后高亮跳回顶部，问题通常不在 TOC，而在正文滚动监听或 heading 定位。",
+          "所以长文 mock 不只是为了展示效果，它也是阅读体验层的一份测试夹具。",
+        ],
+      },
+      {
+        id: "tw-active-heading-threshold",
+        title: "active heading 需要阈值而不是命中判断",
+        level: 3,
+        paragraphs: [
+          "如果高亮切换完全依赖 heading 顶部刚好碰到容器顶端，用户会看到高亮在两个标题之间来回抖动。给一个固定阈值，体验会稳定很多。",
+        ],
+      },
+      {
+        id: "tw-progress-persistence",
+        title: "阅读进度持久化要晚于滚动事件",
+        level: 2,
+        paragraphs: [
+          "每次 scroll 都立刻写入存储会放大开销，也更容易把临时位置误记成最终位置。更稳的做法是节流或防抖后再持久化。",
+        ],
+      },
+      {
+        id: "tw-restore-is-contextual",
+        title: "恢复提示应当是上下文提示，不是模式切换",
+        level: 3,
+        paragraphs: [
+          "用户重新打开文章时，只需要知道系统记住了上次位置，并且可以一键回到顶部。这个提示应该轻，不应该重新组织页面层级。",
+        ],
+      },
+      {
+        id: "tw-empty-branches",
+        title: "空目录要和加载失败分开",
+        level: 2,
+        paragraphs: [
+          "树里存在空目录是正常情况，它可以用于验证布局、空态文案和路径行为。把空目录误判成加载失败，会把整个信息架构搞得很重。",
+        ],
+      },
+      {
+        id: "tw-shared-contract",
+        title: "最后才是共享契约",
+        level: 2,
+        paragraphs: [
+          "等树、正文和右栏都跑顺以后，再回头提炼 repository 契约和共享模型会更稳。否则很多所谓稳定抽象，其实只是首个实现的临时阴影。",
+          "这也是为什么 mock 数据应该足够长、足够深、足够不均匀。只有在复杂用例里站住的接口，才值得上升到共享层。",
         ],
       },
     ],

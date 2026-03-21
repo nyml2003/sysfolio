@@ -22,6 +22,8 @@
   放当前产品语义更强的组件和视图，例如 path bar、file tree、home view、directory view、document view。
 - `index.css`
   统一定义 layer 顺序和导入关系。
+- `responsive-and-multi-input-strategy.md`
+  说明这套 6 层架构如何支撑响应式布局和不同输入能力下的交互。
 
 ## 依赖规则
 

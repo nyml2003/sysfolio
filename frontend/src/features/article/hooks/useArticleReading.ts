@@ -12,7 +12,7 @@ import { useContentRepository } from "@/shared/data/repository";
 type UseArticleReadingOptions = {
   path: string;
   document: ArticleDocument;
-  scrollContainerRef: RefObject<HTMLElement>;
+  scrollContainerRef: RefObject<HTMLElement | null>;
   onActiveHeadingChange: (headingId: string) => void;
 };
 

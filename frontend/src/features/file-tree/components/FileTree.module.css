@@ -4,8 +4,10 @@
     flex-direction: column;
     gap: var(--sys-space-12);
     block-size: 100%;
+    min-block-size: 0;
     padding: var(--sys-space-16) var(--sys-space-12);
     background: rgb(255 255 255 / 12%);
+    overflow: hidden;
   }
 
   .title {
@@ -19,6 +21,7 @@
   }
 
   .list {
+    flex: 1 1 auto;
     min-block-size: 0;
     overflow-y: auto;
     scrollbar-width: thin;

@@ -14,7 +14,7 @@ import styles from "./ContentPane.module.css";
 type ContentPaneProps = {
   path: string;
   resource: ResourceState<RenderableEntryPayload, RepositoryError>;
-  scrollContainerRef: RefObject<HTMLElement>;
+  scrollContainerRef: RefObject<HTMLElement | null>;
   onNavigate: (path: string) => void;
   onActiveHeadingChange: (headingId: string) => void;
 };
