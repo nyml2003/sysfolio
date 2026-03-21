@@ -1,17 +1,16 @@
-import { startTransition, useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
-import type { BreadcrumbSegment } from "@/entities/content";
+import type { ArticleDocument, BreadcrumbSegment } from "@/entities/content";
+import { useArticleReading } from "@/features/article/hooks/useArticleReading";
 import { ContentPane } from "@/features/content-pane/components/ContentPane";
 import { useRenderableEntry } from "@/features/content-pane/hooks/useRenderableEntry";
-import { getTocTargetScrollTop } from "@/features/article/model/toc-activation";
 import { ContextPanel } from "@/features/context-panel/components/ContextPanel";
 import { FileTree } from "@/features/file-tree/components/FileTree";
 import { OnboardingHints } from "@/features/onboarding/components/OnboardingHints";
 import { PathBar } from "@/features/path-bar/components/PathBar";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import { ROOT_PATH, normalizePath, splitPathSegments } from "@/shared/lib/path/content-path";
-import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
 import styles from "./AppShell.module.css";
 
 function buildFallbackBreadcrumbs(path: string, homeTitle: string): BreadcrumbSegment[] {
@@ -49,31 +48,21 @@ function buildFallbackBreadcrumbs(path: string, homeTitle: string): BreadcrumbSe
 function ShellRoute() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { locale } = usePreferences();
   const copy = useUiCopy();
   const currentPath = normalizePath(location.pathname);
   const resource = useRenderableEntry(currentPath);
   const fallbackBreadcrumbs = buildFallbackBreadcrumbs(currentPath, copy.common.homeTitle);
   const scrollContainerRef = useRef<HTMLElement | null>(null);
-  const [activeHeadingId, setActiveHeadingId] = useState("");
-
-  useEffect(() => {
-    startTransition(() => {
-      setActiveHeadingId("");
+  const articleDocument: ArticleDocument | null =
+    resource.tag === "ready" && resource.value.content.kind === "article"
+      ? resource.value.content
+      : null;
+  const { activeHeadingId, restoreNoticeVisible, scrollToHeading, scrollToTop } =
+    useArticleReading({
+      path: currentPath,
+      document: articleDocument,
+      scrollContainerRef,
     });
-  }, [currentPath, locale]);
-
-  useEffect(() => {
-    if (resource.tag === "ready" && resource.value.content.kind === "article") {
-      const firstHeadingId = resource.value.content.toc[0]?.id ?? "";
-
-      if (firstHeadingId !== "") {
-        startTransition(() => {
-          setActiveHeadingId(firstHeadingId);
-        });
-      }
-    }
-  }, [resource]);
 
   const breadcrumbs =
     resource.tag === "ready" && resource.value.context.tag === "some"
@@ -101,13 +90,12 @@ function ShellRoute() {
         </div>
         <main className={styles.main} ref={scrollContainerRef}>
           <ContentPane
-            onActiveHeadingChange={setActiveHeadingId}
             onNavigate={(path) => {
               void navigate(path);
             }}
-            path={currentPath}
             resource={resource}
-            scrollContainerRef={scrollContainerRef}
+            restoreNoticeVisible={restoreNoticeVisible}
+            scrollToTop={scrollToTop}
           />
         </main>
         <div className={styles.right}>
@@ -117,20 +105,7 @@ function ShellRoute() {
               void navigate(path);
             }}
             onScrollToHeading={(headingId) => {
-              const scrollContainer = scrollContainerRef.current;
-
-              if (scrollContainer === null) {
-                return;
-              }
-
-              const heading = scrollContainer.querySelector<HTMLElement>(`#${headingId}`);
-
-              if (heading !== null) {
-                scrollContainer.scrollTo({
-                  top: getTocTargetScrollTop(scrollContainer, heading),
-                  behavior: "smooth",
-                });
-              }
+              scrollToHeading(headingId);
             }}
             resource={resource}
           />

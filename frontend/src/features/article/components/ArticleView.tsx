@@ -1,5 +1,3 @@
-import type { RefObject } from "react";
-
 import type { ArticleDocument, ContentNode } from "@/entities/content";
 import { formatDate } from "@/shared/lib/date/format-date";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
@@ -7,15 +5,13 @@ import { unwrapOr } from "@/shared/lib/monads/option";
 import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
 import buttonStyles from "@/shared/ui/primitives/Button.module.css";
 
-import { useArticleReading } from "../hooks/useArticleReading";
 import styles from "./ArticleView.module.css";
 
 type ArticleViewProps = {
-  path: string;
   node: ContentNode;
   document: ArticleDocument;
-  scrollContainerRef: RefObject<HTMLElement | null>;
-  onActiveHeadingChange: (headingId: string) => void;
+  restoreNoticeVisible: boolean;
+  scrollToTop: () => void;
 };
 
 function renderHeading(level: 2 | 3 | 4, id: string, title: string) {
@@ -43,26 +39,19 @@ function renderHeading(level: 2 | 3 | 4, id: string, title: string) {
 }
 
 export function ArticleView({
-  path,
   node,
   document,
-  scrollContainerRef,
-  onActiveHeadingChange,
+  restoreNoticeVisible,
+  scrollToTop,
 }: ArticleViewProps) {
   const { locale } = usePreferences();
   const copy = useUiCopy();
-  const { restoreNoticeVisible, scrollToTop } = useArticleReading({
-    path,
-    document,
-    scrollContainerRef,
-    onActiveHeadingChange,
-  });
   const updatedAt = unwrapOr(node.updatedAt, "");
   const publishedAt = unwrapOr(node.publishedAt, "");
   const readingMinutes = unwrapOr(node.readingMinutes, 0);
 
   return (
-    <section className={styles.root}>
+    <article className={styles.root}>
       <div className={styles.inner}>
         <header className={styles.header}>
           <div className={styles.eyebrow}>{document.eyebrow}</div>
@@ -90,7 +79,7 @@ export function ArticleView({
             </button>
           </div>
         ) : null}
-        <article className={styles.body}>
+        <div className={styles.body} data-article-body="true">
           {document.sections.map((section) => (
             <section key={section.id}>
               {renderHeading(section.level, section.id, section.title)}
@@ -99,8 +88,8 @@ export function ArticleView({
               ))}
             </section>
           ))}
-        </article>
+        </div>
       </div>
-    </section>
+    </article>
   );
 }

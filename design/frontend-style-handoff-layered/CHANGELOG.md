@@ -16,11 +16,19 @@
   - `business.css`
 - 新增新的入口文件 `index.css`
 - 新增新的分层说明文档 `README.md`
+- 新增 `overall-design-strategy.md`，整合当前所有关键专题文档，形成统一的新设计方案总文档
+- 新增 `six-layer-architecture.md`，定义迭代后的 6 层架构、横向能力轴和 view state 分层职责
 - 新增 `responsive-and-multi-input-strategy.md`，补充响应式布局和多端交互设计约束
 - 新增 `toc-activation-strategy.md`，定义 TOC 当前项的轻量状态机、状态转移表、Mermaid 状态图、激活线、到底兜底和正文底部留白策略
 - 新增 `toc-file-tree-reuse-boundary.md`，定义 TOC 与 File Tree 的共享 pattern 边界和业务拆分边界
 - 新增 `tree-navigation-pattern.md`，定义共享树形导航 pattern 的结构、状态、键盘规则和业务扩展边界
-- 新增 `page-view-state-strategy.md`，定义页面级组件的五态模型、状态转移和整页/局部状态边界
+- 重写 `page-view-state-strategy.md`，从页面级五态改为 view state 的分层承接策略
+
+### 文档收敛
+
+- 将 `six-layer-architecture.md` 的核心内容收敛到 `overall-design-strategy.md`
+- 将 `toc-file-tree-reuse-boundary.md` 的核心内容收敛到 `overall-design-strategy.md` 与 `tree-navigation-pattern.md`
+- 删除已被整合后的重复文档，减少目录噪音
 
 ### 新分层
 

@@ -13,7 +13,7 @@
     --sys-color-border-subtle: #e2d4bb;
     --sys-color-border-default: #d9cab0;
     --sys-color-border-strong: #bcaf97;
-    --sys-color-focus-ring: #7487d8;
+    --sys-color-focus-ring: #7b8fcf;
 
     --sys-color-text-primary: #433a30;
     --sys-color-text-secondary: #51463a;
@@ -23,11 +23,13 @@
     --sys-color-icon-default: #847765;
     --sys-color-icon-active: #564a3c;
 
-    --sys-color-accent: #7487d8;
-    --sys-color-accent-hover: #8597e2;
-    --sys-color-accent-soft: #dce3fa;
+    --sys-color-accent: #8b6740;
+    --sys-color-accent-hover: #9b7650;
+    --sys-color-accent-soft: #eadcc7;
     --sys-color-warm: #a3722d;
     --sys-color-warm-soft: #f1e2c8;
+    --sys-color-current-rail: #a3722d;
+    --sys-color-current-soft: #f1e2c8;
     --sys-color-success: #7e9d63;
     --sys-color-success-soft: #e4ecd8;
     --sys-color-danger: #c75e74;
@@ -35,8 +37,8 @@
     --sys-color-info: #7f94c1;
     --sys-color-info-soft: #e0e6f2;
 
-    --sys-color-link: #6f82d1;
-    --sys-color-link-hover: #5f73c7;
+    --sys-color-link: #6679b4;
+    --sys-color-link-hover: #586aa5;
     --sys-color-code-bg: #f0e3cb;
     --sys-color-code-border: #d9cab0;
     --sys-color-code-text: #3a352e;
@@ -45,13 +47,13 @@
     --sys-color-selection: #e6d7bc;
     --sys-color-search-highlight: #f1e2c8;
     --sys-color-search-highlight-text: #433a30;
-    --sys-color-onboarding-dot: rgb(116 135 216 / 72%);
+    --sys-color-onboarding-dot: rgb(123 143 207 / 72%);
     --sys-color-onboarding-dot-ring: rgb(251 243 222 / 82%);
     --sys-color-onboarding-popover: #f4e8d1;
     --sys-color-onboarding-scrim: rgb(67 58 48 / 8%);
 
     --sys-code-keyword: #8973c1;
-    --sys-code-function: #7487d8;
+    --sys-code-function: #7b8fcf;
     --sys-code-type: #8b7ec0;
     --sys-code-string: #b66f58;
     --sys-code-number: #a3722d;
@@ -138,10 +140,10 @@
     --path-bar-border: var(--sys-color-border-default);
     --file-tree-bg: var(--sys-color-panel-alt);
     --file-tree-node-bg-hover: var(--sys-color-surface-hover);
-    --file-tree-node-bg-active: var(--sys-color-surface-active);
-    --file-tree-node-border-active: var(--sys-color-accent);
-    --toc-item-bg-active: var(--sys-color-warm-soft);
-    --toc-item-border-active: var(--sys-color-warm);
+    --file-tree-node-bg-active: var(--sys-color-current-soft);
+    --file-tree-node-border-active: var(--sys-color-current-rail);
+    --toc-item-bg-active: var(--sys-color-current-soft);
+    --toc-item-border-active: var(--sys-color-current-rail);
     --tag-bg-default: var(--sys-color-panel-alt);
     --tag-bg-article: var(--sys-color-accent-soft);
     --tag-bg-game: var(--sys-color-warm-soft);
@@ -163,7 +165,7 @@
     --sys-color-border-subtle: #424853;
     --sys-color-border-default: #444b57;
     --sys-color-border-strong: #596270;
-    --sys-color-focus-ring: #88a3f7;
+    --sys-color-focus-ring: #97a9e1;
 
     --sys-color-text-primary: #e0e5ec;
     --sys-color-text-secondary: #c5cad3;
@@ -173,11 +175,13 @@
     --sys-color-icon-default: #8c94a1;
     --sys-color-icon-active: #e0e5ec;
 
-    --sys-color-accent: #88a3f7;
-    --sys-color-accent-hover: #9ab0fb;
-    --sys-color-accent-soft: #34415f;
+    --sys-color-accent: #d4b481;
+    --sys-color-accent-hover: #e0c295;
+    --sys-color-accent-soft: #4a3b29;
     --sys-color-warm: #d9b574;
     --sys-color-warm-soft: #4c402a;
+    --sys-color-current-rail: #d9b574;
+    --sys-color-current-soft: #4c402a;
     --sys-color-success: #8fbf8a;
     --sys-color-success-soft: #314035;
     --sys-color-danger: #e1848f;
@@ -185,8 +189,8 @@
     --sys-color-info: #9fb0da;
     --sys-color-info-soft: #313a4c;
 
-    --sys-color-link: #9cb4ff;
-    --sys-color-link-hover: #b1c2ff;
+    --sys-color-link: #a6b6e3;
+    --sys-color-link-hover: #bcc9ed;
     --sys-color-code-bg: #2a2e36;
     --sys-color-code-border: #444b57;
     --sys-color-code-text: #d8dde4;
@@ -195,13 +199,13 @@
     --sys-color-selection: #404651;
     --sys-color-search-highlight: #4c402a;
     --sys-color-search-highlight-text: #e0e5ec;
-    --sys-color-onboarding-dot: rgb(136 163 247 / 78%);
+    --sys-color-onboarding-dot: rgb(151 169 225 / 78%);
     --sys-color-onboarding-dot-ring: rgb(23 25 30 / 82%);
     --sys-color-onboarding-popover: #2a2e36;
     --sys-color-onboarding-scrim: rgb(23 25 30 / 18%);
 
     --sys-code-keyword: #c4a1f6;
-    --sys-code-function: #88a3f7;
+    --sys-code-function: #97a9e1;
     --sys-code-type: #a99edc;
     --sys-code-string: #d8b4a0;
     --sys-code-number: #d9b574;

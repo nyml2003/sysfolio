@@ -1,46 +1,44 @@
-# SysFolio Page View State Strategy
+# SysFolio View State Layering Strategy
 
 ## 文档目的
 
-这份文档定义页面级组件在前端实现时应提前考虑的五种基础状态：
+这份文档重新定义 `idle / loading / ready / empty / error` 这五种状态在 6 层架构中的落位。
 
-- `idle`
-- `loading`
-- `ready`
-- `empty`
-- `error`
+核心不是“每个页面都要有五态”这么简单，而是：
 
-这五种状态主要用于：
-
-- 页面级视图
-- 主要内容容器
-- 业务级列表页、详情页、目录页、阅读页
-
-它们不一定要求每个最小组件都完整实现，但每个页面组件或页面级业务容器都应提前建模。
+- 哪一层应该提供状态原件
+- 哪一层应该承接五态
+- 哪一层应该计算状态
+- 哪一层应该决定状态是局部的还是整页阻塞的
 
 ## 结论
 
-推荐把每个页面级视图都显式建成一个有限状态模型：
+推荐这样理解五态：
 
-`idle -> loading -> ready | empty | error`
+- `primitives`
+  提供状态表达原件和控件级状态
+- `patterns`
+  作为五态的主要承载层
+- `business`
+  计算状态、注入文案和恢复动作
+- `component / page edge`
+  决定状态影响范围和升级策略
 
-也就是说：
+一句话：
 
-- 页面不是“有数据就 render，没数据就临时判断”
-- 页面应先定义自己处于哪种 view state
-- UI 再根据状态切换对应的页面表达
+`primitives 提供状态原件，patterns 承载 view state，business/page 编排 view state`
 
 ## 一、为什么要提前定义这五种状态
 
 如果不提前定义，前端实现通常会出现这些问题：
 
-- 初始进入页面时闪一下旧内容
+- 初始进入视图时闪一下旧内容
 - loading 时布局跳动
 - 没数据和报错混成同一种空白页
-- 页面局部加载和页面整体加载互相覆盖
+- pattern 局部加载和外层容器加载互相覆盖
 - 后续加 skeleton、重试、渐进加载时很难整理
 
-所以这五种状态不是“补丁逻辑”，而是页面组件的基础结构。
+所以这五种状态不是“补丁逻辑”，而是视图容器的基础结构。
 
 ## 二、状态定义
 
@@ -48,7 +46,7 @@
 
 含义：
 
-- 页面刚挂载
+- 视图容器刚挂载
 - 还没开始请求
 - 或依赖条件尚未满足，暂时不能请求
 
@@ -66,21 +64,21 @@
 
 视觉建议：
 
-- 通常不做强存在感页面
+- 通常不做强存在感占位页
 - 可以显示结构占位，也可以直接过渡到 loading
 
 ### 2. `loading`
 
 含义：
 
-- 页面已进入获取数据阶段
-- 主要内容暂时不可用
+- 当前内容区域已进入获取数据阶段
+- 当前内容区域的主体暂时不可用
 
 前端建议：
 
-- 优先保持页面骨架稳定
+- 优先保持外层结构骨架稳定
 - 使用 skeleton、loading placeholder 或局部占位
-- 避免整个页面大幅跳动
+- 避免整个内容区域大幅跳动
 
 视觉建议：
 
@@ -91,13 +89,13 @@
 
 含义：
 
-- 页面数据可用
-- 主内容可正常交互
+- 当前内容区域数据可用
+- 当前内容区域可正常交互
 
 前端建议：
 
-- 正常渲染页面主体
-- 保留必要的局部异步状态，但页面主状态进入 `ready`
+- 正常渲染当前内容主体
+- 保留必要的局部异步状态，但当前容器主状态进入 `ready`
 
 视觉建议：
 
@@ -110,7 +108,7 @@
 含义：
 
 - 请求成功
-- 但没有可展示的数据
+- 但当前内容区域没有可展示的数据
 - 这是业务结果，不是异常
 
 前端建议：
@@ -128,7 +126,7 @@
 含义：
 
 - 请求失败
-- 或关键依赖损坏，页面无法正常展示
+- 或关键依赖损坏，当前内容区域无法正常展示
 
 前端建议：
 
@@ -142,7 +140,7 @@
 
 ## 三、推荐状态转移
 
-推荐页面主状态转移为：
+推荐 pattern / business 容器主状态转移为：
 
 ```mermaid
 stateDiagram-v2
@@ -159,95 +157,117 @@ stateDiagram-v2
 补充说明：
 
 - `ready -> loading`
-  只用于整页重新加载或路由切换
-- 如果只是局部刷新，优先保持页面 `ready`，把局部区域设为局部 loading
+  可以用于重新拉取当前区域内容
+- 如果只是局部刷新，优先保持外层 `ready`，把更小范围区域设为局部 loading
 
-## 四、每个页面组件前端应提前做的事
+## 四、按层分工
 
-### 1. 显式定义 view state
+### 1. `Primitives`
 
-不要只写：
+primitives 不应普遍承担五态本身，但应提供五态所需的“状态原件”。
 
-- `if (!data) return null`
-- `if (error) ...`
-- `if (list.length === 0) ...`
+推荐提供：
 
-而要显式定义：
+- `Spinner`
+- `SkeletonBlock`
+- `InlineNotice`
+- `EmptyState`
+- `ErrorState`
+- `RetryButton`
+- 带 `loading` 态的 `Button`
 
-- 当前页面主状态是什么
-- 谁来决定这个状态
+primitives 主要关心的是控件级状态：
 
-推荐思路：
+- `default`
+- `hover`
+- `focus-visible`
+- `active`
+- `disabled`
+- `loading`（如适用）
 
-- 页面容器先计算 `viewState`
-- 页面展示组件只根据 `viewState` 渲染
+关键判断：
 
-### 2. 稳定页面骨架
+- `Input` 的空值不是这里的 `empty`
+- `Button` 的默认态也不是这里的 `ready`
 
-页面状态切换时，优先保持以下结构稳定：
+### 2. `Patterns`
 
-- 页面标题区
-- 路径区
-- 主要内容区边界
-- 辅助面板的开关逻辑
+patterns 才是五态的主要承载层，尤其是 data-bearing patterns。
 
-不要在 `loading / empty / error` 时把整个页面结构推翻重来。
+典型对象：
 
-### 3. 区分“页面主状态”和“局部异步状态”
+- `TreeNav`
+- `ContentPane`
+- `ReadingPane`
+- `ListPane`
+- `DetailPane`
+- `ContextPanel`
 
-推荐：
+这些 pattern 应优先考虑：
 
-- 页面首次加载失败：页面主状态 `error`
-- 页面首次加载无数据：页面主状态 `empty`
-- 页面已 ready，但某个子模块刷新中：页面仍是 `ready`
-
-一句话：
-
-- 主状态决定整页表达
-- 局部状态决定局部反馈
-
-### 4. 给 `empty` 和 `error` 准备不同内容
-
-不要把 `empty` 和 `error` 用同一套占位图或同一句文案处理。
-
-最少应区分：
-
+- `idle`
+- `loading`
+- `ready`
 - `empty`
-  说明“目前没有内容”
 - `error`
-  说明“加载失败”
 
-### 5. 保留恢复路径
+关键判断：
 
-页面级状态建议至少具备一种恢复动作：
+- 五态主要属于“承载一块内容区域”的模式
+- 不是每个最小 primitive 都要变成五态组件
 
-- `retry`
-- `refresh`
-- `go back`
-- `create first item`
-- `clear filter`
+### 3. `Business`
 
-## 五、推荐页面渲染结构
+business 层负责：
 
-推荐把页面拆成两层：
+- 计算当前 pattern 的 view state
+- 决定是 `ready / empty / error` 中的哪一种
+- 提供业务文案
+- 提供恢复动作
 
-1. `PageContainer`
+例如：
+
+- `TocTree`
+  可以是 `ready / empty / error`
+- `FileTree`
+  可以是 `loading / ready / empty / error`
+- `DocumentContent`
+  可以是 `loading / ready / empty / error`
+
+### 4. `Component / Page Edge`
+
+这一层负责：
+
+- 决定状态影响范围
+- 决定局部状态是否升级为整页状态
+- 决定外层骨架在异常状态下是否仍然保留
+
+关键判断：
+
+- 不是所有五态都要升级成整页状态
+- 外层容器若已 ready，局部 panel 的刷新不应把整页打回 loading
+
+## 五、推荐容器结构
+
+推荐把 data-bearing view 拆成两层：
+
+1. `Container`
 - 负责数据请求
 - 负责状态计算
-- 负责决定当前 view state
+- 负责决定当前 `viewState`
 
-2. `PageView`
-- 只负责根据 `viewState` 渲染对应页面表达
+2. `View / Pattern`
+- 只负责根据 `viewState` 渲染对应表达
 
 推荐结构示意：
 
 ```tsx
 type ViewState = "idle" | "loading" | "ready" | "empty" | "error";
 
-function DirectoryPageContainer() {
-  const viewState = useDirectoryViewState();
+function FileTreeContainer() {
+  const viewState = useFileTreeViewState();
 
-  return <DirectoryPageView viewState={viewState} />;
+  return <FileTreeView viewState={viewState} />;
 }
 ```
 
@@ -257,131 +277,105 @@ function DirectoryPageContainer() {
 - 逻辑更容易测试
 - skeleton / empty / error 不会散落在各个分支里
 
-## 六、在 6 层架构里的落位
+## 六、哪些对象必须优先考虑五态
 
-### `primitives`
+优先考虑的对象：
 
-适合提供：
+- 树形导航
+- 列表面板
+- 正文内容区
+- 详情区
+- 搜索结果区
+- 上下文信息区
 
-- `Spinner`
-- `SkeletonBlock`
-- `EmptyState`
-- `ErrorState`
-- `RetryButton`
+不必强制做成五态对象的：
 
-### `patterns`
+- 单个按钮
+- 单个输入框
+- 单个 tag
+- 单个 icon button
 
-适合提供：
+一句话：
 
-- 页面级 loading skeleton pattern
-- 通用 empty state layout
-- 通用 error state layout
+- 五态优先属于“内容承载模式”
+- 不是优先属于“最小交互控件”
 
-### `business`
+## 七、状态升级规则
 
-适合决定：
+推荐使用这条原则：
 
-- 当前页面的 `viewState`
-- 空态文案和动作
-- 错误态文案和恢复路径
+1. 先在最小合理范围内表达状态
+2. 再决定要不要升级到更高层
 
-### `pages`
+例如：
 
-适合决定：
+- `FileTree` 没数据
+  先表现为 `FileTree.empty`
+- `DocumentContent` 加载失败
+  先表现为 `DocumentContent.error`
+- 只有当外层主任务整体不可继续时
+  才升级成更高层的 page / feature 级 `error`
 
-- 哪些区域在 loading 时保留
-- 哪些区域在 empty / error 时仍然保留结构
-- 页面主任务如何在异常状态下继续
+## 八、针对当前 SysFolio 的建议
 
-## 七、针对当前 SysFolio 的建议
+### 1. `TreeNav`
 
-### 1. Home View
-
-应考虑：
-
-- `idle`
-  首次进入工作区
-- `loading`
-  首页节点、最近内容、推荐条目加载中
-- `ready`
-  首页内容正常显示
-- `empty`
-  工作区还没有任何内容
-- `error`
-  首页数据加载失败
-
-### 2. Directory View
-
-应考虑：
+建议具备：
 
 - `idle`
-  路由切换到目录节点但数据尚未开始准备
 - `loading`
-  目录条目加载中
 - `ready`
-  目录条目正常显示
 - `empty`
-  目录为空
 - `error`
-  目录内容读取失败
 
-### 3. Document View
+### 2. `ContentPane / ReadingPane`
 
-应考虑：
+建议具备：
 
 - `idle`
-  文档节点刚切入
 - `loading`
-  文档内容、目录结构、上下文信息加载中
 - `ready`
-  文档正文可阅读
 - `empty`
-  文档存在但内容为空
 - `error`
-  文档读取失败或解析失败
 
-### 4. Context Panel
+### 3. `ContextPanel`
 
-上下文面板更适合局部状态，不一定总要提升为页面主状态。  
-推荐：
+建议具备：
 
-- 页面主内容若已 `ready`，右侧面板即使单独 `loading / error`，整页仍保持 `ready`
+- `loading`
+- `ready`
+- `empty`
+- `error`
 
-## 八、页面主状态与局部状态的边界
+但通常保持局部状态，不默认升级成整页状态。
 
-以下情况更适合页面主状态：
+### 4. 页面层
 
-- 首次加载失败
-- 首次加载无数据
-- 路由切换后主内容不可用
+页面层负责决定：
 
-以下情况更适合局部状态：
-
-- 右侧面板单独刷新
-- TOC 单独重建
-- 文件树搜索中
-- 局部卡片重新拉取
-
-不要把所有局部异步都上升成整页 `loading / error`。
+- 左栏状态是否阻断主内容
+- 右栏异常是否影响整页主任务
+- 某个 pattern 的错误是否需要升级成整页错误
 
 ## 九、给前端的实现约束
 
-1. 每个页面级视图都应显式定义 `idle / loading / ready / empty / error`。
-2. 不要用 `null`、空数组和错误对象临时拼出页面状态。
-3. `empty` 和 `error` 必须分开设计。
-4. `loading` 尽量保留最终页面骨架。
-5. 页面主状态和局部模块状态必须分开。
-6. `ready` 状态下允许局部子模块继续异步，不要因此把整页打回 `loading`。
+1. 不要把五态只理解成页面级状态。
+2. 不要要求每个 primitive 都实现五态。
+3. 要求每个 data-bearing pattern 提前考虑五态。
+4. primitive 层必须提供状态表达原件。
+5. business 层负责状态计算和文案动作注入。
+6. page / feature 层负责决定状态影响范围和升级策略。
 
 ## 当前判断
 
-对当前 SysFolio，最稳的做法是：
+当前最合理的版本不是：
 
-- 每个页面级视图先定义统一的五态模型
-- 页面容器负责状态计算
-- 页面展示层负责按状态渲染
-- 局部模块在 `ready` 内部再处理自己的小状态
+- “每个页面组件都有五态”
 
-也就是说：
+而是：
 
-`idle / loading / ready / empty / error` 应该成为每个页面组件的前置结构，而不是后面补出来的例外逻辑。
+- `primitives` 提供状态原件
+- `patterns` 承担五态
+- `business / component` 负责编排五态
+
+这才和当前的 6 层架构是对齐的。

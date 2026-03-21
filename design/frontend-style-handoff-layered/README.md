@@ -10,6 +10,8 @@
 
 ## 分层
 
+- `overall-design-strategy.md`
+  当前整体新设计方案的总文档，整合 6 层架构、响应式、多端交互、view state、树形导航和 TOC 规则。
 - `tokens.css`
   只放设计变量和主题覆盖。
 - `utilities.css`
@@ -26,12 +28,10 @@
   说明这套 6 层架构如何支撑响应式布局和不同输入能力下的交互。
 - `toc-activation-strategy.md`
   说明 TOC 在长文阅读中的激活规则，解决滚动到底但目录未到最后一项的问题。
-- `toc-file-tree-reuse-boundary.md`
-  说明 TOC 与 File Tree 应共享哪一层，不应共享哪一层。
 - `tree-navigation-pattern.md`
   定义 TOC 与 File Tree 共享的树形导航模式层，包括结构、状态和交互边界。
 - `page-view-state-strategy.md`
-  定义页面级组件的 `idle / loading / ready / empty / error` 五态模型，以及页面主状态和局部状态的边界。
+  重新定义 `idle / loading / ready / empty / error` 的分层承接方式：`primitives` 提供状态原件，`patterns` 承担五态，`business/page` 负责状态编排。
 
 ## 依赖规则
 
@@ -43,9 +43,10 @@
 
 - `tokens` 不表达组件语义。
 - `utilities` 只表达样式能力，不表达业务概念。
-- `primitives` 不绑定业务数据和业务流程。
-- `patterns` 可以组合基础控件，但尽量不接业务语义。
-- `business` 才承载产品概念、页面视图和高语义结构。
+- `primitives` 不绑定业务数据和业务流程，但要提供基础交互状态和状态原件。
+- `patterns` 可以组合基础控件，并应优先承接 data-bearing 的 view state。
+- `business` 才承载产品概念、业务数据、状态计算和高语义结构。
+- `component` 负责 feature / page 级组合，以及状态影响范围和升级策略。
 
 ## 当前迁移策略
 

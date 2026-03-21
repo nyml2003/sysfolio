@@ -1,5 +1,3 @@
-import type { RefObject } from "react";
-
 import type { ContextInfo, RenderableEntryPayload, RepositoryError } from "@/entities/content";
 import { ArticleView } from "@/features/article/components/ArticleView";
 import { HomeView } from "@/features/home/components/HomeView";
@@ -13,11 +11,10 @@ import { ArticleIcon, FolderIcon, GameIcon, MediaIcon } from "@/shared/ui/primit
 import styles from "./ContentPane.module.css";
 
 type ContentPaneProps = {
-  path: string;
   resource: ResourceState<RenderableEntryPayload, RepositoryError>;
-  scrollContainerRef: RefObject<HTMLElement | null>;
   onNavigate: (path: string) => void;
-  onActiveHeadingChange: (headingId: string) => void;
+  restoreNoticeVisible: boolean;
+  scrollToTop: () => void;
 };
 
 function renderDirectoryIcon(kind: string) {
@@ -146,11 +143,10 @@ function renderStatusState(title: string, message: string) {
 }
 
 export function ContentPane({
-  path,
   resource,
-  scrollContainerRef,
   onNavigate,
-  onActiveHeadingChange,
+  restoreNoticeVisible,
+  scrollToTop,
 }: ContentPaneProps) {
   const copy = useUiCopy();
 
@@ -195,9 +191,8 @@ export function ContentPane({
       <ArticleView
         document={resource.value.content}
         node={resource.value.node}
-        onActiveHeadingChange={onActiveHeadingChange}
-        path={path}
-        scrollContainerRef={scrollContainerRef}
+        restoreNoticeVisible={restoreNoticeVisible}
+        scrollToTop={scrollToTop}
       />
     );
   }

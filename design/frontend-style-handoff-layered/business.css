@@ -129,9 +129,6 @@
 
   .m-file-tree__list {
     min-block-size: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--sys-space-4);
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--sys-color-text-faint) transparent;
@@ -144,28 +141,10 @@
     grid-template-columns: 1rem 1rem minmax(0, 1fr) auto;
     align-items: center;
     gap: var(--sys-space-8);
-    min-block-size: 2rem;
     padding-inline-end: var(--sys-space-10);
     padding-inline-start: calc(
       var(--sys-space-8) + var(--file-node-depth) * var(--sys-space-12)
     );
-    border-radius: var(--sys-radius-8);
-    color: var(--sys-color-text-secondary);
-    background: transparent;
-    transition:
-      color var(--sys-duration-fast) var(--sys-ease-standard),
-      background var(--sys-duration-fast) var(--sys-ease-standard),
-      border-color var(--sys-duration-fast) var(--sys-ease-standard);
-  }
-
-  .m-file-node:hover {
-    background: var(--file-tree-node-bg-hover);
-    color: var(--sys-color-text-primary);
-  }
-
-  .m-file-node:focus-visible {
-    outline: var(--sys-border-width-2) solid var(--sys-color-focus-ring);
-    outline-offset: 2px;
   }
 
   .m-file-node[data-depth="0"] {
@@ -184,25 +163,9 @@
     --file-node-depth: 3;
   }
 
-  .m-file-node.is-selected {
-    background: var(--file-tree-node-bg-active);
-    color: var(--sys-color-text-primary);
-    box-shadow: inset 2px 0 0 var(--file-tree-node-border-active);
-  }
-
   .m-file-node.is-search-match {
     background: var(--sys-color-search-highlight);
     color: var(--sys-color-search-highlight-text);
-  }
-
-  .m-file-node__label {
-    min-inline-size: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-family: var(--sys-font-ui);
-    font-size: var(--sys-font-size-13);
-    line-height: var(--sys-line-height-ui);
   }
 
   .m-file-node__hit {

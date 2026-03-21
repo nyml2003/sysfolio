@@ -1,4 +1,101 @@
 @layer patterns {
+  .m-tree-nav,
+  .m-toc,
+  .m-file-tree__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sys-space-4);
+  }
+
+  .m-tree-nav__item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .m-tree-nav__row,
+  .m-toc__item {
+    display: flex;
+    align-items: center;
+    gap: var(--sys-space-8);
+    min-block-size: 2rem;
+    padding-inline: var(--sys-space-8);
+    border-radius: var(--sys-radius-8);
+    color: var(--sys-color-text-secondary);
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-13);
+    line-height: var(--sys-line-height-ui);
+    @apply --u-tr-fast;
+  }
+
+  .m-tree-nav__row,
+  .m-file-node {
+    min-block-size: 2rem;
+    border-radius: var(--sys-radius-8);
+    color: var(--sys-color-text-secondary);
+    @apply --u-tr-fast;
+  }
+
+  .m-tree-nav__row:hover,
+  .m-toc__item:hover,
+  .m-file-node:hover {
+    background: var(--sys-color-surface-hover);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-tree-nav__row:focus-visible,
+  .m-toc__item:focus-visible,
+  .m-file-node:focus-visible {
+    @apply --u-focus;
+  }
+
+  .m-tree-nav__row.is-current,
+  .m-toc__item.is-active,
+  .m-file-node.is-selected {
+    background: var(--sys-color-current-soft);
+    color: var(--sys-color-text-primary);
+    box-shadow: inset 2px 0 0 var(--sys-color-current-rail);
+  }
+
+  .m-tree-nav__toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border: 0;
+    border-radius: var(--sys-radius-4);
+    background: transparent;
+    color: var(--sys-color-icon-default);
+    cursor: pointer;
+    @apply --u-tr-fast;
+  }
+
+  .m-tree-nav__toggle:hover {
+    background: var(--sys-color-surface-hover);
+    color: var(--sys-color-icon-active);
+  }
+
+  .m-tree-nav__toggle:focus-visible {
+    @apply --u-focus;
+  }
+
+  .m-tree-nav__label,
+  .m-file-node__label {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-13);
+    line-height: var(--sys-line-height-ui);
+  }
+
+  .m-tree-nav__children {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sys-space-4);
+  }
+
   .m-shell {
     min-block-size: 100vh;
     display: grid;
@@ -236,28 +333,22 @@
     color: var(--sys-color-text-secondary);
   }
 
-  .m-toc {
+  .m-loading-state {
     display: flex;
     flex-direction: column;
-    gap: var(--sys-space-4);
+    gap: var(--sys-space-16);
+    padding: var(--sys-space-24);
+    border: var(--sys-border-width-1) solid var(--sys-color-border-default);
+    border-radius: var(--sys-radius-16);
+    background: var(--sys-color-panel);
   }
 
-  .m-toc__item {
+  .m-loading-state__header,
+  .m-loading-state__body,
+  .m-loading-state__footer {
     display: flex;
-    align-items: center;
-    min-block-size: 2rem;
-    padding-inline: var(--sys-space-8);
-    border-radius: var(--sys-radius-8);
-    color: var(--sys-color-text-secondary);
-    font-family: var(--sys-font-ui);
-    font-size: var(--sys-font-size-13);
-    line-height: var(--sys-line-height-ui);
-  }
-
-  .m-toc__item.is-active {
-    background: var(--toc-item-bg-active);
-    color: var(--sys-color-text-primary);
-    box-shadow: inset 2px 0 0 var(--toc-item-border-active);
+    flex-direction: column;
+    gap: var(--sys-space-12);
   }
 
   .m-empty-state {
@@ -276,6 +367,39 @@
     font-family: var(--sys-font-ui);
     font-size: var(--sys-font-size-24);
     font-weight: var(--sys-font-weight-semibold);
+  }
+
+  .m-error-state {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sys-space-16);
+    padding: var(--sys-space-24);
+    border: var(--sys-border-width-1) solid var(--sys-color-danger);
+    border-radius: var(--sys-radius-16);
+    background: var(--sys-color-danger-soft);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-error-state__title {
+    margin: 0;
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-24);
+    font-weight: var(--sys-font-weight-semibold);
+    line-height: 1.15;
+  }
+
+  .m-error-state__body {
+    max-inline-size: var(--sys-layout-reading-measure);
+    color: var(--sys-color-text-secondary);
+    font-family: var(--sys-font-body);
+    font-size: var(--sys-font-size-14);
+    line-height: var(--sys-line-height-body);
+  }
+
+  .m-error-state__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sys-space-12);
   }
 
   @media (width <= 1120px) {
