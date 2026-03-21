@@ -71,6 +71,18 @@
     color: var(--sys-color-text-primary);
   }
 
+  .m-inline-notice--warning {
+    border-color: var(--sys-color-warning);
+    background: var(--sys-color-warning-soft);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-inline-notice--destructive {
+    border-color: var(--sys-color-destructive);
+    background: var(--sys-color-destructive-soft);
+    color: var(--sys-color-text-primary);
+  }
+
   .m-progress {
     inline-size: 100%;
     block-size: 0.5rem;
@@ -95,6 +107,14 @@
 
   .m-progress--danger .m-progress__bar {
     background: var(--sys-color-danger);
+  }
+
+  .m-progress--warning .m-progress__bar {
+    background: var(--sys-color-warning);
+  }
+
+  .m-progress--destructive .m-progress__bar {
+    background: var(--sys-color-destructive);
   }
 
   @media (prefers-reduced-motion: reduce) {

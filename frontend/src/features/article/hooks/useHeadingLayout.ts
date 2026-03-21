@@ -10,11 +10,12 @@ import { fromNullable, isSome, none, some, type Option } from "@/shared/lib/mona
 
 import { useResizeObserver } from "@/shared/lib/layout/useResizeObserver";
 
-import { useArticleDom } from "../context/article-dom.context";
 import {
+  ARTICLE_SCROLL_POSITION_EPSILON,
   TOC_ACTIVATION_LINE_RATIO,
   TOC_SCROLLABLE_EPSILON,
-} from "../model/toc-activation";
+} from "../constant";
+import { useArticleDom } from "../context/article-dom.context";
 
 type HeadingMetric = {
   id: string;
@@ -64,8 +65,10 @@ function areHeadingMetricsEqual(
         nextMetric !== undefined &&
         previousMetric.id === nextMetric.id &&
         previousMetric.element === nextMetric.element &&
-        Math.abs(previousMetric.offsetTop - nextMetric.offsetTop) <= 0.5 &&
-        Math.abs(previousMetric.targetScrollTop - nextMetric.targetScrollTop) <= 0.5
+        Math.abs(previousMetric.offsetTop - nextMetric.offsetTop) <=
+          ARTICLE_SCROLL_POSITION_EPSILON &&
+        Math.abs(previousMetric.targetScrollTop - nextMetric.targetScrollTop) <=
+          ARTICLE_SCROLL_POSITION_EPSILON
       );
     })
   );

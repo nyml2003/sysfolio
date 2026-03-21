@@ -21,13 +21,20 @@ import {
   type Option,
 } from "@/shared/lib/monads/option";
 import { ROOT_PATH, normalizePath, splitPathSegments } from "@/shared/lib/path/content-path";
+
+import {
+  APP_SHELL_HOME_BREADCRUMB_ID,
+  APP_SHELL_ROOT_BREADCRUMB_ID,
+  APP_SHELL_ROOT_BREADCRUMB_TITLE,
+  APP_SHELL_ROUTE_PATH,
+} from "./constant";
 import styles from "./AppShell.module.css";
 
 function buildFallbackBreadcrumbs(path: string, homeTitle: string): BreadcrumbSegment[] {
   const segments = splitPathSegments(path);
   const rootBreadcrumb: BreadcrumbSegment = {
-    id: "root",
-    title: "sysfolio",
+    id: APP_SHELL_ROOT_BREADCRUMB_ID,
+    title: APP_SHELL_ROOT_BREADCRUMB_TITLE,
     path: ROOT_PATH,
   };
   const resolvedBreadcrumbs = segments.reduce<{
@@ -59,7 +66,7 @@ function buildFallbackBreadcrumbs(path: string, homeTitle: string): BreadcrumbSe
     ? [
         ...resolvedBreadcrumbs.breadcrumbs,
         {
-          id: "home",
+          id: APP_SHELL_HOME_BREADCRUMB_ID,
           title: homeTitle,
           path: ROOT_PATH,
         },
@@ -170,7 +177,7 @@ function ShellRoute() {
 export function AppShell() {
   return (
     <Routes>
-      <Route element={<ShellRoute />} path="*" />
+      <Route element={<ShellRoute />} path={APP_SHELL_ROUTE_PATH} />
     </Routes>
   );
 }

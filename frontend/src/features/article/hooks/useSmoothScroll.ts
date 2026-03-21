@@ -11,6 +11,12 @@ import {
 import { useEventListener } from "@/shared/lib/dom/useEventListener";
 import { isSome, none, some, unwrapOr, type Option } from "@/shared/lib/monads/option";
 
+import {
+  ARTICLE_SCROLL_KEYBOARD_KEYS,
+  ARTICLE_SMOOTH_SCROLL_COMPLETION_EPSILON,
+  ARTICLE_SMOOTH_SCROLL_DURATION_SECONDS,
+  ARTICLE_SMOOTH_SCROLL_EASE,
+} from "../constant";
 import { useArticleDom } from "../context/article-dom.context";
 
 type UseSmoothScrollOptions = {
@@ -24,7 +30,15 @@ type UseSmoothScrollResult = {
   cancel: () => void;
 };
 
-const DEFAULT_DURATION_SECONDS = 0.38;
+function hasKeyboardKey(event: Event): event is Event & { key: string } {
+  return "key" in event && typeof event.key === "string";
+}
+
+function isScrollKeyboardKey(key: string): boolean {
+  return ARTICLE_SCROLL_KEYBOARD_KEYS.includes(
+    key as (typeof ARTICLE_SCROLL_KEYBOARD_KEYS)[number],
+  );
+}
 
 function clampScrollTop(scrollContainer: HTMLElement, scrollTop: number): number {
   return Math.max(
@@ -67,7 +81,10 @@ export function useSmoothScroll({
     cancel();
     scrollTopValue.jump(getElementScrollTop(scrollContainerElement));
 
-    if (Math.abs(nextScrollTop - getElementScrollTop(scrollContainerElement)) <= 1) {
+    if (
+      Math.abs(nextScrollTop - getElementScrollTop(scrollContainerElement)) <=
+      ARTICLE_SMOOTH_SCROLL_COMPLETION_EPSILON
+    ) {
       setElementScrollTop(scrollContainerElement, nextScrollTop);
       return;
     }
@@ -75,8 +92,8 @@ export function useSmoothScroll({
     setIsProgrammaticScrolling(true);
     animationRef.current = some(
       animate(scrollTopValue, nextScrollTop, {
-        duration: unwrapOr(durationSeconds, DEFAULT_DURATION_SECONDS),
-        ease: [0.22, 1, 0.36, 1],
+        duration: unwrapOr(durationSeconds, ARTICLE_SMOOTH_SCROLL_DURATION_SECONDS),
+        ease: ARTICLE_SMOOTH_SCROLL_EASE,
       }),
     );
   };
@@ -110,19 +127,11 @@ export function useSmoothScroll({
   };
 
   const handleKeyboardInteraction = (event: Event) => {
-    if (!(event instanceof KeyboardEvent)) {
+    if (!hasKeyboardKey(event)) {
       return;
     }
 
-    if (
-      event.key === "ArrowDown" ||
-      event.key === "ArrowUp" ||
-      event.key === "PageDown" ||
-      event.key === "PageUp" ||
-      event.key === "Home" ||
-      event.key === "End" ||
-      event.key === " "
-    ) {
+    if (isScrollKeyboardKey(event.key)) {
       notifyUserInteraction();
     }
   };

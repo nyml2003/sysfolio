@@ -13,6 +13,7 @@ import { detachPromise } from "@/shared/lib/async/detach-promise";
 import {
   cancelScheduledAnimationFrame,
   clearScheduledTimeout,
+  getPerformanceNow,
   scheduleAnimationFrame,
   scheduleTimeout,
 } from "@/shared/lib/dom/browser-timing";
@@ -20,12 +21,14 @@ import { getElementScrollTop, setElementScrollTop } from "@/shared/lib/dom/scrol
 import { isSome, none, some, unwrapOr, type Option } from "@/shared/lib/monads/option";
 
 import {
+  ARTICLE_EMPTY_ACTIVE_HEADING_ID,
+  ARTICLE_SCROLL_POSITION_EPSILON,
   TOC_ACTIVATION_LINE_RATIO,
   TOC_NAVIGATING_TIMEOUT_MS,
   TOC_READING_PROGRESS_DEBOUNCE_MS,
   TOC_USER_SCROLL_IDLE_MS,
-  type TocReadingState,
-} from "../model/toc-activation";
+} from "../constant";
+import type { TocReadingState } from "../model/toc-activation";
 import { useHeadingActivationObserver } from "./useHeadingActivationObserver";
 import { useHeadingLayout } from "./useHeadingLayout";
 import { useSmoothScroll } from "./useSmoothScroll";
@@ -48,7 +51,7 @@ export function useArticleReading({
 }: UseArticleReadingOptions): UseArticleReadingResult {
   const { scrollContainer } = useArticleDom();
   const repository = useContentRepository();
-  const [activeHeadingId, setActiveHeadingId] = useState("");
+  const [activeHeadingId, setActiveHeadingId] = useState(ARTICLE_EMPTY_ACTIVE_HEADING_ID);
   const [restoreNoticeVisible, setRestoreNoticeVisible] = useState(false);
   const [tocState, setTocStateState] = useState<TocReadingState>("idle");
   const tocStateRef = useRef<TocReadingState>("idle");
@@ -74,7 +77,7 @@ export function useArticleReading({
   });
 
   const setCurrentHeadingFromOptionImmediate = useEffectEvent((headingId: Option<string>) => {
-    setCurrentHeadingImmediate(unwrapOr(headingId, ""));
+    setCurrentHeadingImmediate(unwrapOr(headingId, ARTICLE_EMPTY_ACTIVE_HEADING_ID));
   });
 
   const setCurrentHeadingDeferred = useEffectEvent((headingId: string) => {
@@ -84,7 +87,7 @@ export function useArticleReading({
   });
 
   const setCurrentHeadingFromOptionDeferred = useEffectEvent((headingId: Option<string>) => {
-    setCurrentHeadingDeferred(unwrapOr(headingId, ""));
+    setCurrentHeadingDeferred(unwrapOr(headingId, ARTICLE_EMPTY_ACTIVE_HEADING_ID));
   });
 
   const setRestoreNotice = useEffectEvent((visible: boolean) => {
@@ -183,7 +186,7 @@ export function useArticleReading({
       }
 
       lastObservedScrollTopRef.current = getElementScrollTop(scrollContainer.value);
-      lastObservedScrollChangeAtRef.current = performance.now();
+      lastObservedScrollChangeAtRef.current = getPerformanceNow();
 
       if (userScrollWatchFrameIdRef.current !== 0) {
         return;
@@ -197,9 +200,12 @@ export function useArticleReading({
 
         const currentScrollTop = getElementScrollTop(scrollContainer.value);
 
-        if (Math.abs(currentScrollTop - lastObservedScrollTopRef.current) > 0.5) {
+        if (
+          Math.abs(currentScrollTop - lastObservedScrollTopRef.current) >
+          ARTICLE_SCROLL_POSITION_EPSILON
+        ) {
           lastObservedScrollTopRef.current = currentScrollTop;
-          lastObservedScrollChangeAtRef.current = performance.now();
+          lastObservedScrollChangeAtRef.current = getPerformanceNow();
 
           if (
             tocStateRef.current === "initial" ||
@@ -210,7 +216,7 @@ export function useArticleReading({
           }
         }
 
-        if (performance.now() - lastObservedScrollChangeAtRef.current >= TOC_USER_SCROLL_IDLE_MS) {
+        if (getPerformanceNow() - lastObservedScrollChangeAtRef.current >= TOC_USER_SCROLL_IDLE_MS) {
           stopUserScrollWatch();
           scheduleReadingProgressSave();
           return;

@@ -16,8 +16,10 @@ import { isSome, none, some, type Option } from "@/shared/lib/monads/option";
 
 import {
   TOC_BOTTOM_EPSILON,
+  TOC_BOTTOM_SENTINEL_THRESHOLD,
+  TOC_HEADING_OBSERVER_THRESHOLD,
   TOC_OBSERVER_BAND_HEIGHT,
-} from "../model/toc-activation";
+} from "../constant";
 import { useArticleDom } from "../context/article-dom.context";
 
 type UseHeadingActivationObserverOptions = {
@@ -180,7 +182,7 @@ export function useHeadingActivationObserver({
           return `${rootMarginTop}px 0px ${rootMarginBottom}px 0px`;
         })()
       : "0px 0px 0px 0px",
-    threshold: 0,
+    threshold: TOC_HEADING_OBSERVER_THRESHOLD,
     disabled: disabled || !intersectionObserverSupported || !isSome(scrollContainer) || headings.length === 0,
     dependencyToken: layoutVersion,
   });
@@ -196,7 +198,7 @@ export function useHeadingActivationObserver({
       );
     },
     rootMargin: "0px",
-    threshold: 1,
+    threshold: TOC_BOTTOM_SENTINEL_THRESHOLD,
     disabled: disabled || !intersectionObserverSupported || !isSome(scrollContainer) || !isSome(bottomSentinel),
     dependencyToken: layoutVersion,
   });

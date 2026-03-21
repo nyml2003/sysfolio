@@ -21,6 +21,12 @@ import {
 import { some } from "@/shared/lib/monads/option";
 import { DEFAULT_THEME, type ThemePreference } from "@/shared/lib/theme/theme.types";
 import {
+  DOCUMENT_THEME_ATTRIBUTE_NAME,
+  INITIAL_ONBOARDING_STATE,
+  NEXT_LOCALE_BY_LOCALE,
+  NEXT_THEME_BY_THEME,
+} from "./constant";
+import {
   PreferencesContext,
   type PreferencesContextValue,
 } from "./preferences-context";
@@ -34,9 +40,9 @@ export function PreferencesProvider({ children }: PreferencesProviderProps) {
   const [theme, setTheme] = useState<ThemePreference>(DEFAULT_THEME);
   const [locale, setLocale] = useState<AppLocale>(DEFAULT_LOCALE);
   const [hydrated, setHydrated] = useState(false);
-  const [onboardingState, setOnboardingState] = useState<OnboardingState>({
-    dismissed: true,
-  });
+  const [onboardingState, setOnboardingState] = useState<OnboardingState>(
+    INITIAL_ONBOARDING_STATE,
+  );
 
   const hydratePreferences = useEffectEvent(async () => {
     const [themeResource, localeResource, onboardingResource] = await Promise.all([
@@ -69,7 +75,7 @@ export function PreferencesProvider({ children }: PreferencesProviderProps) {
   });
 
   const toggleTheme = useEffectEvent(async () => {
-    const nextTheme: ThemePreference = theme === "light" ? "dark" : "light";
+    const nextTheme: ThemePreference = NEXT_THEME_BY_THEME[theme];
     const themeResource = await repository.setThemePreference(nextTheme);
 
     if (themeResource.tag === "ready") {
@@ -80,7 +86,7 @@ export function PreferencesProvider({ children }: PreferencesProviderProps) {
   });
 
   const toggleLocale = useEffectEvent(async () => {
-    const nextLocale: AppLocale = locale === "zh-CN" ? "en-US" : "zh-CN";
+    const nextLocale: AppLocale = NEXT_LOCALE_BY_LOCALE[locale];
     const localeResource = await repository.setLocalePreference(nextLocale);
 
     if (localeResource.tag === "ready") {
@@ -104,7 +110,7 @@ export function PreferencesProvider({ children }: PreferencesProviderProps) {
     detachPromise(hydratePreferences());
   }, [hydratePreferences]);
 
-  useDocumentElementAttribute("data-theme", theme);
+  useDocumentElementAttribute(DOCUMENT_THEME_ATTRIBUTE_NAME, theme);
   useDocumentElementLanguage(locale);
 
   const value = useMemo<PreferencesContextValue>(

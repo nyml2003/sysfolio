@@ -62,6 +62,27 @@
     color: var(--sys-color-text-secondary);
   }
 
+  .m-button--success,
+  .m-button.is-success {
+    border: var(--sys-border-width-1) solid var(--sys-color-success);
+    background: var(--sys-color-success-soft);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-button--warning,
+  .m-button.is-warning {
+    border: var(--sys-border-width-1) solid var(--sys-color-warning);
+    background: var(--sys-color-warning-soft);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-button--destructive,
+  .m-button.is-destructive {
+    border: var(--sys-border-width-1) solid var(--sys-color-destructive);
+    background: var(--sys-color-destructive-soft);
+    color: var(--sys-color-text-primary);
+  }
+
   .m-button-group--attached > .m-button:not(:first-child) {
     margin-inline-start: calc(var(--sys-border-width-1) * -1);
     border-start-start-radius: 0;
@@ -107,6 +128,27 @@
     color: var(--sys-color-text-inverse);
   }
 
+  .m-icon-button--success,
+  .m-icon-button.is-success {
+    border-color: var(--sys-color-success);
+    background: var(--sys-color-success-soft);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-icon-button--warning,
+  .m-icon-button.is-warning {
+    border-color: var(--sys-color-warning);
+    background: var(--sys-color-warning-soft);
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-icon-button--destructive,
+  .m-icon-button.is-destructive {
+    border-color: var(--sys-color-destructive);
+    background: var(--sys-color-destructive-soft);
+    color: var(--sys-color-text-primary);
+  }
+
   .m-icon-button--ghost {
     border-color: transparent;
   }
@@ -128,6 +170,30 @@
       border-color: var(--sys-color-accent-hover);
       background: var(--sys-color-accent-hover);
       color: var(--sys-color-text-inverse);
+    }
+
+    .m-button--success:hover,
+    .m-button.is-success:hover,
+    .m-icon-button--success:hover,
+    .m-icon-button.is-success:hover {
+      border-color: var(--sys-color-success);
+      background: var(--sys-color-panel);
+    }
+
+    .m-button--warning:hover,
+    .m-button.is-warning:hover,
+    .m-icon-button--warning:hover,
+    .m-icon-button.is-warning:hover {
+      border-color: var(--sys-color-warning);
+      background: var(--sys-color-panel);
+    }
+
+    .m-button--destructive:hover,
+    .m-button.is-destructive:hover,
+    .m-icon-button--destructive:hover,
+    .m-icon-button.is-destructive:hover {
+      border-color: var(--sys-color-destructive);
+      background: var(--sys-color-panel);
     }
   }
 

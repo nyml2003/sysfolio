@@ -126,6 +126,140 @@
     border-radius: var(--sys-radius-8);
   }
 
+  .m-table-wrap {
+    overflow: auto;
+    border: var(--sys-border-width-1) solid var(--sys-color-border-default);
+    border-radius: var(--sys-radius-12);
+    background: var(--sys-color-panel);
+  }
+
+  .m-table {
+    inline-size: 100%;
+    min-inline-size: 36rem;
+    border-collapse: collapse;
+    color: var(--sys-color-text-secondary);
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-13);
+    line-height: var(--sys-line-height-ui);
+  }
+
+  .m-table__head {
+    background: var(--sys-color-panel-alt);
+  }
+
+  .m-table__row {
+    --m-table-row-bg: transparent;
+    --m-table-row-border: var(--sys-color-border-default);
+    --m-table-row-rail: transparent;
+
+    color: var(--sys-color-text-secondary);
+    @apply --u-tr-fast;
+  }
+
+  .m-table__header,
+  .m-table__cell {
+    padding: var(--sys-space-10) var(--sys-space-12);
+    border-block-end: var(--sys-border-width-1) solid var(--m-table-row-border);
+    background: var(--m-table-row-bg);
+    vertical-align: top;
+    @apply --u-tr-fast;
+  }
+
+  .m-table__header {
+    text-align: start;
+    color: var(--sys-color-text-muted);
+    font-size: var(--sys-font-size-12);
+    font-weight: var(--sys-font-weight-semibold);
+  }
+
+  .m-table__row > .m-table__header:first-child,
+  .m-table__row > .m-table__cell:first-child {
+    box-shadow: inset 2px 0 0 var(--m-table-row-rail);
+  }
+
+  .m-table__body .m-table__row:last-child > .m-table__header,
+  .m-table__body .m-table__row:last-child > .m-table__cell {
+    border-block-end: 0;
+  }
+
+  .m-table__row.is-current {
+    --m-table-row-bg: var(--sys-color-current-soft);
+    --m-table-row-border: var(--sys-color-current-rail);
+    --m-table-row-rail: var(--sys-color-current-rail);
+
+    color: var(--sys-color-text-primary);
+    font-weight: var(--sys-font-weight-medium);
+  }
+
+  .m-table__row.is-selected {
+    --m-table-row-bg: var(--sys-color-accent-soft);
+    --m-table-row-border: var(--sys-color-accent);
+
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-table__row.is-warning {
+    --m-table-row-bg: var(--sys-color-warning-soft);
+    --m-table-row-border: var(--sys-color-warning);
+
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-table__row.is-destructive {
+    --m-table-row-bg: var(--sys-color-destructive-soft);
+    --m-table-row-border: var(--sys-color-destructive);
+
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-table__row.is-drag-target {
+    --m-table-row-bg: var(--sys-color-drag-target-soft);
+    --m-table-row-border: var(--sys-color-drag-target);
+
+    color: var(--sys-color-text-primary);
+  }
+
+  .m-table__row.is-draggable {
+    cursor: grab;
+  }
+
+  .m-table__row.is-reordering {
+    opacity: 0.72;
+    cursor: grabbing;
+  }
+
+  .m-table__row.is-reorder-before > .m-table__header,
+  .m-table__row.is-reorder-before > .m-table__cell {
+    box-shadow: inset 0 2px 0 var(--sys-color-reorder-guide);
+  }
+
+  .m-table__row.is-reorder-after > .m-table__header,
+  .m-table__row.is-reorder-after > .m-table__cell {
+    box-shadow: inset 0 -2px 0 var(--sys-color-reorder-guide);
+  }
+
+  .m-table__row.is-current.is-reorder-before > .m-table__header:first-child,
+  .m-table__row.is-current.is-reorder-before > .m-table__cell:first-child {
+    box-shadow:
+      inset 2px 0 0 var(--m-table-row-rail),
+      inset 0 2px 0 var(--sys-color-reorder-guide);
+  }
+
+  .m-table__row.is-current.is-reorder-after > .m-table__header:first-child,
+  .m-table__row.is-current.is-reorder-after > .m-table__cell:first-child {
+    box-shadow:
+      inset 2px 0 0 var(--m-table-row-rail),
+      inset 0 -2px 0 var(--sys-color-reorder-guide);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .m-table__body .m-table__row:not(.is-current):not(.is-selected):not(.is-warning):not(.is-destructive):not(.is-drag-target):hover > .m-table__header,
+    .m-table__body .m-table__row:not(.is-current):not(.is-selected):not(.is-warning):not(.is-destructive):not(.is-drag-target):hover > .m-table__cell {
+      background: var(--sys-color-surface-hover);
+      color: var(--sys-color-text-primary);
+    }
+  }
+
   @media (width <= 800px) {
     .m-card {
       padding: var(--sys-space-12);
@@ -133,6 +267,10 @@
 
     .m-stat__value {
       font-size: var(--sys-font-size-18);
+    }
+
+    .m-table {
+      min-inline-size: 30rem;
     }
   }
 }

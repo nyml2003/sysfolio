@@ -73,6 +73,8 @@
 - 时间字段统一使用 ISO 字符串或时间戳。
 - 业务层不直接触碰 DOM / browser API。
 - 所有 DOM 读写、事件监听、observer、滚动测量和浏览器调度，统一收口到 `shared/lib/dom` 或 `shared/lib/layout`。
+- 业务层默认不直接写散落字面量。
+- 业务常量按 feature 或 shared 维度收口到 `constant.ts`，避免阈值、默认值和配置在多个文件分叉。
 
 ## Error And Loading Semantics
 

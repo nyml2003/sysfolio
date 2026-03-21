@@ -15,6 +15,9 @@
 - 需要触发异步副作用时，使用显式命名 helper 包装，并明确错误处理或忽略策略。
 - 业务代码和业务 hooks 不直接访问 DOM API。
 - `document` / `window` / 事件监听 / observer / 滚动读写统一走 `shared/lib/dom` 或 `shared/lib/layout` 适配层。
+- 业务代码不散落字面量。
+- 业务阈值、默认值、文案 key、路由片段、交互配置统一收口到 `constant.ts`。
+- 类型判别值、协议固定值、框架要求的最小字面量和测试 fixture，不强制抽到 `constant.ts`。
 
 ## File Pattern
 
@@ -23,6 +26,7 @@
 - `useComponent.ts`
 - `component.model.ts`
 - `component.types.ts`
+- `constant.ts`
 - `FeatureContext.tsx` 仅在该 feature 存在复杂共享状态时引入
 
 ## Import Direction

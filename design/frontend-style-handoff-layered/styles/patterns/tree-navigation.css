@@ -44,6 +44,11 @@
       font-weight: var(--sys-font-weight-medium);
       box-shadow: inset 2px 0 0 var(--sys-color-current-rail);
     };
+    --p-tree-row-selected: {
+      background: var(--sys-color-accent-soft);
+      color: var(--sys-color-text-primary);
+      box-shadow: inset 0 0 0 1px var(--sys-color-accent);
+    };
     --p-tree-toggle: {
       display: inline-flex;
       align-items: center;
@@ -139,7 +144,7 @@
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .m-tree-nav__row:hover {
+    .m-tree-nav__row:not(.is-current):hover {
       @apply --p-tree-row-hover;
     }
 

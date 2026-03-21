@@ -13,3 +13,7 @@ export function scheduleAnimationFrame(callback: FrameRequestCallback): number {
 export function cancelScheduledAnimationFrame(frameId: number) {
   window.cancelAnimationFrame(frameId);
 }
+
+export function getPerformanceNow(): number {
+  return window.performance.now();
+}

@@ -23,6 +23,14 @@ import {
 import { iconStyle } from "@/shared/ui/primitives/Icon.style";
 import styles from "./FileTree.module.css";
 
+import {
+  FILE_TREE_DEFAULT_ICON_COLOR,
+  FILE_TREE_DISCLOSURE_ICON_SIZE,
+  FILE_TREE_MUTED_ICON_COLOR,
+  FILE_TREE_NODE_ICON_SIZE,
+  FILE_TREE_OVERSCAN,
+  FILE_TREE_ROW_HEIGHT,
+} from "../constant";
 import { useFileTree } from "../hooks/useFileTree";
 
 type FileTreeProps = {
@@ -37,26 +45,26 @@ function getNodePath(node: ContentNode): string {
 function renderNodeIcon(node: ContentNode) {
   const color =
     node.status === "coming_soon"
-      ? "var(--sys-color-text-muted)"
-      : "var(--sys-color-icon-default)";
+      ? FILE_TREE_MUTED_ICON_COLOR
+      : FILE_TREE_DEFAULT_ICON_COLOR;
 
   if (node.kind === "home") {
-    return <HomeIcon size={14} style={iconStyle(color)} />;
+    return <HomeIcon size={FILE_TREE_NODE_ICON_SIZE} style={iconStyle(color)} />;
   }
 
   if (node.kind === "folder") {
-    return <FolderIcon size={14} style={iconStyle(color)} />;
+    return <FolderIcon size={FILE_TREE_NODE_ICON_SIZE} style={iconStyle(color)} />;
   }
 
   if (node.kind === "game") {
-    return <GameIcon size={14} style={iconStyle(color)} />;
+    return <GameIcon size={FILE_TREE_NODE_ICON_SIZE} style={iconStyle(color)} />;
   }
 
   if (node.kind === "media") {
-    return <MediaIcon size={14} style={iconStyle(color)} />;
+    return <MediaIcon size={FILE_TREE_NODE_ICON_SIZE} style={iconStyle(color)} />;
   }
 
-  return <ArticleIcon size={14} style={iconStyle(color)} />;
+  return <ArticleIcon size={FILE_TREE_NODE_ICON_SIZE} style={iconStyle(color)} />;
 }
 
 function toStableElementOption(
@@ -85,9 +93,9 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
   }, []);
   const virtualizer = useVirtualizer({
     count: rows.length,
-    estimateSize: () => 36,
+    estimateSize: () => FILE_TREE_ROW_HEIGHT,
     getScrollElement: () => (isSome(scrollElement) ? scrollElement.value : null),
-    overscan: 10,
+    overscan: FILE_TREE_OVERSCAN,
   });
 
   return (
@@ -149,9 +157,9 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                 >
                   {showDisclosure ? (
                     isExpanded ? (
-                      <ChevronDownIcon size={12} />
+                      <ChevronDownIcon size={FILE_TREE_DISCLOSURE_ICON_SIZE} />
                     ) : (
-                      <ChevronRightIcon size={12} />
+                      <ChevronRightIcon size={FILE_TREE_DISCLOSURE_ICON_SIZE} />
                     )
                   ) : null}
                 </button>

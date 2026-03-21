@@ -4,6 +4,12 @@ import {
   getElementScrollTop,
   getElementScrollTopWithinContainer as getDomElementScrollTopWithinContainer,
 } from "@/shared/lib/dom/scroll-element";
+import {
+  TOC_ACTIVATION_LINE_RATIO,
+  TOC_BOTTOM_EPSILON,
+  TOC_SCROLLABLE_EPSILON,
+  TOC_TARGET_EPSILON,
+} from "../constant";
 
 export type TocReadingState =
   | "idle"
@@ -11,15 +17,6 @@ export type TocReadingState =
   | "short_content"
   | "navigating"
   | "reading";
-
-export const TOC_ACTIVATION_LINE_RATIO = 0.28;
-export const TOC_BOTTOM_EPSILON = 4;
-export const TOC_OBSERVER_BAND_HEIGHT = 4;
-export const TOC_SCROLLABLE_EPSILON = 6;
-export const TOC_TARGET_EPSILON = 6;
-export const TOC_READING_PROGRESS_DEBOUNCE_MS = 180;
-export const TOC_USER_SCROLL_IDLE_MS = 140;
-export const TOC_NAVIGATING_TIMEOUT_MS = 2_000;
 
 export function getElementScrollTopWithinContainer(
   scrollContainer: HTMLElement,
