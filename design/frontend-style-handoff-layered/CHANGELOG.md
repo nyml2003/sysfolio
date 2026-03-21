@@ -20,6 +20,7 @@
 - 新增 `toc-activation-strategy.md`，定义 TOC 当前项的轻量状态机、状态转移表、Mermaid 状态图、激活线、到底兜底和正文底部留白策略
 - 新增 `toc-file-tree-reuse-boundary.md`，定义 TOC 与 File Tree 的共享 pattern 边界和业务拆分边界
 - 新增 `tree-navigation-pattern.md`，定义共享树形导航 pattern 的结构、状态、键盘规则和业务扩展边界
+- 新增 `page-view-state-strategy.md`，定义页面级组件的五态模型、状态转移和整页/局部状态边界
 
 ### 新分层
 

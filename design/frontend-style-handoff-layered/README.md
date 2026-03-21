@@ -30,6 +30,8 @@
   说明 TOC 与 File Tree 应共享哪一层，不应共享哪一层。
 - `tree-navigation-pattern.md`
   定义 TOC 与 File Tree 共享的树形导航模式层，包括结构、状态和交互边界。
+- `page-view-state-strategy.md`
+  定义页面级组件的 `idle / loading / ready / empty / error` 五态模型，以及页面主状态和局部状态的边界。
 
 ## 依赖规则
 
