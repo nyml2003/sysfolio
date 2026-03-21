@@ -7,11 +7,15 @@ import {
   type RefObject,
 } from "react";
 
-import type { ArticleDocument } from "@/entities/content";
+import type { ArticleDocument, RepositoryError } from "@/entities/content";
 import { useContentRepository } from "@/shared/data/repository";
+import { isSome, none, some, unwrapOr, type Option } from "@/shared/lib/monads/option";
 
 import {
   TOC_ACTIVATION_LINE_RATIO,
+  TOC_NAVIGATING_TIMEOUT_MS,
+  TOC_READING_PROGRESS_DEBOUNCE_MS,
+  TOC_USER_SCROLL_IDLE_MS,
   type TocReadingState,
 } from "../model/toc-activation";
 import { useHeadingActivationObserver } from "./useHeadingActivationObserver";
@@ -31,10 +35,6 @@ type UseArticleReadingResult = {
   scrollToTop: () => void;
 };
 
-const READING_PROGRESS_DEBOUNCE_MS = 180;
-const USER_SCROLL_IDLE_MS = 140;
-const NAVIGATING_TIMEOUT_MS = 2_000;
-
 export function useArticleReading({
   path,
   document,
@@ -45,9 +45,8 @@ export function useArticleReading({
   const [restoreNoticeVisible, setRestoreNoticeVisible] = useState(false);
   const [tocState, setTocStateState] = useState<TocReadingState>("idle");
   const tocStateRef = useRef<TocReadingState>("idle");
-  const observedActiveHeadingIdRef = useRef("");
+  const observedActiveHeadingIdRef = useRef<Option<string>>(none());
   const bottomVisibleRef = useRef(false);
-  const programmaticTargetIdRef = useRef("");
   const saveTimeoutIdRef = useRef(0);
   const navigatingTimeoutIdRef = useRef(0);
   const userScrollWatchFrameIdRef = useRef(0);
@@ -68,16 +67,32 @@ export function useArticleReading({
     setActiveHeadingId((currentId) => (currentId === headingId ? currentId : headingId));
   });
 
+  const setCurrentHeadingFromOptionImmediate = useEffectEvent((headingId: Option<string>) => {
+    setCurrentHeadingImmediate(unwrapOr(headingId, ""));
+  });
+
   const setCurrentHeadingDeferred = useEffectEvent((headingId: string) => {
     startTransition(() => {
       setActiveHeadingId((currentId) => (currentId === headingId ? currentId : headingId));
     });
   });
 
+  const setCurrentHeadingFromOptionDeferred = useEffectEvent((headingId: Option<string>) => {
+    setCurrentHeadingDeferred(unwrapOr(headingId, ""));
+  });
+
   const setRestoreNotice = useEffectEvent((visible: boolean) => {
     startTransition(() => {
       setRestoreNoticeVisible(visible);
     });
+  });
+
+  const reportRepositoryError = useEffectEvent((context: string, error: RepositoryError) => {
+    console.error(`[article-reading] ${context}: ${error.code} - ${error.message}`);
+  });
+
+  const reportUnexpectedError = useEffectEvent((context: string, error: unknown) => {
+    console.error(`[article-reading] ${context}.`, error);
   });
 
   const clearSaveTimeout = useEffectEvent(() => {
@@ -95,6 +110,52 @@ export function useArticleReading({
     userScrollWatchFrameIdRef.current = 0;
   });
 
+  const clearPendingWork = useEffectEvent(() => {
+    clearSaveTimeout();
+    clearNavigatingTimeout();
+    stopUserScrollWatch();
+  });
+
+  const getResolvedHeadingId = useEffectEvent((): Option<string> => {
+    if (isSome(observedActiveHeadingIdRef.current)) {
+      return observedActiveHeadingIdRef.current;
+    }
+
+    const currentHeadingId = layout.getHeadingIdForCurrentScrollPosition();
+
+    return isSome(currentHeadingId) ? currentHeadingId : layout.getFirstHeadingId();
+  });
+
+  const saveReadingProgress = useEffectEvent(async (scrollTop: number) => {
+    try {
+      const result = await repository.saveReadingProgress(path, {
+        scrollTop,
+        updatedAt: new Date().toISOString(),
+      });
+
+      if (result.tag === "error") {
+        reportRepositoryError("Failed to save reading progress", result.error);
+      }
+    } catch (error) {
+      reportUnexpectedError("Unexpected reading progress save failure", error);
+    }
+  });
+
+  const scheduleReadingProgressSave = useEffectEvent(() => {
+    clearSaveTimeout();
+    saveTimeoutIdRef.current = window.setTimeout(() => {
+      saveTimeoutIdRef.current = 0;
+
+      const stableScrollContainer = scrollContainerRef.current;
+
+      if (stableScrollContainer === null) {
+        return;
+      }
+
+      void saveReadingProgress(stableScrollContainer.scrollTop);
+    }, TOC_READING_PROGRESS_DEBOUNCE_MS);
+  });
+
   const {
     cancel: cancelSmoothScroll,
     isProgrammaticScrolling,
@@ -105,6 +166,7 @@ export function useArticleReading({
         return;
       }
 
+      clearSaveTimeout();
       clearNavigatingTimeout();
 
       if (
@@ -112,11 +174,7 @@ export function useArticleReading({
         tocStateRef.current === "navigating"
       ) {
         setTocState("reading");
-        setCurrentHeadingImmediate(
-          observedActiveHeadingIdRef.current ||
-            layout.getHeadingIdForCurrentScrollPosition() ||
-            layout.getFirstHeadingId(),
-        );
+        setCurrentHeadingFromOptionImmediate(getResolvedHeadingId());
       }
 
       const scrollContainer = scrollContainerRef.current;
@@ -151,29 +209,13 @@ export function useArticleReading({
             tocStateRef.current === "navigating"
           ) {
             setTocState("reading");
-            setCurrentHeadingImmediate(
-              observedActiveHeadingIdRef.current ||
-                layout.getHeadingIdForCurrentScrollPosition() ||
-                layout.getFirstHeadingId(),
-            );
+            setCurrentHeadingFromOptionImmediate(getResolvedHeadingId());
           }
         }
 
-        if (performance.now() - lastObservedScrollChangeAtRef.current >= USER_SCROLL_IDLE_MS) {
+        if (performance.now() - lastObservedScrollChangeAtRef.current >= TOC_USER_SCROLL_IDLE_MS) {
           stopUserScrollWatch();
-          clearSaveTimeout();
-          saveTimeoutIdRef.current = window.setTimeout(() => {
-            const stableScrollContainer = scrollContainerRef.current;
-
-            if (stableScrollContainer === null) {
-              return;
-            }
-
-            void repository.saveReadingProgress(path, {
-              scrollTop: stableScrollContainer.scrollTop,
-              updatedAt: new Date().toISOString(),
-            });
-          }, READING_PROGRESS_DEBOUNCE_MS);
+          scheduleReadingProgressSave();
           return;
         }
 
@@ -188,26 +230,19 @@ export function useArticleReading({
   const syncReadingHeading = useEffectEvent(() => {
     const lastHeadingId = layout.getLastHeadingId();
 
-    if (bottomVisibleRef.current && lastHeadingId !== "") {
-      setCurrentHeadingImmediate(lastHeadingId);
+    if (bottomVisibleRef.current && isSome(lastHeadingId)) {
+      setCurrentHeadingImmediate(lastHeadingId.value);
       return;
     }
 
-    const observedHeadingId = observedActiveHeadingIdRef.current;
-
-    if (observedHeadingId !== "") {
-      setCurrentHeadingImmediate(observedHeadingId);
-      return;
-    }
-
-    setCurrentHeadingImmediate(
-      layout.getHeadingIdForCurrentScrollPosition() || layout.getFirstHeadingId(),
-    );
+    setCurrentHeadingFromOptionImmediate(getResolvedHeadingId());
   });
 
   const scheduleNavigatingTimeout = useEffectEvent(() => {
     clearNavigatingTimeout();
     navigatingTimeoutIdRef.current = window.setTimeout(() => {
+      navigatingTimeoutIdRef.current = 0;
+
       if (tocStateRef.current !== "navigating") {
         return;
       }
@@ -215,27 +250,23 @@ export function useArticleReading({
       cancelSmoothScroll();
       setTocState("reading");
       syncReadingHeading();
-    }, NAVIGATING_TIMEOUT_MS);
+    }, TOC_NAVIGATING_TIMEOUT_MS);
   });
 
   const enterNavigatingState = useEffectEvent((headingId: string) => {
-    programmaticTargetIdRef.current = headingId;
     setTocState("navigating");
     setCurrentHeadingDeferred(headingId);
     scheduleNavigatingTimeout();
   });
 
   const resetReadingState = useEffectEvent(() => {
-    clearSaveTimeout();
-    clearNavigatingTimeout();
-    stopUserScrollWatch();
+    clearPendingWork();
     cancelSmoothScroll();
-    observedActiveHeadingIdRef.current = "";
+    observedActiveHeadingIdRef.current = none();
     bottomVisibleRef.current = false;
-    programmaticTargetIdRef.current = "";
     setTocState("idle");
     setRestoreNotice(false);
-    setCurrentHeadingDeferred("");
+    setCurrentHeadingFromOptionDeferred(none());
   });
 
   useHeadingActivationObserver({
@@ -246,7 +277,7 @@ export function useArticleReading({
     getHeadings: () => layout.getHeadingMetrics().map((metric) => metric.element),
     layoutVersion: layout.layoutVersion,
     onActiveHeadingChange: (headingId) => {
-      observedActiveHeadingIdRef.current = headingId;
+      observedActiveHeadingIdRef.current = some(headingId);
 
       if (tocStateRef.current !== "reading" || bottomVisibleRef.current) {
         return;
@@ -264,8 +295,8 @@ export function useArticleReading({
       if (visible) {
         const lastHeadingId = layout.getLastHeadingId();
 
-        if (lastHeadingId !== "") {
-          setCurrentHeadingImmediate(lastHeadingId);
+        if (isSome(lastHeadingId)) {
+          setCurrentHeadingImmediate(lastHeadingId.value);
         }
 
         return;
@@ -287,33 +318,31 @@ export function useArticleReading({
 
     const firstHeadingId = layout.getFirstHeadingId();
 
-    if (firstHeadingId === "") {
+    if (!isSome(firstHeadingId)) {
       setTocState("idle");
-      setCurrentHeadingDeferred("");
+      setCurrentHeadingFromOptionDeferred(none());
       return;
     }
 
     if (!layout.hasScrollableContent()) {
       scrollContainer.scrollTop = 0;
-      programmaticTargetIdRef.current = "";
       setTocState("short_content");
-      setCurrentHeadingDeferred(firstHeadingId);
+      observedActiveHeadingIdRef.current = firstHeadingId;
+      setCurrentHeadingDeferred(firstHeadingId.value);
       return;
     }
 
     if (requestedScrollTop > 0) {
       scrollContainer.scrollTop = requestedScrollTop;
-      const restoredHeadingId =
-        layout.getHeadingIdForCurrentScrollPosition() || firstHeadingId;
-
+      const restoredHeadingId = layout.getHeadingIdForCurrentScrollPosition();
       observedActiveHeadingIdRef.current = restoredHeadingId;
-      enterNavigatingState(restoredHeadingId);
+      enterNavigatingState(unwrapOr(restoredHeadingId, firstHeadingId.value));
       return;
     }
 
-    programmaticTargetIdRef.current = "";
+    observedActiveHeadingIdRef.current = firstHeadingId;
     setTocState("initial");
-    setCurrentHeadingDeferred(firstHeadingId);
+    setCurrentHeadingDeferred(firstHeadingId.value);
   });
 
   const handleScrollToHeading = useEffectEvent((headingId: string) => {
@@ -328,18 +357,19 @@ export function useArticleReading({
     const firstHeadingId = layout.getFirstHeadingId();
     const heading = layout.getHeadingById(headingId);
 
-    if (firstHeadingId === "" || heading === null) {
+    if (!isSome(firstHeadingId) || heading === null) {
       return;
     }
 
     if (!layout.hasScrollableContent() || tocStateRef.current === "short_content") {
       scrollContainer.scrollTop = layout.getHeadingTargetScrollTop(headingId);
       setTocState("short_content");
-      setCurrentHeadingDeferred(firstHeadingId);
+      observedActiveHeadingIdRef.current = firstHeadingId;
+      setCurrentHeadingDeferred(firstHeadingId.value);
       return;
     }
 
-    observedActiveHeadingIdRef.current = "";
+    observedActiveHeadingIdRef.current = none();
     bottomVisibleRef.current = false;
     enterNavigatingState(headingId);
     smoothScrollTo(layout.getHeadingTargetScrollTop(headingId));
@@ -356,7 +386,7 @@ export function useArticleReading({
 
     const firstHeadingId = layout.getFirstHeadingId();
 
-    if (firstHeadingId === "") {
+    if (!isSome(firstHeadingId)) {
       return;
     }
 
@@ -365,13 +395,14 @@ export function useArticleReading({
     if (!layout.hasScrollableContent()) {
       scrollContainer.scrollTop = 0;
       setTocState("short_content");
-      setCurrentHeadingDeferred(firstHeadingId);
+      observedActiveHeadingIdRef.current = firstHeadingId;
+      setCurrentHeadingDeferred(firstHeadingId.value);
       return;
     }
 
-    observedActiveHeadingIdRef.current = "";
+    observedActiveHeadingIdRef.current = none();
     bottomVisibleRef.current = false;
-    enterNavigatingState(firstHeadingId);
+    enterNavigatingState(firstHeadingId.value);
     smoothScrollTo(0);
   });
 
@@ -385,27 +416,48 @@ export function useArticleReading({
     }
 
     const restoreReadingProgress = async () => {
-      const progressResource = await repository.getSavedReadingProgress(path);
+      try {
+        const progressResource = await repository.getSavedReadingProgress(path);
 
-      if (cancelled) {
-        return;
-      }
-
-      const restoredScrollTop =
-        progressResource.tag === "ready" &&
-        progressResource.value.tag === "some" &&
-        progressResource.value.value.scrollTop > 0
-          ? progressResource.value.value.scrollTop
-          : 0;
-
-      frameId = window.requestAnimationFrame(() => {
         if (cancelled) {
           return;
         }
 
-        setRestoreNotice(restoredScrollTop > 0);
-        applyEntryState(restoredScrollTop);
-      });
+        let restoredScrollTop = 0;
+
+        if (progressResource.tag === "error") {
+          reportRepositoryError("Failed to restore reading progress", progressResource.error);
+        } else if (
+          progressResource.tag === "ready" &&
+          progressResource.value.tag === "some" &&
+          progressResource.value.value.scrollTop > 0
+        ) {
+          restoredScrollTop = progressResource.value.value.scrollTop;
+        }
+
+        frameId = window.requestAnimationFrame(() => {
+          if (cancelled) {
+            return;
+          }
+
+          setRestoreNotice(restoredScrollTop > 0);
+          applyEntryState(restoredScrollTop);
+        });
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        reportUnexpectedError("Unexpected reading progress restore failure", error);
+        frameId = window.requestAnimationFrame(() => {
+          if (cancelled) {
+            return;
+          }
+
+          setRestoreNotice(false);
+          applyEntryState(0);
+        });
+      }
     };
 
     void restoreReadingProgress();

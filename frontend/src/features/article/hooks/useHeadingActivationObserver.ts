@@ -1,5 +1,14 @@
 import { useEffect, useRef, type RefObject } from "react";
 
+import { isSome, none, type Option } from "@/shared/lib/monads/option";
+
+import {
+  TOC_BOTTOM_EPSILON,
+  TOC_OBSERVER_BAND_HEIGHT,
+  getElementScrollTopWithinContainer,
+} from "../model/toc-activation";
+import { getTocHeadingId } from "../model/toc-heading-id";
+
 type UseHeadingActivationObserverOptions = {
   scrollContainerRef: RefObject<HTMLElement | null>;
   getHeadings: () => HTMLElement[];
@@ -11,8 +20,11 @@ type UseHeadingActivationObserverOptions = {
   onBottomVisibilityChange: (visible: boolean) => void;
 };
 
-function getHeadingId(heading: HTMLElement): string {
-  return heading.dataset.tocId ?? "";
+function isBottomVisible(scrollContainer: HTMLElement): boolean {
+  return (
+    scrollContainer.scrollTop + scrollContainer.clientHeight >=
+    scrollContainer.scrollHeight - TOC_BOTTOM_EPSILON
+  );
 }
 
 export function useHeadingActivationObserver({
@@ -48,7 +60,70 @@ export function useHeadingActivationObserver({
       return undefined;
     }
 
-    const bandHeight = 4;
+    if (typeof IntersectionObserver === "undefined") {
+      const syncFallbackState = () => {
+        const activationLine =
+          scrollContainer.scrollTop + scrollContainer.clientHeight * activationLineRatio;
+        let activeHeadingId: Option<string> = none();
+
+        for (const heading of headings) {
+          const headingId = getTocHeadingId(heading);
+
+          if (!isSome(headingId)) {
+            continue;
+          }
+
+          if (getElementScrollTopWithinContainer(scrollContainer, heading) <= activationLine) {
+            activeHeadingId = headingId;
+            continue;
+          }
+
+          break;
+        }
+
+        if (isSome(activeHeadingId)) {
+          onActiveHeadingChangeRef.current(activeHeadingId.value);
+        }
+
+        onBottomVisibilityChangeRef.current(
+          bottomSentinel !== null && isBottomVisible(scrollContainer),
+        );
+      };
+
+      syncFallbackState();
+      scrollContainer.addEventListener("scroll", syncFallbackState, { passive: true });
+      window.addEventListener("resize", syncFallbackState);
+
+      return () => {
+        intersectingHeadingIds.clear();
+        scrollContainer.removeEventListener("scroll", syncFallbackState);
+        window.removeEventListener("resize", syncFallbackState);
+      };
+    }
+
+    const emitActiveHeadingChange = () => {
+      if (intersectingHeadingIds.size === 0) {
+        return;
+      }
+
+      let activeHeadingId: Option<string> = none();
+
+      for (const heading of headings) {
+        const headingId = getTocHeadingId(heading);
+
+        if (!isSome(headingId) || !intersectingHeadingIds.has(headingId.value)) {
+          continue;
+        }
+
+        activeHeadingId = headingId;
+      }
+
+      if (isSome(activeHeadingId)) {
+        onActiveHeadingChangeRef.current(activeHeadingId.value);
+      }
+    };
+
+    const bandHeight = TOC_OBSERVER_BAND_HEIGHT;
     const activationTop = scrollContainer.clientHeight * activationLineRatio;
     const rootMarginTop = -activationTop;
     const rootMarginBottom =
@@ -56,39 +131,21 @@ export function useHeadingActivationObserver({
     const headingObserver = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          const headingId = getHeadingId(entry.target as HTMLElement);
+          const headingId = getTocHeadingId(entry.target as HTMLElement);
 
-          if (headingId === "") {
+          if (!isSome(headingId)) {
             continue;
           }
 
           if (entry.isIntersecting) {
-            intersectingHeadingIds.add(headingId);
+            intersectingHeadingIds.add(headingId.value);
             continue;
           }
 
-          intersectingHeadingIds.delete(headingId);
+          intersectingHeadingIds.delete(headingId.value);
         }
 
-        if (intersectingHeadingIds.size === 0) {
-          return;
-        }
-
-        let activeHeadingId = "";
-
-        for (const heading of headings) {
-          const headingId = getHeadingId(heading);
-
-          if (!intersectingHeadingIds.has(headingId)) {
-            continue;
-          }
-
-          activeHeadingId = headingId;
-        }
-
-        if (activeHeadingId !== "") {
-          onActiveHeadingChangeRef.current(activeHeadingId);
-        }
+        emitActiveHeadingChange();
       },
       {
         root: scrollContainer,
@@ -121,6 +178,15 @@ export function useHeadingActivationObserver({
 
     return () => {
       intersectingHeadingIds.clear();
+
+      for (const heading of headings) {
+        headingObserver.unobserve(heading);
+      }
+
+      if (bottomObserver !== null && bottomSentinel !== null) {
+        bottomObserver.unobserve(bottomSentinel);
+      }
+
       headingObserver.disconnect();
       bottomObserver?.disconnect();
     };

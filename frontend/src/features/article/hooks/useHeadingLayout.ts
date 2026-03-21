@@ -1,5 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState, type RefObject } from "react";
 
+import { isSome, none, some, type Option } from "@/shared/lib/monads/option";
+
 import { useResizeObserver } from "@/shared/lib/layout/useResizeObserver";
 
 import {
@@ -7,6 +9,7 @@ import {
   TOC_SCROLLABLE_EPSILON,
   getElementScrollTopWithinContainer,
 } from "../model/toc-activation";
+import { getTocHeadingId } from "../model/toc-heading-id";
 
 type HeadingMetric = {
   id: string;
@@ -24,17 +27,38 @@ type UseHeadingLayoutResult = {
   layoutVersion: number;
   getHeadingMetrics: () => HeadingMetric[];
   getHeadingById: (headingId: string) => HTMLElement | null;
-  getFirstHeadingId: () => string;
-  getLastHeadingId: () => string;
+  getFirstHeadingId: () => Option<string>;
+  getLastHeadingId: () => Option<string>;
   getHeadingTargetScrollTop: (headingId: string) => number;
-  getHeadingIdForCurrentScrollPosition: () => string;
+  getHeadingIdForCurrentScrollPosition: () => Option<string>;
   hasScrollableContent: () => boolean;
   getBottomSentinel: () => HTMLElement | null;
   refreshLayout: () => void;
 };
 
-function getHeadingId(heading: HTMLElement): string {
-  return heading.dataset.tocId ?? "";
+function areHeadingMetricsEqual(
+  previousMetrics: HeadingMetric[],
+  nextMetrics: HeadingMetric[],
+): boolean {
+  if (previousMetrics.length !== nextMetrics.length) {
+    return false;
+  }
+
+  for (let index = 0; index < previousMetrics.length; index += 1) {
+    const previousMetric = previousMetrics[index];
+    const nextMetric = nextMetrics[index];
+
+    if (
+      previousMetric.id !== nextMetric.id ||
+      previousMetric.element !== nextMetric.element ||
+      Math.abs(previousMetric.offsetTop - nextMetric.offsetTop) > 0.5 ||
+      Math.abs(previousMetric.targetScrollTop - nextMetric.targetScrollTop) > 0.5
+    ) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 export function useHeadingLayout({
@@ -51,6 +75,15 @@ export function useHeadingLayout({
     const scrollContainer = scrollContainerRef.current;
 
     if (!enabled || scrollContainer === null) {
+      const hadLayout =
+        headingMetricsRef.current.length > 0 ||
+        headingByIdRef.current.size > 0 ||
+        bottomSentinelRef.current !== null;
+
+      if (!hadLayout) {
+        return;
+      }
+
       headingMetricsRef.current = [];
       headingByIdRef.current = new Map();
       bottomSentinelRef.current = null;
@@ -67,9 +100,9 @@ export function useHeadingLayout({
     );
 
     for (const heading of headings) {
-      const headingId = getHeadingId(heading);
+      const headingId = getTocHeadingId(heading);
 
-      if (headingId === "") {
+      if (!isSome(headingId)) {
         continue;
       }
 
@@ -80,20 +113,29 @@ export function useHeadingLayout({
       );
 
       nextMetrics.push({
-        id: headingId,
+        id: headingId.value,
         element: heading,
         offsetTop,
         targetScrollTop,
       });
-      nextHeadingById.set(headingId, heading);
+      nextHeadingById.set(headingId.value, heading);
       nextTargetScrollTopCache.set(heading, targetScrollTop);
+    }
+
+    const nextBottomSentinel = scrollContainer.querySelector<HTMLElement>(
+      "[data-toc-bottom-sentinel]",
+    );
+    const layoutChanged =
+      !areHeadingMetricsEqual(headingMetricsRef.current, nextMetrics) ||
+      bottomSentinelRef.current !== nextBottomSentinel;
+
+    if (!layoutChanged) {
+      return;
     }
 
     headingMetricsRef.current = nextMetrics;
     headingByIdRef.current = nextHeadingById;
-    bottomSentinelRef.current = scrollContainer.querySelector<HTMLElement>(
-      "[data-toc-bottom-sentinel]",
-    );
+    bottomSentinelRef.current = nextBottomSentinel;
     targetScrollTopCacheRef.current = nextTargetScrollTopCache;
     setLayoutVersion((version) => version + 1);
   });
@@ -106,7 +148,8 @@ export function useHeadingLayout({
 
   useResizeObserver({
     disabled: !enabled,
-    dependencyToken: enabled,
+    dependencyToken:
+      scrollContainerRef.current?.querySelector<HTMLElement>("[data-article-body]") ?? enabled,
     getTargets: () => {
       const scrollContainer = scrollContainerRef.current;
       const articleBody =
@@ -120,11 +163,15 @@ export function useHeadingLayout({
   });
 
   const getFirstHeadingId = useEffectEvent(() => {
-    return headingMetricsRef.current[0]?.id ?? "";
+    const firstHeadingMetric = headingMetricsRef.current[0];
+
+    return firstHeadingMetric === undefined ? none() : some(firstHeadingMetric.id);
   });
 
   const getLastHeadingId = useEffectEvent(() => {
-    return headingMetricsRef.current.at(-1)?.id ?? "";
+    const lastHeadingMetric = headingMetricsRef.current.at(-1);
+
+    return lastHeadingMetric === undefined ? none() : some(lastHeadingMetric.id);
   });
 
   const getHeadingById = useEffectEvent((headingId: string) => {
@@ -159,13 +206,13 @@ export function useHeadingLayout({
     const headingMetrics = headingMetricsRef.current;
 
     if (scrollContainer === null || headingMetrics.length === 0) {
-      return "";
+      return none();
     }
 
     const activationLine =
       scrollContainer.scrollTop +
       scrollContainer.clientHeight * TOC_ACTIVATION_LINE_RATIO;
-    let currentHeadingId = headingMetrics[0].id;
+    let currentHeadingId = headingMetrics[0]?.id;
 
     for (const metric of headingMetrics) {
       if (metric.offsetTop <= activationLine) {
@@ -176,7 +223,7 @@ export function useHeadingLayout({
       break;
     }
 
-    return currentHeadingId;
+    return currentHeadingId === undefined ? none() : some(currentHeadingId);
   });
 
   const getBottomSentinel = useEffectEvent(() => {

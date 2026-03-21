@@ -1,3 +1,7 @@
+import { isSome, none, type Option } from "@/shared/lib/monads/option";
+
+import { getTocHeadingId } from "./toc-heading-id";
+
 export type TocReadingState =
   | "idle"
   | "initial"
@@ -7,8 +11,12 @@ export type TocReadingState =
 
 export const TOC_ACTIVATION_LINE_RATIO = 0.28;
 export const TOC_BOTTOM_EPSILON = 4;
+export const TOC_OBSERVER_BAND_HEIGHT = 4;
 export const TOC_SCROLLABLE_EPSILON = 6;
 export const TOC_TARGET_EPSILON = 6;
+export const TOC_READING_PROGRESS_DEBOUNCE_MS = 180;
+export const TOC_USER_SCROLL_IDLE_MS = 140;
+export const TOC_NAVIGATING_TIMEOUT_MS = 2_000;
 
 export function getElementScrollTopWithinContainer(
   scrollContainer: HTMLElement,
@@ -42,8 +50,16 @@ export function getTocHeadingElements(scrollContainer: HTMLElement): HTMLElement
   return Array.from(scrollContainer.querySelectorAll<HTMLElement>("[data-toc-id]"));
 }
 
-export function getFirstTocHeadingId(headings: HTMLElement[]): string {
-  return headings[0]?.dataset.tocId ?? "";
+export function getFirstTocHeadingId(headings: HTMLElement[]): Option<string> {
+  for (const heading of headings) {
+    const headingId = getTocHeadingId(heading);
+
+    if (isSome(headingId)) {
+      return headingId;
+    }
+  }
+
+  return none();
 }
 
 export function hasScrollableTocContent(scrollContainer: HTMLElement): boolean {
@@ -63,30 +79,46 @@ export function isAtScrollBottom(scrollContainer: HTMLElement): boolean {
 export function getReadingActiveHeadingId(
   scrollContainer: HTMLElement,
   headings: HTMLElement[],
-): string {
+): Option<string> {
+  const firstHeadingId = getFirstTocHeadingId(headings);
+
   if (headings.length === 0) {
-    return "";
+    return none();
   }
 
   if (isAtScrollBottom(scrollContainer)) {
-    return headings.at(-1)?.dataset.tocId ?? getFirstTocHeadingId(headings);
+    for (let index = headings.length - 1; index >= 0; index -= 1) {
+      const headingId = getTocHeadingId(headings[index]);
+
+      if (isSome(headingId)) {
+        return headingId;
+      }
+    }
+
+    return firstHeadingId;
   }
 
   const activationLine = getTocActivationLine(scrollContainer);
-  let currentHeading = headings[0];
+  let currentHeadingId = firstHeadingId;
 
   for (const heading of headings) {
+    const headingId = getTocHeadingId(heading);
+
+    if (!isSome(headingId)) {
+      continue;
+    }
+
     if (
       getElementScrollTopWithinContainer(scrollContainer, heading) <= activationLine
     ) {
-      currentHeading = heading;
+      currentHeadingId = headingId;
       continue;
     }
 
     break;
   }
 
-  return currentHeading.dataset.tocId ?? getFirstTocHeadingId(headings);
+  return currentHeadingId;
 }
 
 export function isTocTargetScrollReached(
