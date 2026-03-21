@@ -92,10 +92,12 @@
 - `Button`
 - `Input`
 - `IconButton`
+- `Segmented`
+- `TabsNav`
+- `Card`
+- `Tooltip`
 - `Spinner`
 - `SkeletonBlock`
-- `EmptyState`
-- `ErrorState`
 
 重点：
 
@@ -313,14 +315,18 @@
 
 ## 九、当前 CSS handoff 结构
 
-当前 handoff 目录保留旧视觉方向，但重组了样式职责：
+当前 handoff 目录保留旧视觉方向，但真实源码已经转到 `styles/`：
 
-- [tokens.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/tokens.css)
-- [utilities.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/utilities.css)
-- [primitives.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/primitives.css)
-- [patterns.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/patterns.css)
-- [business.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/business.css)
-- [index.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/index.css)
+- [styles/index.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/styles/index.css)
+- [styles/tokens.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/styles/tokens.css)
+- [styles/utilities.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/styles/utilities.css)
+- [styles/primitives/index.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/styles/primitives/index.css)
+- [styles/patterns/index.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/styles/patterns/index.css)
+- [styles/business/index.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/styles/business/index.css)
+- [styles/component.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/styles/component.css)
+- [primitive-inventory.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/primitive-inventory.md)
+
+根层的 [index.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/index.css)、[tokens.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/tokens.css)、[utilities.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/utilities.css)、[primitives.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/primitives.css)、[patterns.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/patterns.css)、[business.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/business.css)、[component.css](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/component.css) 现在都只是兼容包装。
 
 当前目标不是一次性重命名全部 selector，而是：
 
@@ -363,6 +369,10 @@
 - 小屏导航层和右侧面板的具体交互还没定稿
 - 深色主题对比度还没做完整复核
 - 动效规则还处于弱定义状态
+
+这些内容的下一轮细化，已经单独整理到：
+
+- [visual-refinement-strategy.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/visual-refinement-strategy.md)
 
 ## 十二、当前方案的最终表达
 

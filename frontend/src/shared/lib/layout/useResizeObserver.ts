@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
 
+import { isSome, type Option } from "@/shared/lib/monads/option";
+
 type UseResizeObserverOptions = {
-  getTargets: () => ReadonlyArray<Element | null>;
+  getTargets: () => ReadonlyArray<Option<Element>>;
   onResize: () => void;
   dependencyToken?: unknown;
   disabled?: boolean;
@@ -37,7 +39,9 @@ export function useResizeObserver({
     };
 
     const observedTargets = Array.from(
-      new Set(getTargetsRef.current().filter((target): target is Element => target !== null)),
+      new Set(
+        getTargetsRef.current().flatMap((target) => (isSome(target) ? [target.value] : [])),
+      ),
     );
 
     if (typeof ResizeObserver === "undefined") {

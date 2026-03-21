@@ -1,4 +1,14 @@
 @layer primitives {
+  .m-button-group {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--sys-space-8);
+  }
+
+  .m-button-group--attached {
+    gap: 0;
+  }
+
   .m-button {
     @apply --u-row;
     justify-content: center;
@@ -50,6 +60,17 @@
     border: var(--sys-border-width-1) solid var(--sys-color-border-default);
     background: var(--sys-color-panel);
     color: var(--sys-color-text-secondary);
+  }
+
+  .m-button-group--attached > .m-button:not(:first-child) {
+    margin-inline-start: calc(var(--sys-border-width-1) * -1);
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+
+  .m-button-group--attached > .m-button:not(:last-child) {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
   }
 
   .m-icon-button {
@@ -111,6 +132,10 @@
   }
 
   @media (pointer: coarse) {
+    .m-button-group {
+      inline-size: 100%;
+    }
+
     .m-button {
       min-block-size: var(--sys-size-hit-target-comfortable);
       padding-inline: var(--sys-space-16);

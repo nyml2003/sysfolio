@@ -1,0 +1,53 @@
+@layer business {
+  .m-onboarding-hints {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: var(--sys-color-onboarding-scrim);
+  }
+
+  .m-hint-dot {
+    position: absolute;
+    inline-size: 24px;
+    block-size: 24px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .m-hint-dot::before,
+  .m-hint-dot::after {
+    content: "";
+    position: absolute;
+    inset: 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .m-hint-dot::before {
+    inline-size: 12px;
+    block-size: 12px;
+    background: var(--sys-color-onboarding-dot);
+  }
+
+  .m-hint-dot::after {
+    inline-size: 24px;
+    block-size: 24px;
+    border: 1px solid var(--sys-color-onboarding-dot-ring);
+  }
+
+  .m-hint-popover {
+    position: absolute;
+    max-inline-size: 18rem;
+    padding: var(--sys-space-12) var(--sys-space-16);
+    border: var(--sys-border-width-1) solid var(--sys-color-border-default);
+    border-radius: var(--sys-radius-12);
+    background: var(--sys-color-onboarding-popover);
+    box-shadow: var(--sys-shadow-soft);
+    color: var(--sys-color-text-primary);
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-13);
+    line-height: var(--sys-line-height-ui);
+  }
+}

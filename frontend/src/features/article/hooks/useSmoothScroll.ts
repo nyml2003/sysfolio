@@ -1,8 +1,11 @@
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useRef, useState } from "react";
 import { animate, useMotionValue, useMotionValueEvent } from "motion/react";
 
+import { isSome } from "@/shared/lib/monads/option";
+
+import { useArticleDom } from "../context/article-dom.context";
+
 type UseSmoothScrollOptions = {
-  scrollContainerRef: RefObject<HTMLElement | null>;
   durationSeconds?: number;
   onUserInteraction?: () => void;
 };
@@ -23,10 +26,11 @@ function clampScrollTop(scrollContainer: HTMLElement, scrollTop: number): number
 }
 
 export function useSmoothScroll({
-  scrollContainerRef,
   durationSeconds = DEFAULT_DURATION_SECONDS,
   onUserInteraction,
 }: UseSmoothScrollOptions): UseSmoothScrollResult {
+  const { scrollContainer } = useArticleDom();
+  const scrollContainerDependency = isSome(scrollContainer) ? scrollContainer.value : false;
   const [isProgrammaticScrolling, setIsProgrammaticScrolling] = useState(false);
   const scrollTopValue = useMotionValue(0);
   const animationRef = useRef<{ stop: () => void } | null>(null);
@@ -43,19 +47,18 @@ export function useSmoothScroll({
   };
 
   const scrollTo = (targetScrollTop: number) => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (scrollContainer === null) {
+    if (!isSome(scrollContainer)) {
       return;
     }
 
-    const nextScrollTop = clampScrollTop(scrollContainer, targetScrollTop);
+    const scrollContainerElement = scrollContainer.value;
+    const nextScrollTop = clampScrollTop(scrollContainerElement, targetScrollTop);
 
     cancel();
-    scrollTopValue.jump(scrollContainer.scrollTop);
+    scrollTopValue.jump(scrollContainerElement.scrollTop);
 
-    if (Math.abs(nextScrollTop - scrollContainer.scrollTop) <= 1) {
-      scrollContainer.scrollTop = nextScrollTop;
+    if (Math.abs(nextScrollTop - scrollContainerElement.scrollTop) <= 1) {
+      scrollContainerElement.scrollTop = nextScrollTop;
       return;
     }
 
@@ -67,13 +70,11 @@ export function useSmoothScroll({
   };
 
   useMotionValueEvent(scrollTopValue, "change", (latest) => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (scrollContainer === null || !isProgrammaticScrollingRef.current) {
+    if (!isSome(scrollContainer) || !isProgrammaticScrollingRef.current) {
       return;
     }
 
-    scrollContainer.scrollTop = clampScrollTop(scrollContainer, latest);
+    scrollContainer.value.scrollTop = clampScrollTop(scrollContainer.value, latest);
   });
 
   useMotionValueEvent(scrollTopValue, "animationComplete", () => {
@@ -87,11 +88,11 @@ export function useSmoothScroll({
   });
 
   useEffect(() => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (scrollContainer === null) {
+    if (scrollContainerDependency === false) {
       return undefined;
     }
+
+    const scrollContainerElement = scrollContainerDependency;
 
     const notifyUserInteraction = () => {
       onUserInteractionRef.current?.();
@@ -115,19 +116,19 @@ export function useSmoothScroll({
       }
     };
 
-    scrollContainer.addEventListener("wheel", notifyUserInteraction, { passive: true });
-    scrollContainer.addEventListener("touchstart", notifyUserInteraction, {
+    scrollContainerElement.addEventListener("wheel", notifyUserInteraction, { passive: true });
+    scrollContainerElement.addEventListener("touchstart", notifyUserInteraction, {
       passive: true,
     });
     window.addEventListener("keydown", handleKeyboardInteraction);
 
     return () => {
-      scrollContainer.removeEventListener("wheel", notifyUserInteraction);
-      scrollContainer.removeEventListener("touchstart", notifyUserInteraction);
+      scrollContainerElement.removeEventListener("wheel", notifyUserInteraction);
+      scrollContainerElement.removeEventListener("touchstart", notifyUserInteraction);
       window.removeEventListener("keydown", handleKeyboardInteraction);
       cancel();
     };
-  }, [scrollContainerRef]);
+  }, [scrollContainerDependency]);
 
   return {
     isProgrammaticScrolling,

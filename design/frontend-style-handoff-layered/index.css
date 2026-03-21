@@ -1,8 +1,1 @@
-@layer tokens, utilities, primitives, patterns, business, component;
-
-@import url("./tokens.css");
-@import url("./utilities.css");
-@import url("./primitives.css");
-@import url("./patterns.css");
-@import url("./business.css");
-@import url("./component.css");
+@import url("./styles/index.css");

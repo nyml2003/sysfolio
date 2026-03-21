@@ -1,5 +1,9 @@
 @layer primitives {
-  .m-surface-popover {
+  .m-surface-popover,
+  .m-footnote-popover,
+  .m-dropdown-surface,
+  .m-dialog-surface,
+  .m-drawer-surface {
     max-inline-size: 20rem;
     padding: var(--sys-space-12) var(--sys-space-16);
     border: var(--sys-border-width-1) solid var(--sys-color-border-default);
@@ -10,10 +14,26 @@
   }
 
   .m-footnote-popover {
-    @apply --m-surface-popover;
     font-family: var(--sys-font-body);
     font-size: var(--sys-font-size-14);
     line-height: var(--sys-line-height-body);
+  }
+
+  .m-dropdown-surface {
+    min-inline-size: 12rem;
+    padding: var(--sys-space-8);
+  }
+
+  .m-dialog-surface {
+    max-inline-size: min(100%, 36rem);
+    padding: var(--sys-space-20) var(--sys-space-24);
+  }
+
+  .m-drawer-surface {
+    max-inline-size: min(100vw, 24rem);
+    block-size: 100%;
+    border-radius: 0;
+    box-shadow: var(--sys-shadow-soft);
   }
 
   .m-tooltip {
@@ -26,5 +46,15 @@
     font-size: var(--sys-font-size-12);
     line-height: var(--sys-line-height-ui);
     box-shadow: var(--sys-shadow-panel);
+  }
+
+  @media (width <= 800px) {
+    .m-dialog-surface {
+      padding: var(--sys-space-16);
+    }
+
+    .m-drawer-surface {
+      max-inline-size: min(100vw, 20rem);
+    }
   }
 }

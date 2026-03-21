@@ -171,8 +171,8 @@ primitives 不应普遍承担五态本身，但应提供五态所需的“状态
 - `Spinner`
 - `SkeletonBlock`
 - `InlineNotice`
-- `EmptyState`
-- `ErrorState`
+- `Progress`
+- `Tooltip`
 - `RetryButton`
 - 带 `loading` 态的 `Button`
 
@@ -202,6 +202,9 @@ patterns 才是五态的主要承载层，尤其是 data-bearing patterns。
 - `ListPane`
 - `DetailPane`
 - `ContextPanel`
+- `LoadingState`
+- `EmptyState`
+- `ErrorState`
 
 这些 pattern 应优先考虑：
 

@@ -1,8 +1,10 @@
-import { useRef } from "react";
+import { useCallback, useMemo } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 import type { ArticleDocument, BreadcrumbSegment } from "@/entities/content";
+import { useArticleDom } from "@/features/article/context/article-dom.context";
 import { useArticleReading } from "@/features/article/hooks/useArticleReading";
+import { ArticleDomProvider } from "@/features/article/providers/ArticleDomProvider";
 import { ContentPane } from "@/features/content-pane/components/ContentPane";
 import { useRenderableEntry } from "@/features/content-pane/hooks/useRenderableEntry";
 import { ContextPanel } from "@/features/context-panel/components/ContextPanel";
@@ -10,6 +12,7 @@ import { FileTree } from "@/features/file-tree/components/FileTree";
 import { OnboardingHints } from "@/features/onboarding/components/OnboardingHints";
 import { PathBar } from "@/features/path-bar/components/PathBar";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
+import { fromNullable, none, some, type Option } from "@/shared/lib/monads/option";
 import { ROOT_PATH, normalizePath, splitPathSegments } from "@/shared/lib/path/content-path";
 import styles from "./AppShell.module.css";
 
@@ -45,23 +48,38 @@ function buildFallbackBreadcrumbs(path: string, homeTitle: string): BreadcrumbSe
   return breadcrumbs;
 }
 
-function ShellRoute() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const copy = useUiCopy();
-  const currentPath = normalizePath(location.pathname);
-  const resource = useRenderableEntry(currentPath);
-  const fallbackBreadcrumbs = buildFallbackBreadcrumbs(currentPath, copy.common.homeTitle);
-  const scrollContainerRef = useRef<HTMLElement | null>(null);
-  const articleDocument: ArticleDocument | null =
-    resource.tag === "ready" && resource.value.content.kind === "article"
-      ? resource.value.content
-      : null;
+type ShellContentProps = {
+  currentPath: string;
+  fallbackBreadcrumbs: BreadcrumbSegment[];
+  resource: ReturnType<typeof useRenderableEntry>;
+  onNavigate: (path: string) => void;
+};
+
+function ShellContent({
+  currentPath,
+  fallbackBreadcrumbs,
+  resource,
+  onNavigate,
+}: ShellContentProps) {
+  const { registerScrollContainer } = useArticleDom();
+  const renderableContent = resource.tag === "ready" ? resource.value.content : false;
+  const articleDocument = useMemo<Option<ArticleDocument>>(() => {
+    if (renderableContent === false || renderableContent.kind !== "article") {
+      return none();
+    }
+
+    return some(renderableContent);
+  }, [renderableContent]);
+  const registerScrollContainerElement = useCallback(
+    (node: HTMLElement | null) => {
+      registerScrollContainer(fromNullable(node));
+    },
+    [registerScrollContainer],
+  );
   const { activeHeadingId, restoreNoticeVisible, scrollToHeading, scrollToTop } =
     useArticleReading({
       path: currentPath,
       document: articleDocument,
-      scrollContainerRef,
     });
 
   const breadcrumbs =
@@ -75,24 +93,18 @@ function ShellRoute() {
       <PathBar
         breadcrumbs={breadcrumbs}
         isLoading={pathBarLoading}
-        onNavigate={(path) => {
-          void navigate(path);
-        }}
+        onNavigate={onNavigate}
       />
       <div className={styles.body}>
         <div className={styles.left}>
           <FileTree
             currentPath={currentPath}
-            onNavigate={(path) => {
-              void navigate(path);
-            }}
+            onNavigate={onNavigate}
           />
         </div>
-        <main className={styles.main} ref={scrollContainerRef}>
+        <main className={styles.main} ref={registerScrollContainerElement}>
           <ContentPane
-            onNavigate={(path) => {
-              void navigate(path);
-            }}
+            onNavigate={onNavigate}
             resource={resource}
             restoreNoticeVisible={restoreNoticeVisible}
             scrollToTop={scrollToTop}
@@ -101,9 +113,7 @@ function ShellRoute() {
         <div className={styles.right}>
           <ContextPanel
             activeHeadingId={activeHeadingId}
-            onNavigate={(path) => {
-              void navigate(path);
-            }}
+            onNavigate={onNavigate}
             onScrollToHeading={(headingId) => {
               scrollToHeading(headingId);
             }}
@@ -113,6 +123,28 @@ function ShellRoute() {
       </div>
       <OnboardingHints />
     </div>
+  );
+}
+
+function ShellRoute() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const copy = useUiCopy();
+  const currentPath = normalizePath(location.pathname);
+  const resource = useRenderableEntry(currentPath);
+  const fallbackBreadcrumbs = buildFallbackBreadcrumbs(currentPath, copy.common.homeTitle);
+
+  return (
+    <ArticleDomProvider>
+      <ShellContent
+        currentPath={currentPath}
+        fallbackBreadcrumbs={fallbackBreadcrumbs}
+        onNavigate={(path) => {
+          void navigate(path);
+        }}
+        resource={resource}
+      />
+    </ArticleDomProvider>
   );
 }
 

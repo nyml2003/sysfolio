@@ -1,7 +1,10 @@
+import { useCallback, useEffect, useMemo } from "react";
+
 import type { ArticleDocument, ContentNode } from "@/entities/content";
+import { useArticleDom } from "@/features/article/context/article-dom.context";
 import { formatDate } from "@/shared/lib/date/format-date";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
-import { unwrapOr } from "@/shared/lib/monads/option";
+import { fromNullable, unwrapOr } from "@/shared/lib/monads/option";
 import { usePreferences } from "@/shared/store/preferences";
 import buttonStyles from "@/shared/ui/primitives/Button.module.css";
 
@@ -14,10 +17,24 @@ type ArticleViewProps = {
   scrollToTop: () => void;
 };
 
-function renderHeading(level: 2 | 3 | 4, id: string, title: string) {
+type ArticleHeadingProps = {
+  id: string;
+  level: 2 | 3 | 4;
+  title: string;
+};
+
+function ArticleHeading({ id, level, title }: ArticleHeadingProps) {
+  const { registerHeading } = useArticleDom();
+  const registerHeadingElement = useCallback(
+    (node: HTMLHeadingElement | null) => {
+      registerHeading(id, fromNullable(node));
+    },
+    [id, registerHeading],
+  );
+
   if (level === 3) {
     return (
-      <h3 data-toc-id={id} id={id}>
+      <h3 id={id} ref={registerHeadingElement}>
         {title}
       </h3>
     );
@@ -25,14 +42,14 @@ function renderHeading(level: 2 | 3 | 4, id: string, title: string) {
 
   if (level === 4) {
     return (
-      <h4 data-toc-id={id} id={id}>
+      <h4 id={id} ref={registerHeadingElement}>
         {title}
       </h4>
     );
   }
 
   return (
-    <h2 data-toc-id={id} id={id}>
+    <h2 id={id} ref={registerHeadingElement}>
       {title}
     </h2>
   );
@@ -46,9 +63,36 @@ export function ArticleView({
 }: ArticleViewProps) {
   const { locale } = usePreferences();
   const copy = useUiCopy();
+  const { registerArticleBody, registerBottomSentinel, registerHeadingOrder } = useArticleDom();
   const updatedAt = unwrapOr(node.updatedAt, "");
   const publishedAt = unwrapOr(node.publishedAt, "");
   const readingMinutes = unwrapOr(node.readingMinutes, 0);
+  const headingIds = useMemo(
+    () => document.sections.map((section) => section.id),
+    [document.sections],
+  );
+  const registerArticleBodyElement = useCallback(
+    (node: HTMLDivElement | null) => {
+      registerArticleBody(fromNullable(node));
+    },
+    [registerArticleBody],
+  );
+  const registerBottomSentinelElement = useCallback(
+    (node: HTMLDivElement | null) => {
+      registerBottomSentinel(fromNullable(node));
+    },
+    [registerBottomSentinel],
+  );
+
+  useEffect(() => {
+    registerHeadingOrder(headingIds);
+  }, [headingIds, registerHeadingOrder]);
+
+  useEffect(() => {
+    return () => {
+      registerHeadingOrder([]);
+    };
+  }, [registerHeadingOrder]);
 
   return (
     <article className={styles.root}>
@@ -79,20 +123,16 @@ export function ArticleView({
             </button>
           </div>
         ) : null}
-        <div className={styles.body} data-article-body="true">
+        <div className={styles.body} ref={registerArticleBodyElement}>
           {document.sections.map((section) => (
             <section key={section.id}>
-              {renderHeading(section.level, section.id, section.title)}
+              <ArticleHeading id={section.id} level={section.level} title={section.title} />
               {section.paragraphs.map((paragraph) => (
                 <p key={`${section.id}-${paragraph.slice(0, 12)}`}>{paragraph}</p>
               ))}
             </section>
           ))}
-          <div
-            aria-hidden="true"
-            className={styles.bottomSentinel}
-            data-toc-bottom-sentinel=""
-          />
+          <div aria-hidden="true" className={styles.bottomSentinel} ref={registerBottomSentinelElement} />
         </div>
       </div>
     </article>

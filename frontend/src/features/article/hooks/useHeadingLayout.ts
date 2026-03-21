@@ -1,15 +1,15 @@
-import { useEffect, useEffectEvent, useRef, useState, type RefObject } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 
-import { isSome, none, some, type Option } from "@/shared/lib/monads/option";
+import { fromNullable, isSome, none, some, type Option } from "@/shared/lib/monads/option";
 
 import { useResizeObserver } from "@/shared/lib/layout/useResizeObserver";
 
+import { useArticleDom } from "../context/article-dom.context";
 import {
   TOC_ACTIVATION_LINE_RATIO,
   TOC_SCROLLABLE_EPSILON,
   getElementScrollTopWithinContainer,
 } from "../model/toc-activation";
-import { getTocHeadingId } from "../model/toc-heading-id";
 
 type HeadingMetric = {
   id: string;
@@ -19,20 +19,19 @@ type HeadingMetric = {
 };
 
 type UseHeadingLayoutOptions = {
-  scrollContainerRef: RefObject<HTMLElement | null>;
   enabled: boolean;
 };
 
 type UseHeadingLayoutResult = {
   layoutVersion: number;
   getHeadingMetrics: () => HeadingMetric[];
-  getHeadingById: (headingId: string) => HTMLElement | null;
+  getHeadingById: (headingId: string) => Option<HTMLElement>;
   getFirstHeadingId: () => Option<string>;
   getLastHeadingId: () => Option<string>;
   getHeadingTargetScrollTop: (headingId: string) => number;
   getHeadingIdForCurrentScrollPosition: () => Option<string>;
   hasScrollableContent: () => boolean;
-  getBottomSentinel: () => HTMLElement | null;
+  getBottomSentinel: () => Option<HTMLElement>;
   refreshLayout: () => void;
 };
 
@@ -62,23 +61,24 @@ function areHeadingMetricsEqual(
 }
 
 export function useHeadingLayout({
-  scrollContainerRef,
   enabled,
 }: UseHeadingLayoutOptions): UseHeadingLayoutResult {
+  const { articleBody, bottomSentinel, headings, scrollContainer } = useArticleDom();
+  const articleBodyDependency = isSome(articleBody) ? articleBody.value : false;
+  const bottomSentinelDependency = isSome(bottomSentinel) ? bottomSentinel.value : false;
+  const scrollContainerDependency = isSome(scrollContainer) ? scrollContainer.value : false;
   const [layoutVersion, setLayoutVersion] = useState(0);
   const headingMetricsRef = useRef<HeadingMetric[]>([]);
   const headingByIdRef = useRef<Map<string, HTMLElement>>(new Map());
-  const bottomSentinelRef = useRef<HTMLElement | null>(null);
+  const bottomSentinelRef = useRef<Option<HTMLElement>>(none());
   const targetScrollTopCacheRef = useRef<WeakMap<HTMLElement, number>>(new WeakMap());
 
   const refreshLayout = useEffectEvent(() => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (!enabled || scrollContainer === null) {
+    if (!enabled || !isSome(scrollContainer)) {
       const hadLayout =
         headingMetricsRef.current.length > 0 ||
         headingByIdRef.current.size > 0 ||
-        bottomSentinelRef.current !== null;
+        isSome(bottomSentinelRef.current);
 
       if (!hadLayout) {
         return;
@@ -86,48 +86,40 @@ export function useHeadingLayout({
 
       headingMetricsRef.current = [];
       headingByIdRef.current = new Map();
-      bottomSentinelRef.current = null;
+      bottomSentinelRef.current = none();
       targetScrollTopCacheRef.current = new WeakMap();
       setLayoutVersion((version) => version + 1);
       return;
     }
 
+    const scrollContainerElement = scrollContainer.value;
+
     const nextMetrics: HeadingMetric[] = [];
     const nextHeadingById = new Map<string, HTMLElement>();
     const nextTargetScrollTopCache = new WeakMap<HTMLElement, number>();
-    const headings = Array.from(
-      scrollContainer.querySelectorAll<HTMLElement>("[data-toc-id]"),
-    );
 
     for (const heading of headings) {
-      const headingId = getTocHeadingId(heading);
-
-      if (!isSome(headingId)) {
-        continue;
-      }
-
-      const offsetTop = getElementScrollTopWithinContainer(scrollContainer, heading);
+      const offsetTop = getElementScrollTopWithinContainer(
+        scrollContainerElement,
+        heading.element,
+      );
       const targetScrollTop = Math.max(
         0,
-        offsetTop - scrollContainer.clientHeight * TOC_ACTIVATION_LINE_RATIO,
+        offsetTop - scrollContainerElement.clientHeight * TOC_ACTIVATION_LINE_RATIO,
       );
 
       nextMetrics.push({
-        id: headingId.value,
-        element: heading,
+        id: heading.id,
+        element: heading.element,
         offsetTop,
         targetScrollTop,
       });
-      nextHeadingById.set(headingId.value, heading);
-      nextTargetScrollTopCache.set(heading, targetScrollTop);
+      nextHeadingById.set(heading.id, heading.element);
+      nextTargetScrollTopCache.set(heading.element, targetScrollTop);
     }
-
-    const nextBottomSentinel = scrollContainer.querySelector<HTMLElement>(
-      "[data-toc-bottom-sentinel]",
-    );
     const layoutChanged =
       !areHeadingMetricsEqual(headingMetricsRef.current, nextMetrics) ||
-      bottomSentinelRef.current !== nextBottomSentinel;
+      bottomSentinelRef.current !== bottomSentinel;
 
     if (!layoutChanged) {
       return;
@@ -135,7 +127,7 @@ export function useHeadingLayout({
 
     headingMetricsRef.current = nextMetrics;
     headingByIdRef.current = nextHeadingById;
-    bottomSentinelRef.current = nextBottomSentinel;
+    bottomSentinelRef.current = bottomSentinel;
     targetScrollTopCacheRef.current = nextTargetScrollTopCache;
     setLayoutVersion((version) => version + 1);
   });
@@ -144,17 +136,22 @@ export function useHeadingLayout({
     refreshLayout();
     // Effect Events are intentionally non-reactive here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled]);
+  }, [
+    articleBodyDependency,
+    bottomSentinelDependency,
+    enabled,
+    headings,
+    scrollContainerDependency,
+  ]);
 
   useResizeObserver({
     disabled: !enabled,
-    dependencyToken:
-      scrollContainerRef.current?.querySelector<HTMLElement>("[data-article-body]") ?? enabled,
+    dependencyToken: isSome(articleBody)
+      ? articleBody.value
+      : isSome(scrollContainer)
+        ? scrollContainer.value
+        : enabled,
     getTargets: () => {
-      const scrollContainer = scrollContainerRef.current;
-      const articleBody =
-        scrollContainer?.querySelector<HTMLElement>("[data-article-body]") ?? null;
-
       return [scrollContainer, articleBody];
     },
     onResize: () => {
@@ -175,7 +172,7 @@ export function useHeadingLayout({
   });
 
   const getHeadingById = useEffectEvent((headingId: string) => {
-    return headingByIdRef.current.get(headingId) ?? null;
+    return fromNullable(headingByIdRef.current.get(headingId));
   });
 
   const getHeadingTargetScrollTop = useEffectEvent((headingId: string) => {
@@ -189,29 +186,26 @@ export function useHeadingLayout({
   });
 
   const hasScrollableContent = useEffectEvent(() => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (scrollContainer === null) {
+    if (!isSome(scrollContainer)) {
       return false;
     }
 
     return (
-      scrollContainer.scrollHeight - scrollContainer.clientHeight >
+      scrollContainer.value.scrollHeight - scrollContainer.value.clientHeight >
       TOC_SCROLLABLE_EPSILON
     );
   });
 
   const getHeadingIdForCurrentScrollPosition = useEffectEvent(() => {
-    const scrollContainer = scrollContainerRef.current;
     const headingMetrics = headingMetricsRef.current;
 
-    if (scrollContainer === null || headingMetrics.length === 0) {
+    if (!isSome(scrollContainer) || headingMetrics.length === 0) {
       return none();
     }
 
     const activationLine =
-      scrollContainer.scrollTop +
-      scrollContainer.clientHeight * TOC_ACTIVATION_LINE_RATIO;
+      scrollContainer.value.scrollTop +
+      scrollContainer.value.clientHeight * TOC_ACTIVATION_LINE_RATIO;
     let currentHeadingId = headingMetrics[0]?.id;
 
     for (const metric of headingMetrics) {

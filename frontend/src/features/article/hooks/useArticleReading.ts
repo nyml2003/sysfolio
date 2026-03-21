@@ -4,10 +4,10 @@ import {
   useEffectEvent,
   useRef,
   useState,
-  type RefObject,
 } from "react";
 
 import type { ArticleDocument, RepositoryError } from "@/entities/content";
+import { useArticleDom } from "@/features/article/context/article-dom.context";
 import { useContentRepository } from "@/shared/data/repository";
 import { isSome, none, some, unwrapOr, type Option } from "@/shared/lib/monads/option";
 
@@ -24,8 +24,7 @@ import { useSmoothScroll } from "./useSmoothScroll";
 
 type UseArticleReadingOptions = {
   path: string;
-  document: ArticleDocument | null;
-  scrollContainerRef: RefObject<HTMLElement | null>;
+  document: Option<ArticleDocument>;
 };
 
 type UseArticleReadingResult = {
@@ -38,8 +37,10 @@ type UseArticleReadingResult = {
 export function useArticleReading({
   path,
   document,
-  scrollContainerRef,
 }: UseArticleReadingOptions): UseArticleReadingResult {
+  const { scrollContainer } = useArticleDom();
+  const documentDependency = isSome(document) ? document.value : false;
+  const scrollContainerDependency = isSome(scrollContainer) ? scrollContainer.value : false;
   const repository = useContentRepository();
   const [activeHeadingId, setActiveHeadingId] = useState("");
   const [restoreNoticeVisible, setRestoreNoticeVisible] = useState(false);
@@ -54,8 +55,7 @@ export function useArticleReading({
   const lastObservedScrollChangeAtRef = useRef(0);
 
   const layout = useHeadingLayout({
-    enabled: document !== null,
-    scrollContainerRef,
+    enabled: isSome(document),
   });
 
   const setTocState = useEffectEvent((nextState: TocReadingState) => {
@@ -146,13 +146,11 @@ export function useArticleReading({
     saveTimeoutIdRef.current = window.setTimeout(() => {
       saveTimeoutIdRef.current = 0;
 
-      const stableScrollContainer = scrollContainerRef.current;
-
-      if (stableScrollContainer === null) {
+      if (!isSome(scrollContainer)) {
         return;
       }
 
-      void saveReadingProgress(stableScrollContainer.scrollTop);
+      void saveReadingProgress(scrollContainer.value.scrollTop);
     }, TOC_READING_PROGRESS_DEBOUNCE_MS);
   });
 
@@ -162,7 +160,7 @@ export function useArticleReading({
     scrollTo: smoothScrollTo,
   } = useSmoothScroll({
     onUserInteraction: () => {
-      if (document === null || !layout.hasScrollableContent()) {
+      if (!isSome(document) || !layout.hasScrollableContent() || !isSome(scrollContainer)) {
         return;
       }
 
@@ -177,13 +175,7 @@ export function useArticleReading({
         setCurrentHeadingFromOptionImmediate(getResolvedHeadingId());
       }
 
-      const scrollContainer = scrollContainerRef.current;
-
-      if (scrollContainer === null) {
-        return;
-      }
-
-      lastObservedScrollTopRef.current = scrollContainer.scrollTop;
+      lastObservedScrollTopRef.current = scrollContainer.value.scrollTop;
       lastObservedScrollChangeAtRef.current = performance.now();
 
       if (userScrollWatchFrameIdRef.current !== 0) {
@@ -191,14 +183,12 @@ export function useArticleReading({
       }
 
       const watchUserScroll = () => {
-        const nextScrollContainer = scrollContainerRef.current;
-
-        if (nextScrollContainer === null) {
+        if (!isSome(scrollContainer)) {
           stopUserScrollWatch();
           return;
         }
 
-        const currentScrollTop = nextScrollContainer.scrollTop;
+        const currentScrollTop = scrollContainer.value.scrollTop;
 
         if (Math.abs(currentScrollTop - lastObservedScrollTopRef.current) > 0.5) {
           lastObservedScrollTopRef.current = currentScrollTop;
@@ -224,7 +214,6 @@ export function useArticleReading({
 
       userScrollWatchFrameIdRef.current = window.requestAnimationFrame(watchUserScroll);
     },
-    scrollContainerRef,
   });
 
   const syncReadingHeading = useEffectEvent(() => {
@@ -272,9 +261,7 @@ export function useArticleReading({
   useHeadingActivationObserver({
     activationLineRatio: TOC_ACTIVATION_LINE_RATIO,
     disabled:
-      document === null || tocState !== "reading" || isProgrammaticScrolling,
-    getBottomSentinel: () => layout.getBottomSentinel(),
-    getHeadings: () => layout.getHeadingMetrics().map((metric) => metric.element),
+      !isSome(document) || tocState !== "reading" || isProgrammaticScrolling,
     layoutVersion: layout.layoutVersion,
     onActiveHeadingChange: (headingId) => {
       observedActiveHeadingIdRef.current = some(headingId);
@@ -304,15 +291,14 @@ export function useArticleReading({
 
       syncReadingHeading();
     },
-    scrollContainerRef,
   });
 
   const applyEntryState = useEffectEvent((requestedScrollTop: number) => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (document === null || scrollContainer === null) {
+    if (!isSome(document) || !isSome(scrollContainer)) {
       return;
     }
+
+    const scrollContainerElement = scrollContainer.value;
 
     layout.refreshLayout();
 
@@ -325,7 +311,7 @@ export function useArticleReading({
     }
 
     if (!layout.hasScrollableContent()) {
-      scrollContainer.scrollTop = 0;
+      scrollContainerElement.scrollTop = 0;
       setTocState("short_content");
       observedActiveHeadingIdRef.current = firstHeadingId;
       setCurrentHeadingDeferred(firstHeadingId.value);
@@ -333,7 +319,7 @@ export function useArticleReading({
     }
 
     if (requestedScrollTop > 0) {
-      scrollContainer.scrollTop = requestedScrollTop;
+      scrollContainerElement.scrollTop = requestedScrollTop;
       const restoredHeadingId = layout.getHeadingIdForCurrentScrollPosition();
       observedActiveHeadingIdRef.current = restoredHeadingId;
       enterNavigatingState(unwrapOr(restoredHeadingId, firstHeadingId.value));
@@ -346,23 +332,23 @@ export function useArticleReading({
   });
 
   const handleScrollToHeading = useEffectEvent((headingId: string) => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (document === null || scrollContainer === null) {
+    if (!isSome(document) || !isSome(scrollContainer)) {
       return;
     }
+
+    const scrollContainerElement = scrollContainer.value;
 
     layout.refreshLayout();
 
     const firstHeadingId = layout.getFirstHeadingId();
     const heading = layout.getHeadingById(headingId);
 
-    if (!isSome(firstHeadingId) || heading === null) {
+    if (!isSome(firstHeadingId) || !isSome(heading)) {
       return;
     }
 
     if (!layout.hasScrollableContent() || tocStateRef.current === "short_content") {
-      scrollContainer.scrollTop = layout.getHeadingTargetScrollTop(headingId);
+      scrollContainerElement.scrollTop = layout.getHeadingTargetScrollTop(headingId);
       setTocState("short_content");
       observedActiveHeadingIdRef.current = firstHeadingId;
       setCurrentHeadingDeferred(firstHeadingId.value);
@@ -376,11 +362,11 @@ export function useArticleReading({
   });
 
   const handleScrollToTop = useEffectEvent(() => {
-    const scrollContainer = scrollContainerRef.current;
-
-    if (document === null || scrollContainer === null) {
+    if (!isSome(document) || !isSome(scrollContainer)) {
       return;
     }
+
+    const scrollContainerElement = scrollContainer.value;
 
     layout.refreshLayout();
 
@@ -393,7 +379,7 @@ export function useArticleReading({
     setRestoreNotice(false);
 
     if (!layout.hasScrollableContent()) {
-      scrollContainer.scrollTop = 0;
+      scrollContainerElement.scrollTop = 0;
       setTocState("short_content");
       observedActiveHeadingIdRef.current = firstHeadingId;
       setCurrentHeadingDeferred(firstHeadingId.value);
@@ -410,7 +396,7 @@ export function useArticleReading({
     let cancelled = false;
     let frameId = 0;
 
-    if (document === null) {
+    if (!isSome(document)) {
       resetReadingState();
       return undefined;
     }
@@ -469,7 +455,7 @@ export function useArticleReading({
     };
     // Effect Events are intentionally non-reactive here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [document, path, repository]);
+  }, [documentDependency, path, repository, scrollContainerDependency]);
 
   return {
     activeHeadingId,

@@ -7,25 +7,34 @@
 - 保留现有视觉方向、token 值和大部分 selector，避免一次性重绘。
 - 把当前 `tokens / atomic / molecular` 的混层问题拆开。
 - 用更明确的职责层次对齐设计和前端实现。
+- 把 CSS 真实源码收进 `styles/`，避免后续继续在根目录平铺增长。
 
-## 分层
+## 源码结构
 
 - `overall-design-strategy.md`
   当前整体新设计方案的总文档，整合 6 层架构、响应式、多端交互、view state、树形导航和 TOC 规则。
-- `tokens.css`
+- `primitive-inventory.md`
+  基于 Ant Design 的组件总览检查 primitive 覆盖面，但按 SysFolio 的 6 层架构重划边界。
+- `visual-refinement-strategy.md`
+  把当前视觉侧待设计项推进成可执行的细化方案，覆盖基础控件、状态矩阵、响应式行为、树导航层级、版式密度、深色主题和动效规则。
+- `styles/`
+  真实源码目录，所有 CSS 维护都应落在这里。
+- `styles/tokens.css`
   只放设计变量和主题覆盖。
-- `utilities.css`
+- `styles/utilities.css`
   对应低层样式能力，承接原 `atomic.css`，不再使用 atomic design 的术语解释。
-- `primitives.css`
-  放基础控件样式，例如按钮、标签、基础浮层。
-- `patterns.css`
-  放可复用结构模式，例如 app shell、reading pane、doc header、empty state。
-- `business.css`
-  放当前产品语义更强的组件和视图，例如 path bar、file tree、home view、directory view、document view。
-- `component.css`
+- `styles/primitives/`
+  放基础控件样式，按能力家族拆分，目前包括 `actions / data-entry / navigation / data-display / feedback / overlays`。
+- `styles/patterns/`
+  放可复用结构模式，例如 `shell / reading / tree-navigation / view-states`。
+- `styles/business/`
+  放当前产品语义更强的组件和视图，当前拆为 `navigation / explorer / views / onboarding`。
+- `styles/component.css`
   预留给 page edge / feature edge 级的编排和状态升级规则。
-- `index.css`
+- `styles/index.css`
   统一定义 layer 顺序和导入关系。
+- 根层 `index.css / tokens.css / utilities.css / primitives.css / patterns.css / business.css / component.css`
+  现在都只是兼容包装，用来平滑过渡旧引用。
 - `responsive-and-multi-input-strategy.md`
   说明这套 6 层架构如何支撑响应式布局和不同输入能力下的交互。
 - `toc-activation-strategy.md`
@@ -55,7 +64,8 @@
 
 - 保留 `--sys-*`、`--u-*` 和现有 `.m-*` selector。
 - 本轮先做文件拆分和职责归位，不做大规模重命名。
-- `molecular.css` 中的内容拆到 `primitives / patterns / business` 三层。
+- `molecular.css` 中的内容拆到 `primitives / patterns / business` 三层，并进一步归到 `styles/` 子目录。
+- `primitives` 不按单个组件一文件拆，而按家族拆，避免基础控件变多后目录失控。
 - `tokens.css` 只保留纯语义变量，不再保留 `shell / path / file-tree / toc` 这类组件别名 token。
 
 ## 与旧目录的关系
@@ -67,9 +77,10 @@
 ## 建议接入方式
 
 1. 将这套目录整体放入 `src/shared/ui/styles`
-2. 在应用入口引入 `index.css`
-3. `Component.module.css` 优先复用 `business / patterns / primitives`
-4. 组件差异化部分再保留在局部 module.css 中
+2. 在应用入口优先引入 `styles/index.css`
+3. 如果短期内要兼容旧引用，再保留根层 `index.css` 作为过渡入口
+4. `Component.module.css` 优先复用 `business / patterns / primitives`
+5. 组件差异化部分再保留在局部 module.css 中
 
 ## 备注
 
