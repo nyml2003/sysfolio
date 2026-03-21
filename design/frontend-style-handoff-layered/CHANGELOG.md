@@ -28,6 +28,11 @@
 - 新增 `visual-refinement-strategy.md`，把视觉侧待设计项推进成详细设计规范
 - 新增 `visual-delivery-roadmap.md`，把视觉规范继续拆成前端执行顺序和阶段验收标准
 - 新增 `primitive-visual-spec.md`，把 `Phase 1` 拆成可直接指导 CSS 调整的 primitive 视觉规范
+- 新增 `navigation-state-spec.md`，把 `Phase 2` 拆成可直接指导导航状态统一的视觉规范
+- 新增 `layout-behavior-spec.md`，把 `Phase 3` 拆成可直接指导三档布局和区域入口行为的规范
+- 新增 `view-density-spec.md`，把 `Phase 4` 拆成可直接指导三类业务视图与状态容器密度的规范
+- 新增 `dark-theme-spec.md`，把 `Phase 5` 拆成可直接指导 dark theme token 复核与对象级检查的规范
+- 新增 `motion-spec.md`，把 `Phase 6` 拆成可直接指导动效权重、结构切换和 reduced motion 的规范
 - 修复 `styles/primitives/overlays.css` 中无效的 `@apply --m-surface-popover`
 - 补齐 `component.css`，让 `component` 层在目录和入口上都真实存在
 - 清理 `tokens.css` 中的组件别名 token，改回纯语义 token + 纯布局 token
@@ -141,12 +146,19 @@
 6. 深色主题需要做一轮对比度复核。
 token 已有 dark theme 覆盖，但还没做完整的对比度和长文阅读舒适度检查。
 
-7. 动效规则还是弱定义。
-现在只有基础 transition token，没有正式定义页面切换、树节点展开、面板显隐和 onboarding 的节奏。
+7. 动效规则已有专项规范，但还没有正式回写到 CSS。
+现在已经补出独立的 `motion-spec.md`，但 token alias、transition helper 和各层组件的节奏还没有在样式文件里统一落地。
 
-上述 7 项现在已有一份细化方案文档：
+上述 7 项现在已经继续拆成多份专题文档：
 
 - `visual-refinement-strategy.md`
+- `visual-delivery-roadmap.md`
+- `primitive-visual-spec.md`
+- `navigation-state-spec.md`
+- `layout-behavior-spec.md`
+- `view-density-spec.md`
+- `dark-theme-spec.md`
+- `motion-spec.md`
 
 ### 给前端的说明
 

@@ -368,12 +368,17 @@
 - 交互状态矩阵还没完全收齐
 - 小屏导航层和右侧面板的具体交互还没定稿
 - 深色主题对比度还没做完整复核
-- 动效规则还处于弱定义状态
+- 动效规则已有专项规范，但还没正式回写到 CSS
 
 这些内容的下一轮细化，已经单独整理到：
 
 - [visual-refinement-strategy.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/visual-refinement-strategy.md)
 - [visual-delivery-roadmap.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/visual-delivery-roadmap.md)
+- [navigation-state-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/navigation-state-spec.md)
+- [layout-behavior-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/layout-behavior-spec.md)
+- [view-density-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/view-density-spec.md)
+- [dark-theme-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/dark-theme-spec.md)
+- [motion-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/motion-spec.md)
 
 ## 十二、当前方案的最终表达
 

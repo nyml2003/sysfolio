@@ -35,6 +35,17 @@ type UseHeadingLayoutResult = {
   refreshLayout: () => void;
 };
 
+function areSameElementOption(
+  left: Option<HTMLElement>,
+  right: Option<HTMLElement>,
+): boolean {
+  if (!isSome(left) || !isSome(right)) {
+    return !isSome(left) && !isSome(right);
+  }
+
+  return left.value === right.value;
+}
+
 function areHeadingMetricsEqual(
   previousMetrics: HeadingMetric[],
   nextMetrics: HeadingMetric[],
@@ -64,20 +75,17 @@ export function useHeadingLayout({
   enabled,
 }: UseHeadingLayoutOptions): UseHeadingLayoutResult {
   const { articleBody, bottomSentinel, headings, scrollContainer } = useArticleDom();
-  const articleBodyDependency = isSome(articleBody) ? articleBody.value : false;
-  const bottomSentinelDependency = isSome(bottomSentinel) ? bottomSentinel.value : false;
-  const scrollContainerDependency = isSome(scrollContainer) ? scrollContainer.value : false;
   const [layoutVersion, setLayoutVersion] = useState(0);
   const headingMetricsRef = useRef<HeadingMetric[]>([]);
-  const headingByIdRef = useRef<Map<string, HTMLElement>>(new Map());
+  const headingByIdRef = useRef<Record<string, HTMLElement>>({});
   const bottomSentinelRef = useRef<Option<HTMLElement>>(none());
-  const targetScrollTopCacheRef = useRef<WeakMap<HTMLElement, number>>(new WeakMap());
+  const targetScrollTopByIdRef = useRef<Record<string, number>>({});
 
   const refreshLayout = useEffectEvent(() => {
     if (!enabled || !isSome(scrollContainer)) {
       const hadLayout =
         headingMetricsRef.current.length > 0 ||
-        headingByIdRef.current.size > 0 ||
+        Object.keys(headingByIdRef.current).length > 0 ||
         isSome(bottomSentinelRef.current);
 
       if (!hadLayout) {
@@ -85,9 +93,9 @@ export function useHeadingLayout({
       }
 
       headingMetricsRef.current = [];
-      headingByIdRef.current = new Map();
+      headingByIdRef.current = {};
       bottomSentinelRef.current = none();
-      targetScrollTopCacheRef.current = new WeakMap();
+      targetScrollTopByIdRef.current = {};
       setLayoutVersion((version) => version + 1);
       return;
     }
@@ -95,8 +103,8 @@ export function useHeadingLayout({
     const scrollContainerElement = scrollContainer.value;
 
     const nextMetrics: HeadingMetric[] = [];
-    const nextHeadingById = new Map<string, HTMLElement>();
-    const nextTargetScrollTopCache = new WeakMap<HTMLElement, number>();
+    const nextHeadingById: Record<string, HTMLElement> = {};
+    const nextTargetScrollTopById: Record<string, number> = {};
 
     for (const heading of headings) {
       const offsetTop = getElementScrollTopWithinContainer(
@@ -114,12 +122,12 @@ export function useHeadingLayout({
         offsetTop,
         targetScrollTop,
       });
-      nextHeadingById.set(heading.id, heading.element);
-      nextTargetScrollTopCache.set(heading.element, targetScrollTop);
+      nextHeadingById[heading.id] = heading.element;
+      nextTargetScrollTopById[heading.id] = targetScrollTop;
     }
     const layoutChanged =
       !areHeadingMetricsEqual(headingMetricsRef.current, nextMetrics) ||
-      bottomSentinelRef.current !== bottomSentinel;
+      !areSameElementOption(bottomSentinelRef.current, bottomSentinel);
 
     if (!layoutChanged) {
       return;
@@ -128,7 +136,7 @@ export function useHeadingLayout({
     headingMetricsRef.current = nextMetrics;
     headingByIdRef.current = nextHeadingById;
     bottomSentinelRef.current = bottomSentinel;
-    targetScrollTopCacheRef.current = nextTargetScrollTopCache;
+    targetScrollTopByIdRef.current = nextTargetScrollTopById;
     setLayoutVersion((version) => version + 1);
   });
 
@@ -137,20 +145,16 @@ export function useHeadingLayout({
     // Effect Events are intentionally non-reactive here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    articleBodyDependency,
-    bottomSentinelDependency,
+    articleBody,
+    bottomSentinel,
     enabled,
     headings,
-    scrollContainerDependency,
+    scrollContainer,
   ]);
 
   useResizeObserver({
     disabled: !enabled,
-    dependencyToken: isSome(articleBody)
-      ? articleBody.value
-      : isSome(scrollContainer)
-        ? scrollContainer.value
-        : enabled,
+    dependencyToken: isSome(articleBody) ? articleBody : scrollContainer,
     getTargets: () => {
       return [scrollContainer, articleBody];
     },
@@ -172,17 +176,11 @@ export function useHeadingLayout({
   });
 
   const getHeadingById = useEffectEvent((headingId: string) => {
-    return fromNullable(headingByIdRef.current.get(headingId));
+    return fromNullable(headingByIdRef.current[headingId]);
   });
 
   const getHeadingTargetScrollTop = useEffectEvent((headingId: string) => {
-    const heading = headingByIdRef.current.get(headingId);
-
-    if (heading === undefined) {
-      return 0;
-    }
-
-    return targetScrollTopCacheRef.current.get(heading) ?? 0;
+    return targetScrollTopByIdRef.current[headingId] ?? 0;
   });
 
   const hasScrollableContent = useEffectEvent(() => {
@@ -203,10 +201,16 @@ export function useHeadingLayout({
       return none();
     }
 
+    const firstHeadingMetric = headingMetrics[0];
+
+    if (firstHeadingMetric === undefined) {
+      return none();
+    }
+
     const activationLine =
       scrollContainer.value.scrollTop +
       scrollContainer.value.clientHeight * TOC_ACTIVATION_LINE_RATIO;
-    let currentHeadingId = headingMetrics[0]?.id;
+    let currentHeadingId = firstHeadingMetric.id;
 
     for (const metric of headingMetrics) {
       if (metric.offsetTop <= activationLine) {

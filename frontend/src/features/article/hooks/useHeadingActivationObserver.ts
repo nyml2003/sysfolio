@@ -32,11 +32,9 @@ export function useHeadingActivationObserver({
   onBottomVisibilityChange,
 }: UseHeadingActivationObserverOptions) {
   const { bottomSentinel, headings, scrollContainer } = useArticleDom();
-  const bottomSentinelDependency = isSome(bottomSentinel) ? bottomSentinel.value : false;
-  const scrollContainerDependency = isSome(scrollContainer) ? scrollContainer.value : false;
   const onActiveHeadingChangeRef = useRef(onActiveHeadingChange);
   const onBottomVisibilityChangeRef = useRef(onBottomVisibilityChange);
-  const intersectingHeadingIdsRef = useRef<Set<string>>(new Set());
+  const intersectingHeadingIdsRef = useRef<Record<string, true>>({});
 
   onActiveHeadingChangeRef.current = onActiveHeadingChange;
   onBottomVisibilityChangeRef.current = onBottomVisibilityChange;
@@ -45,13 +43,13 @@ export function useHeadingActivationObserver({
     const observedHeadings = headings;
     const intersectingHeadingIds = intersectingHeadingIdsRef.current;
 
-    if (disabled || scrollContainerDependency === false || observedHeadings.length === 0) {
-      intersectingHeadingIds.clear();
+    if (disabled || !isSome(scrollContainer) || observedHeadings.length === 0) {
+      intersectingHeadingIdsRef.current = {};
       onBottomVisibilityChangeRef.current(false);
       return undefined;
     }
 
-    const scrollContainerElement = scrollContainerDependency;
+    const scrollContainerElement = scrollContainer.value;
 
     if (typeof IntersectionObserver === "undefined") {
       const syncFallbackState = () => {
@@ -77,7 +75,7 @@ export function useHeadingActivationObserver({
         }
 
         onBottomVisibilityChangeRef.current(
-          bottomSentinelDependency !== false && isBottomVisible(scrollContainerElement),
+          isSome(bottomSentinel) && isBottomVisible(scrollContainerElement),
         );
       };
 
@@ -86,21 +84,21 @@ export function useHeadingActivationObserver({
       window.addEventListener("resize", syncFallbackState);
 
       return () => {
-        intersectingHeadingIds.clear();
+        intersectingHeadingIdsRef.current = {};
         scrollContainerElement.removeEventListener("scroll", syncFallbackState);
         window.removeEventListener("resize", syncFallbackState);
       };
     }
 
     const emitActiveHeadingChange = () => {
-      if (intersectingHeadingIds.size === 0) {
+      if (Object.keys(intersectingHeadingIds).length === 0) {
         return;
       }
 
       let activeHeadingId: Option<string> = none();
 
       for (const heading of observedHeadings) {
-        if (!intersectingHeadingIds.has(heading.id)) {
+        if (intersectingHeadingIds[heading.id] !== true) {
           continue;
         }
 
@@ -117,24 +115,23 @@ export function useHeadingActivationObserver({
     const rootMarginTop = -activationTop;
     const rootMarginBottom =
       -(scrollContainerElement.clientHeight - activationTop - bandHeight);
-    const headingIdsByElement = new Map(
-      observedHeadings.map((heading) => [heading.element, heading.id]),
-    );
     const headingObserver = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          const headingId = headingIdsByElement.get(entry.target as HTMLElement);
+          const headingId = observedHeadings.find(
+            (heading) => heading.element === entry.target,
+          )?.id;
 
           if (headingId === undefined) {
             continue;
           }
 
           if (entry.isIntersecting) {
-            intersectingHeadingIds.add(headingId);
+            intersectingHeadingIds[headingId] = true;
             continue;
           }
 
-          intersectingHeadingIds.delete(headingId);
+          delete intersectingHeadingIds[headingId];
         }
 
         emitActiveHeadingChange();
@@ -145,49 +142,54 @@ export function useHeadingActivationObserver({
         threshold: 0,
       },
     );
-    const bottomObserver =
-      bottomSentinelDependency === false
-        ? null
-        : new IntersectionObserver(
+    const bottomObserver = isSome(bottomSentinel)
+      ? some(
+          new IntersectionObserver(
             (entries) => {
               const entry = entries[0];
 
-              onBottomVisibilityChangeRef.current(entry?.isIntersecting ?? false);
+              onBottomVisibilityChangeRef.current(
+                entry === undefined ? false : entry.isIntersecting,
+              );
             },
             {
               root: scrollContainerElement,
               threshold: 1,
             },
-          );
+          ),
+        )
+      : none();
 
     for (const heading of observedHeadings) {
       headingObserver.observe(heading.element);
     }
 
-    if (bottomObserver !== null && bottomSentinelDependency !== false) {
-      bottomObserver.observe(bottomSentinelDependency);
+    if (isSome(bottomObserver) && isSome(bottomSentinel)) {
+      bottomObserver.value.observe(bottomSentinel.value);
     }
 
     return () => {
-      intersectingHeadingIds.clear();
+      intersectingHeadingIdsRef.current = {};
 
       for (const heading of observedHeadings) {
         headingObserver.unobserve(heading.element);
       }
 
-      if (bottomObserver !== null && bottomSentinelDependency !== false) {
-        bottomObserver.unobserve(bottomSentinelDependency);
+      if (isSome(bottomObserver) && isSome(bottomSentinel)) {
+        bottomObserver.value.unobserve(bottomSentinel.value);
       }
 
       headingObserver.disconnect();
-      bottomObserver?.disconnect();
+      if (isSome(bottomObserver)) {
+        bottomObserver.value.disconnect();
+      }
     };
   }, [
     activationLineRatio,
-    bottomSentinelDependency,
+    bottomSentinel,
     disabled,
     headings,
     layoutVersion,
-    scrollContainerDependency,
+    scrollContainer,
   ]);
 }

@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { animate, useMotionValue, useMotionValueEvent } from "motion/react";
 
-import { isSome } from "@/shared/lib/monads/option";
+import { isSome, none, some, unwrapOr, type Option } from "@/shared/lib/monads/option";
 
 import { useArticleDom } from "../context/article-dom.context";
 
 type UseSmoothScrollOptions = {
-  durationSeconds?: number;
-  onUserInteraction?: () => void;
+  durationSeconds: Option<number>;
+  onUserInteraction: Option<() => void>;
 };
 
 type UseSmoothScrollResult = {
@@ -26,14 +26,13 @@ function clampScrollTop(scrollContainer: HTMLElement, scrollTop: number): number
 }
 
 export function useSmoothScroll({
-  durationSeconds = DEFAULT_DURATION_SECONDS,
+  durationSeconds,
   onUserInteraction,
 }: UseSmoothScrollOptions): UseSmoothScrollResult {
   const { scrollContainer } = useArticleDom();
-  const scrollContainerDependency = isSome(scrollContainer) ? scrollContainer.value : false;
   const [isProgrammaticScrolling, setIsProgrammaticScrolling] = useState(false);
   const scrollTopValue = useMotionValue(0);
-  const animationRef = useRef<{ stop: () => void } | null>(null);
+  const animationRef = useRef<Option<{ stop: () => void }>>(none());
   const onUserInteractionRef = useRef(onUserInteraction);
   const isProgrammaticScrollingRef = useRef(isProgrammaticScrolling);
 
@@ -41,8 +40,11 @@ export function useSmoothScroll({
   isProgrammaticScrollingRef.current = isProgrammaticScrolling;
 
   const cancel = () => {
-    animationRef.current?.stop();
-    animationRef.current = null;
+    if (isSome(animationRef.current)) {
+      animationRef.current.value.stop();
+    }
+
+    animationRef.current = none();
     setIsProgrammaticScrolling(false);
   };
 
@@ -63,10 +65,12 @@ export function useSmoothScroll({
     }
 
     setIsProgrammaticScrolling(true);
-    animationRef.current = animate(scrollTopValue, nextScrollTop, {
-      duration: durationSeconds,
-      ease: [0.22, 1, 0.36, 1],
-    });
+    animationRef.current = some(
+      animate(scrollTopValue, nextScrollTop, {
+        duration: unwrapOr(durationSeconds, DEFAULT_DURATION_SECONDS),
+        ease: [0.22, 1, 0.36, 1],
+      }),
+    );
   };
 
   useMotionValueEvent(scrollTopValue, "change", (latest) => {
@@ -78,26 +82,28 @@ export function useSmoothScroll({
   });
 
   useMotionValueEvent(scrollTopValue, "animationComplete", () => {
-    animationRef.current = null;
+    animationRef.current = none();
     setIsProgrammaticScrolling(false);
   });
 
   useMotionValueEvent(scrollTopValue, "animationCancel", () => {
-    animationRef.current = null;
+    animationRef.current = none();
     setIsProgrammaticScrolling(false);
   });
 
   useEffect(() => {
-    if (scrollContainerDependency === false) {
+    if (!isSome(scrollContainer)) {
       return undefined;
     }
 
-    const scrollContainerElement = scrollContainerDependency;
+    const scrollContainerElement = scrollContainer.value;
 
     const notifyUserInteraction = () => {
-      onUserInteractionRef.current?.();
+      if (isSome(onUserInteractionRef.current)) {
+        onUserInteractionRef.current.value();
+      }
 
-      if (animationRef.current !== null) {
+      if (isSome(animationRef.current)) {
         cancel();
       }
     };
@@ -128,7 +134,7 @@ export function useSmoothScroll({
       window.removeEventListener("keydown", handleKeyboardInteraction);
       cancel();
     };
-  }, [scrollContainerDependency]);
+  }, [scrollContainer]);
 
   return {
     isProgrammaticScrolling,

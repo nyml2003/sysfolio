@@ -80,14 +80,18 @@ export function ArticleDomProvider({ children }: ArticleDomProviderProps) {
         : [...nextHeadingOrder],
     );
 
-    const allowedHeadingIds = new Set(nextHeadingOrder);
+    const allowedHeadingIds: Record<string, true> = {};
+
+    for (const headingId of nextHeadingOrder) {
+      allowedHeadingIds[headingId] = true;
+    }
 
     setHeadingElementsById((currentHeadingElementsById) => {
       let changed = false;
       const nextHeadingElementsById: Record<string, HTMLElement> = {};
 
       for (const [headingId, element] of Object.entries(currentHeadingElementsById)) {
-        if (!allowedHeadingIds.has(headingId)) {
+        if (allowedHeadingIds[headingId] !== true) {
           changed = true;
           continue;
         }

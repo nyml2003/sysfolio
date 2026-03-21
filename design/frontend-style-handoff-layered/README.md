@@ -21,6 +21,16 @@
   把视觉细化方案继续拆成前端可执行的交付顺序，明确每一轮改哪些文件、解决什么问题、怎样算完成。
 - `primitive-visual-spec.md`
   把 `Phase 1` 继续细化成 primitive 家族视觉规范，直接对应现有类名、尺寸基线、状态表达和验收标准。
+- `navigation-state-spec.md`
+  把 `Phase 2` 细化成导航状态规范，统一 `TreeNav / TOC / FileTree / PathBar` 的 ownership、交互叠加和信息状态。
+- `layout-behavior-spec.md`
+  把 `Phase 3` 细化成布局行为规范，统一 `Shell / FileTree / TOC / ContextPanel / PathBar` 在三档宽度下的驻留方式、入口和返回路径。
+- `view-density-spec.md`
+  把 `Phase 4` 细化成视图密度规范，统一 `Home / Directory / Document` 的版式节奏，以及 `loading / empty / error` 在不同视图中的语气和重量。
+- `dark-theme-spec.md`
+  把 `Phase 5` 细化成深色主题复核规范，统一 token 优先级、重点复核对象和 dark theme 的验收标准。
+- `motion-spec.md`
+  把 `Phase 6` 细化成动效规范，统一 feedback、structure、overlay、onboarding 和 reduced motion 的节奏边界。
 - `styles/`
   真实源码目录，所有 CSS 维护都应落在这里。
 - `styles/tokens.css`

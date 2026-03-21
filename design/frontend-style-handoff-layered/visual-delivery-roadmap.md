@@ -85,6 +85,10 @@
 - `hover`
 - `expanded`
 
+详细规范见：
+
+- [navigation-state-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/navigation-state-spec.md)
+
 ### 范围
 
 - `styles/patterns/tree-navigation.css`
@@ -117,6 +121,10 @@
 ### 目标
 
 把当前“宽度不够就隐藏”的工程策略，升级成正式的布局行为方案。
+
+详细规范见：
+
+- [layout-behavior-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/layout-behavior-spec.md)
 
 ### 范围
 
@@ -151,6 +159,10 @@
 
 让 `home / directory / document` 三类视图各自有稳定节奏，不再像同一个通用容器套了不同内容。
 
+详细规范见：
+
+- [view-density-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/view-density-spec.md)
+
 ### 范围
 
 - `styles/patterns/reading.css`
@@ -182,6 +194,10 @@
 ### 目标
 
 不是“补一个 dark 版本”，而是正式验证阅读舒适度、层级和语义色在 dark 下是否成立。
+
+详细规范见：
+
+- [dark-theme-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/dark-theme-spec.md)
 
 ### 范围
 
@@ -216,6 +232,10 @@
 ### 目标
 
 让系统里的动效从“零散过渡”变成“有主次、有因果关系的节奏规则”。
+
+详细规范见：
+
+- [motion-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/motion-spec.md)
 
 ### 范围
 

@@ -5,15 +5,29 @@ import { isSome, type Option } from "@/shared/lib/monads/option";
 type UseResizeObserverOptions = {
   getTargets: () => ReadonlyArray<Option<Element>>;
   onResize: () => void;
-  dependencyToken?: unknown;
-  disabled?: boolean;
+  dependencyToken: Option<unknown>;
+  disabled: boolean;
 };
+
+function collectObservedTargets(targets: ReadonlyArray<Option<Element>>): Element[] {
+  const observedTargets: Element[] = [];
+
+  for (const target of targets) {
+    if (!isSome(target) || observedTargets.includes(target.value)) {
+      continue;
+    }
+
+    observedTargets.push(target.value);
+  }
+
+  return observedTargets;
+}
 
 export function useResizeObserver({
   getTargets,
   onResize,
   dependencyToken,
-  disabled = false,
+  disabled,
 }: UseResizeObserverOptions) {
   const getTargetsRef = useRef(getTargets);
   const onResizeRef = useRef(onResize);
@@ -38,11 +52,7 @@ export function useResizeObserver({
       });
     };
 
-    const observedTargets = Array.from(
-      new Set(
-        getTargetsRef.current().flatMap((target) => (isSome(target) ? [target.value] : [])),
-      ),
-    );
+    const observedTargets = collectObservedTargets(getTargetsRef.current());
 
     if (typeof ResizeObserver === "undefined") {
       scheduleResize();

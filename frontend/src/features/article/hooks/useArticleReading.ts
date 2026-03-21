@@ -39,8 +39,6 @@ export function useArticleReading({
   document,
 }: UseArticleReadingOptions): UseArticleReadingResult {
   const { scrollContainer } = useArticleDom();
-  const documentDependency = isSome(document) ? document.value : false;
-  const scrollContainerDependency = isSome(scrollContainer) ? scrollContainer.value : false;
   const repository = useContentRepository();
   const [activeHeadingId, setActiveHeadingId] = useState("");
   const [restoreNoticeVisible, setRestoreNoticeVisible] = useState(false);
@@ -159,7 +157,8 @@ export function useArticleReading({
     isProgrammaticScrolling,
     scrollTo: smoothScrollTo,
   } = useSmoothScroll({
-    onUserInteraction: () => {
+    durationSeconds: none(),
+    onUserInteraction: some(() => {
       if (!isSome(document) || !layout.hasScrollableContent() || !isSome(scrollContainer)) {
         return;
       }
@@ -213,7 +212,7 @@ export function useArticleReading({
       };
 
       userScrollWatchFrameIdRef.current = window.requestAnimationFrame(watchUserScroll);
-    },
+    }),
   });
 
   const syncReadingHeading = useEffectEvent(() => {
@@ -455,7 +454,7 @@ export function useArticleReading({
     };
     // Effect Events are intentionally non-reactive here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [documentDependency, path, repository, scrollContainerDependency]);
+  }, [document, path, repository, scrollContainer]);
 
   return {
     activeHeadingId,

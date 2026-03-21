@@ -41,7 +41,7 @@
 
 ## Data Shape Rules
 
-- 内部数据只允许：
+- 业务契约和可序列化数据默认使用：
   - `number`
   - `string`
   - `boolean`
@@ -56,14 +56,19 @@
   - 浏览器 API 适配
   - storage / URL / 外部输入适配
 - 前端业务代码不直接传递或存储 `Result<E, T>`。
-- 内部数据不使用：
+- 业务层默认不使用：
   - `null`
   - `undefined`
   - `Date`
-  - `Map`
-  - `Set`
   - `Proxy`
   - 其他复杂 class 实例
+- `Set` / `Map` 可用于运行期实现细节：
+  - 本地缓存
+  - 去重索引
+  - DOM 注册表
+  - 观察者集合
+  - 高频查询辅助结构
+- 但 `Set` / `Map` 不应默认成为 repository 返回值、mock fixture、跨边界共享契约或需要持久化的业务数据形状。
 - 时间字段统一使用 ISO 字符串或时间戳。
 
 ## Error And Loading Semantics
