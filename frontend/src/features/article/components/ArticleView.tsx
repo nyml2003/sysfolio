@@ -1,13 +1,12 @@
-import "./ArticleView.module.css";
-import "@/shared/ui/primitives/Button.module.css";
-
 import type { RefObject } from "react";
 
 import type { ArticleDocument, ContentNode } from "@/entities/content";
 import { formatDate } from "@/shared/lib/date/format-date";
 import { unwrapOr } from "@/shared/lib/monads/option";
+import buttonStyles from "@/shared/ui/primitives/Button.module.css";
 
 import { useArticleReading } from "../hooks/useArticleReading";
+import styles from "./ArticleView.module.css";
 
 type ArticleViewProps = {
   path: string;
@@ -59,27 +58,31 @@ export function ArticleView({
   const readingMinutes = unwrapOr(node.readingMinutes, 0);
 
   return (
-    <section className="m-document-view">
-      <div className="m-document-view__inner">
-        <header className="m-doc-header">
-          <div className="m-doc-header__eyebrow">{document.eyebrow}</div>
-          <h1 className="m-doc-header__title">{document.title}</h1>
-          <div className="m-doc-header__meta">
+    <section className={styles.root}>
+      <div className={styles.inner}>
+        <header className={styles.header}>
+          <div className={styles.eyebrow}>{document.eyebrow}</div>
+          <h1 className={styles.title}>{document.title}</h1>
+          <div className={styles.meta}>
             {publishedAt === "" ? null : <span>发布于 {formatDate(publishedAt)}</span>}
             {updatedAt === "" ? null : <span>更新于 {formatDate(updatedAt)}</span>}
             {readingMinutes === 0 ? null : <span>{readingMinutes} min</span>}
           </div>
-          <div className="m-doc-header__summary">{document.summary}</div>
+          <div className={styles.summary}>{document.summary}</div>
         </header>
         {restoreNoticeVisible ? (
-          <div className="m-progress-notice">
+          <div className={styles.progressNotice}>
             <span>已恢复到上次阅读位置。</span>
-            <button className="m-button m-button--secondary" onClick={scrollToTop} type="button">
+            <button
+              className={[buttonStyles.root, buttonStyles.secondary].join(" ")}
+              onClick={scrollToTop}
+              type="button"
+            >
               回到顶部
             </button>
           </div>
         ) : null}
-        <article className="m-article-body">
+        <article className={styles.body}>
           {document.sections.map((section) => (
             <section key={section.id}>
               {renderHeading(section.level, section.id, section.title)}

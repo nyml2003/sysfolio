@@ -1,7 +1,6 @@
-import "./ThemeToggle.module.css";
-
 import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
 import { MoonIcon, SunIcon } from "@/shared/ui/primitives/Icon";
+import styles from "./ThemeToggle.module.css";
 
 export function ThemeToggle() {
   const { theme, toggleTheme } = usePreferences();
@@ -9,7 +8,7 @@ export function ThemeToggle() {
   return (
     <button
       aria-label={theme === "light" ? "切换到深色主题" : "切换到浅色主题"}
-      className="m-theme-toggle"
+      className={styles.root}
       onClick={toggleTheme}
       type="button"
     >

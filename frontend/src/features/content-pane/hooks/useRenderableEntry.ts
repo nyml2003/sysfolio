@@ -1,4 +1,4 @@
-import { startTransition, useEffect, useEffectEvent, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 
 import type { RenderableEntryPayload, RepositoryError } from "@/entities/content";
 import { useContentRepository } from "@/shared/data/repository";
@@ -12,18 +12,24 @@ export function useRenderableEntry(
     idleState(),
   );
 
-  const loadEntry = useEffectEvent(async () => {
-    setResource(loadingState());
-    const nextResource = await repository.getRenderableEntryByPath(path);
-
-    startTransition(() => {
-      setResource(nextResource);
-    });
-  });
-
   useEffect(() => {
-    void loadEntry();
-  }, [loadEntry, path]);
+    let cancelled = false;
+
+    setResource(loadingState());
+    void repository.getRenderableEntryByPath(path).then((nextResource) => {
+      if (cancelled) {
+        return;
+      }
+
+      startTransition(() => {
+        setResource(nextResource);
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [path, repository]);
 
   return resource;
 }

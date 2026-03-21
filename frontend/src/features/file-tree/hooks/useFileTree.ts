@@ -1,4 +1,4 @@
-import { startTransition, useEffect, useEffectEvent, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 
 import type { RepositoryError } from "@/entities/content";
 import { useContentRepository } from "@/shared/data/repository";
@@ -29,37 +29,24 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
   );
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
   const [loadingNodeIds, setLoadingNodeIds] = useState<string[]>([]);
+  const loadingNodeIdsRef = useRef<string[]>([]);
 
-  const loadRoot = useEffectEvent(async () => {
-    setRootState(loadingState());
-    const treeRootResource = await repository.getTreeRoot();
+  useEffect(() => {
+    loadingNodeIdsRef.current = loadingNodeIds;
+  }, [loadingNodeIds]);
 
-    if (treeRootResource.tag !== "ready") {
-      setRootState(treeRootResource);
+  async function loadChildren(nodeId: string) {
+    if (loadingNodeIdsRef.current.includes(nodeId)) {
       return;
     }
 
-    const nextIndex = createTreeIndex(treeRootResource.value);
-
-    startTransition(() => {
-      setRootState({
-        tag: "ready",
-        value: nextIndex,
-      });
-      setExpandedIds(getDefaultExpandedIds(nextIndex));
-    });
-  });
-
-  const loadChildren = useEffectEvent(async (nodeId: string) => {
-    if (loadingNodeIds.includes(nodeId)) {
-      return;
-    }
-
-    setLoadingNodeIds((currentIds) => [...currentIds, nodeId]);
+    loadingNodeIdsRef.current = [...loadingNodeIdsRef.current, nodeId];
+    setLoadingNodeIds(loadingNodeIdsRef.current);
     const childrenResource = await repository.loadChildren(nodeId, 1);
 
     startTransition(() => {
-      setLoadingNodeIds((currentIds) => currentIds.filter((id) => id !== nodeId));
+      loadingNodeIdsRef.current = loadingNodeIdsRef.current.filter((id) => id !== nodeId);
+      setLoadingNodeIds(loadingNodeIdsRef.current);
 
       if (childrenResource.tag !== "ready") {
         return;
@@ -76,57 +63,89 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
         };
       });
     });
-  });
+  }
 
-  const ensurePathLoaded = useEffectEvent(async () => {
+  useEffect(() => {
+    let cancelled = false;
+
+    setRootState(loadingState());
+    void repository.getTreeRoot().then((treeRootResource) => {
+      if (cancelled) {
+        return;
+      }
+
+      if (treeRootResource.tag !== "ready") {
+        setRootState(treeRootResource);
+        return;
+      }
+
+      const nextIndex = createTreeIndex(treeRootResource.value);
+
+      startTransition(() => {
+        setRootState({
+          tag: "ready",
+          value: nextIndex,
+        });
+        setExpandedIds(getDefaultExpandedIds(nextIndex));
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [repository]);
+
+  useEffect(() => {
     if (rootState.tag !== "ready") {
       return;
     }
 
-    const nodeResource = await repository.getNodeByPath(currentPath);
+    let cancelled = false;
 
-    if (nodeResource.tag !== "ready") {
-      return;
-    }
-
-    const currentNode = nodeResource.value;
-
-    for (const ancestorId of currentNode.ancestorIds) {
-      if (
-        ancestorId !== rootState.value.rootId &&
-        rootState.value.childrenByParentId[ancestorId] === undefined
-      ) {
-        await loadChildren(ancestorId);
+    void repository.getNodeByPath(currentPath).then(async (nodeResource) => {
+      if (cancelled || nodeResource.tag !== "ready") {
+        return;
       }
-    }
 
-    if (
-      currentNode.kind === "folder" &&
-      currentNode.hasChildren &&
-      rootState.value.childrenByParentId[currentNode.id] === undefined
-    ) {
-      await loadChildren(currentNode.id);
-    }
+      const currentNode = nodeResource.value;
 
-    startTransition(() => {
-      setExpandedIds((currentIds) =>
-        mergeExpandedIds(
-          currentIds,
-          currentNode.kind === "folder"
-            ? [...currentNode.ancestorIds, currentNode.id]
-            : currentNode.ancestorIds,
-        ),
-      );
+      for (const ancestorId of currentNode.ancestorIds) {
+        if (
+          ancestorId !== rootState.value.rootId &&
+          rootState.value.childrenByParentId[ancestorId] === undefined
+        ) {
+          await loadChildren(ancestorId);
+        }
+      }
+
+      if (
+        currentNode.kind === "folder" &&
+        currentNode.hasChildren &&
+        rootState.value.childrenByParentId[currentNode.id] === undefined
+      ) {
+        await loadChildren(currentNode.id);
+      }
+
+      if (cancelled) {
+        return;
+      }
+
+      startTransition(() => {
+        setExpandedIds((currentIds) =>
+          mergeExpandedIds(
+            currentIds,
+            currentNode.kind === "folder"
+              ? [...currentNode.ancestorIds, currentNode.id]
+              : currentNode.ancestorIds,
+          ),
+        );
+      });
     });
-  });
 
-  useEffect(() => {
-    void loadRoot();
-  }, [loadRoot]);
-
-  useEffect(() => {
-    void ensurePathLoaded();
-  }, [currentPath, ensurePathLoaded, rootState]);
+    return () => {
+      cancelled = true;
+    };
+  }, [currentPath, repository, rootState]);
 
   const rows =
     rootState.tag === "ready"
@@ -139,6 +158,15 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
     loadingNodeIds,
     expandedIds,
     toggleNode(nodeId) {
+      if (
+        rootState.tag === "ready" &&
+        rootState.value.nodesById[nodeId]?.kind === "folder" &&
+        rootState.value.nodesById[nodeId]?.hasChildren &&
+        rootState.value.childrenByParentId[nodeId] === undefined
+      ) {
+        void loadChildren(nodeId);
+      }
+
       setExpandedIds((currentIds) => toggleExpanded(currentIds, nodeId));
     },
   };

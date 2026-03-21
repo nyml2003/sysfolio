@@ -1,5 +1,3 @@
-import "./FileTree.module.css";
-
 import { startTransition, useRef } from "react";
 
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -16,6 +14,7 @@ import {
   MediaIcon,
   iconStyle,
 } from "@/shared/ui/primitives/Icon";
+import styles from "./FileTree.module.css";
 
 import { useFileTree } from "../hooks/useFileTree";
 
@@ -64,17 +63,17 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
   });
 
   return (
-    <aside className="m-file-tree" aria-label="文件树">
-      <div className="m-file-tree__title">Filesystem</div>
+    <aside className={styles.root} aria-label="文件树">
+      <div className={styles.title}>Filesystem</div>
       {rootState.tag === "error" ? (
-        <div className="m-file-tree__status">{rootState.error.message}</div>
+        <div className={styles.status}>{rootState.error.message}</div>
       ) : null}
       {rootState.tag === "loading" ? (
-        <div className="m-file-tree__status">正在展开目录视图…</div>
+        <div className={styles.status}>正在展开目录视图…</div>
       ) : null}
-      <div className="m-file-tree__list" ref={parentRef}>
+      <div className={styles.list} ref={parentRef}>
         <div
-          className="m-file-tree__viewport"
+          className={styles.viewport}
           style={{ height: `${virtualizer.getTotalSize()}px` }}
         >
           {virtualizer.getVirtualItems().map((virtualRow) => {
@@ -86,19 +85,17 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
 
             return (
               <div
-                className={[
-                  "m-file-node",
-                  row.isSelected ? "is-selected" : "",
-                  row.node.status !== "available" ? "is-muted" : "",
-                ]
+                className={[styles.row, row.isSelected ? styles.selected : "", row.node.status !== "available" ? styles.muted : ""]
                   .filter(Boolean)
                   .join(" ")}
-                data-depth={row.depth}
                 key={row.node.id}
-                style={{ transform: `translateY(${virtualRow.start}px)` }}
+                style={{
+                  transform: `translateY(${virtualRow.start}px)`,
+                  paddingInlineStart: `calc(var(--sys-space-8) + ${row.depth} * var(--sys-space-12))`,
+                }}
               >
                 <button
-                  className="m-file-node__trigger"
+                  className={styles.trigger}
                   disabled={!showDisclosure || isLoading}
                   onClick={() => {
                     if (!showDisclosure) {
@@ -119,7 +116,7 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                 </button>
                 {renderNodeIcon(row.node)}
                 <button
-                  className="m-file-node__label"
+                  className={styles.label}
                   onClick={() => {
                     startTransition(() => {
                       onNavigate(nodePath);
@@ -130,7 +127,7 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                   {row.node.title}
                 </button>
                 {row.node.status === "coming_soon" ? (
-                  <span className="m-file-node__status" />
+                  <span className={styles.statusDot} />
                 ) : null}
               </div>
             );

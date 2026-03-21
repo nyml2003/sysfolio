@@ -1,5 +1,5 @@
 @layer component {
-  :global(.m-path-bar) {
+  .root {
     min-block-size: var(--sys-layout-pathbar-height);
     display: flex;
     align-items: center;
@@ -11,7 +11,7 @@
     border-block-end: var(--sys-border-width-1) solid var(--sys-color-border-default);
   }
 
-  :global(.m-path-bar__segments) {
+  .segments {
     display: flex;
     align-items: center;
     gap: var(--sys-space-8);
@@ -19,13 +19,19 @@
     flex: 1 1 auto;
   }
 
-  :global(.m-path-bar__tools) {
+  .segmentGroup {
     display: flex;
     align-items: center;
     gap: var(--sys-space-8);
   }
 
-  :global(.m-path-segment) {
+  .tools {
+    display: flex;
+    align-items: center;
+    gap: var(--sys-space-8);
+  }
+
+  .segment {
     font-family: var(--sys-font-ui);
     font-size: var(--sys-font-size-13);
     font-weight: var(--sys-font-weight-medium);
@@ -37,16 +43,16 @@
       opacity var(--sys-duration-fast) var(--sys-ease-standard);
   }
 
-  :global(.m-path-segment:hover) {
+  .segment:hover {
     color: var(--sys-color-text-primary);
   }
 
-  :global(.m-path-segment.is-current) {
+  .current {
     color: var(--sys-color-text-primary);
     font-weight: var(--sys-font-weight-semibold);
   }
 
-  :global(.m-path-segment__separator) {
+  .separator {
     color: var(--sys-color-icon-default);
   }
 }

@@ -1,5 +1,5 @@
 @layer component {
-  :global(.m-theme-toggle) {
+  .root {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -15,12 +15,12 @@
       border-color var(--sys-duration-fast) var(--sys-ease-standard);
   }
 
-  :global(.m-theme-toggle:hover) {
+  .root:hover {
     background: var(--sys-color-surface-hover);
     color: var(--sys-color-text-primary);
   }
 
-  :global(.m-theme-toggle:focus-visible) {
+  .root:focus-visible {
     outline: var(--sys-border-width-2) solid var(--sys-color-focus-ring);
     outline-offset: 2px;
   }

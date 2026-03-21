@@ -1,6 +1,3 @@
-import "./ContentPane.module.css";
-import "@/shared/ui/primitives/Button.module.css";
-
 import type { RefObject } from "react";
 
 import type { ContextInfo, RenderableEntryPayload, RepositoryError } from "@/entities/content";
@@ -9,7 +6,10 @@ import { HomeView } from "@/features/home/components/HomeView";
 import { none, unwrapOr } from "@/shared/lib/monads/option";
 import { ROOT_PATH } from "@/shared/lib/path/content-path";
 import type { ResourceState } from "@/shared/lib/resource/resource-state";
+import buttonStyles from "@/shared/ui/primitives/Button.module.css";
 import { ArticleIcon, FolderIcon, GameIcon, MediaIcon } from "@/shared/ui/primitives/Icon";
+
+import styles from "./ContentPane.module.css";
 
 type ContentPaneProps = {
   path: string;
@@ -41,28 +41,28 @@ function renderDirectoryView(payload: RenderableEntryPayload, onNavigate: (path:
   }
 
   return (
-    <section className="m-directory-view">
-      <header className="m-directory-view__header">
-        <div className="m-directory-view__eyebrow">
+    <section className={styles.directoryRoot}>
+      <header className={styles.directoryHeader}>
+        <div className={styles.directoryEyebrow}>
           {payload.node.pathSegments.join(" / ") || "root"}
         </div>
-        <h1 className="m-directory-view__title">{payload.content.title}</h1>
+        <h1 className={styles.directoryTitle}>{payload.content.title}</h1>
         {unwrapOr(payload.content.description, "") === "" ? null : (
-          <div className="m-directory-view__summary">
+          <div className={styles.directorySummary}>
             {unwrapOr(payload.content.description, "")}
           </div>
         )}
       </header>
-      <div className="m-directory-view__meta">
+      <div className={styles.directoryMeta}>
         <span>{payload.content.children.length} items</span>
         <span>目录和文章共用统一内容壳</span>
       </div>
-      <div className="m-directory-view__list">
+      <div className={styles.directoryList}>
         {payload.content.children.map((entry) => (
           <button
             className={[
-              "m-directory-entry",
-              entry.status === "coming_soon" ? "is-coming-soon" : "",
+              styles.directoryEntry,
+              entry.status === "coming_soon" ? styles.directoryEntryComingSoon : "",
             ]
               .filter(Boolean)
               .join(" ")}
@@ -73,16 +73,16 @@ function renderDirectoryView(payload: RenderableEntryPayload, onNavigate: (path:
             type="button"
           >
             {renderDirectoryIcon(entry.kind)}
-            <div className="m-directory-entry__body">
-              <div className="m-directory-entry__title">{entry.title}</div>
-              <div className="m-directory-entry__meta">
+            <div className={styles.directoryEntryBody}>
+              <div className={styles.directoryEntryTitle}>{entry.title}</div>
+              <div className={styles.directoryEntryMeta}>
                 <span>{entry.kind === "folder" ? "目录" : entry.kind}</span>
                 {entry.readingMinutes.tag === "some" ? (
                   <span>{entry.readingMinutes.value} min</span>
                 ) : null}
               </div>
               {unwrapOr(entry.description, "") === "" ? null : (
-                <div className="m-directory-entry__summary">
+                <div className={styles.directoryEntrySummary}>
                   {unwrapOr(entry.description, "")}
                 </div>
               )}
@@ -94,7 +94,7 @@ function renderDirectoryView(payload: RenderableEntryPayload, onNavigate: (path:
   );
 }
 
-function renderFallbackContext(context: ContextInfo, onNavigate: (path: string) => void) {
+function renderUnsupportedState(context: ContextInfo, onNavigate: (path: string) => void) {
   const fallbackPath =
     context.parent.tag === "some"
       ? context.parent.value.path
@@ -103,15 +103,15 @@ function renderFallbackContext(context: ContextInfo, onNavigate: (path: string) 
         : ROOT_PATH;
 
   return (
-    <section className="m-content-pane">
-      <div className="m-content-pane__inner">
-        <div className="m-empty-state">
-          <h2 className="m-empty-state__title">正在搭建当前视图</h2>
+    <section className={styles.root}>
+      <div className={styles.inner}>
+        <div className={styles.emptyState}>
+          <h2 className={styles.emptyTitle}>正在搭建当前视图</h2>
           <p>
             这条路径已经进入统一 repository，但当前类型还没有正文阅读器。你可以先返回父级目录继续浏览。
           </p>
           <button
-            className="m-button m-button--secondary"
+            className={[buttonStyles.root, buttonStyles.secondary].join(" ")}
             onClick={() => {
               onNavigate(fallbackPath);
             }}
@@ -119,6 +119,19 @@ function renderFallbackContext(context: ContextInfo, onNavigate: (path: string) 
           >
             返回上一级
           </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function renderStatusState(title: string, message: string) {
+  return (
+    <section className={styles.root}>
+      <div className={styles.inner}>
+        <div className={styles.emptyState}>
+          <h2 className={styles.emptyTitle}>{title}</h2>
+          <p>{message}</p>
         </div>
       </div>
     </section>
@@ -133,41 +146,20 @@ export function ContentPane({
   onActiveHeadingChange,
 }: ContentPaneProps) {
   if (resource.tag === "loading" || resource.tag === "idle") {
-    return (
-      <section className="m-content-pane">
-        <div className="m-content-pane__inner">
-          <div className="m-empty-state">
-            <h2 className="m-empty-state__title">正在读取内容</h2>
-            <p>路径已经解析完成，当前正在从 repository 聚合渲染所需内容。</p>
-          </div>
-        </div>
-      </section>
+    return renderStatusState(
+      "正在读取内容",
+      "路径已经解析完成，当前正在从 repository 聚合渲染所需内容。",
     );
   }
 
   if (resource.tag === "error") {
-    return (
-      <section className="m-content-pane">
-        <div className="m-content-pane__inner">
-          <div className="m-empty-state">
-            <h2 className="m-empty-state__title">路径未命中</h2>
-            <p>{resource.error.message}</p>
-          </div>
-        </div>
-      </section>
-    );
+    return renderStatusState("路径未命中", resource.error.message);
   }
 
   if (resource.tag === "empty") {
-    return (
-      <section className="m-content-pane">
-        <div className="m-content-pane__inner">
-          <div className="m-empty-state">
-            <h2 className="m-empty-state__title">当前内容为空</h2>
-            <p>{unwrapOr(resource.reason, "这条路径暂时没有可渲染内容。")}</p>
-          </div>
-        </div>
-      </section>
+    return renderStatusState(
+      "当前内容为空",
+      unwrapOr(resource.reason, "这条路径暂时没有可渲染内容。"),
     );
   }
 
@@ -201,5 +193,5 @@ export function ContentPane({
     );
   }
 
-  return renderFallbackContext(context, onNavigate);
+  return renderUnsupportedState(context, onNavigate);
 }

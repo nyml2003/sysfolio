@@ -1,5 +1,5 @@
 @layer component {
-  :global(.m-file-tree) {
+  .root {
     display: flex;
     flex-direction: column;
     gap: var(--sys-space-12);
@@ -8,7 +8,7 @@
     background: rgb(255 255 255 / 12%);
   }
 
-  :global(.m-file-tree__title) {
+  .title {
     font-family: var(--sys-font-ui);
     font-size: var(--sys-font-size-12);
     font-weight: var(--sys-font-weight-semibold);
@@ -18,19 +18,19 @@
     text-transform: uppercase;
   }
 
-  :global(.m-file-tree__list) {
+  .list {
     min-block-size: 0;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--sys-color-text-faint) transparent;
   }
 
-  :global(.m-file-tree__viewport) {
+  .viewport {
     position: relative;
     inline-size: 100%;
   }
 
-  :global(.m-file-tree__status) {
+  .status {
     padding: var(--sys-space-12);
     border: var(--sys-border-width-1) solid var(--sys-color-border-subtle);
     border-radius: var(--sys-radius-12);
@@ -41,9 +41,7 @@
     line-height: var(--sys-line-height-ui);
   }
 
-  :global(.m-file-node) {
-    --file-node-depth: 0;
-
+  .row {
     position: absolute;
     inset-inline: 0;
     display: grid;
@@ -52,9 +50,6 @@
     gap: var(--sys-space-8);
     min-block-size: 2rem;
     padding-inline-end: var(--sys-space-10);
-    padding-inline-start: calc(
-      var(--sys-space-8) + var(--file-node-depth) * var(--sys-space-12)
-    );
     border-radius: var(--sys-radius-8);
     color: var(--sys-color-text-secondary);
     background: transparent;
@@ -65,47 +60,27 @@
       transform var(--sys-duration-base) var(--sys-ease-standard);
   }
 
-  :global(.m-file-node:hover) {
+  .row:hover {
     background: var(--sys-color-surface-hover);
     color: var(--sys-color-text-primary);
   }
 
-  :global(.m-file-node:focus-visible) {
+  .row:focus-visible {
     outline: var(--sys-border-width-2) solid var(--sys-color-focus-ring);
     outline-offset: 2px;
   }
 
-  :global(.m-file-node[data-depth="0"]) {
-    --file-node-depth: 0;
-  }
-
-  :global(.m-file-node[data-depth="1"]) {
-    --file-node-depth: 1;
-  }
-
-  :global(.m-file-node[data-depth="2"]) {
-    --file-node-depth: 2;
-  }
-
-  :global(.m-file-node[data-depth="3"]) {
-    --file-node-depth: 3;
-  }
-
-  :global(.m-file-node[data-depth="4"]) {
-    --file-node-depth: 4;
-  }
-
-  :global(.m-file-node.is-selected) {
+  .selected {
     background: var(--sys-color-surface-active);
     color: var(--sys-color-text-primary);
     box-shadow: inset 2px 0 0 var(--sys-color-accent);
   }
 
-  :global(.m-file-node.is-muted) {
+  .muted {
     color: var(--sys-color-text-muted);
   }
 
-  :global(.m-file-node__trigger) {
+  .trigger {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -115,7 +90,7 @@
     color: inherit;
   }
 
-  :global(.m-file-node__label) {
+  .label {
     min-inline-size: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -126,7 +101,7 @@
     text-align: left;
   }
 
-  :global(.m-file-node__status) {
+  .statusDot {
     inline-size: 0.5rem;
     block-size: 0.5rem;
     border-radius: 999px;

@@ -1,8 +1,7 @@
-import "./PathBar.module.css";
-
 import type { BreadcrumbSegment } from "@/entities/content";
 
 import { ThemeToggle } from "@/features/theme/components/ThemeToggle";
+import styles from "./PathBar.module.css";
 
 type PathBarProps = {
   breadcrumbs: BreadcrumbSegment[];
@@ -11,15 +10,15 @@ type PathBarProps = {
 
 export function PathBar({ breadcrumbs, onNavigate }: PathBarProps) {
   return (
-    <header className="m-path-bar">
-      <nav aria-label="当前路径" className="m-path-bar__segments">
+    <header className={styles.root}>
+      <nav aria-label="当前路径" className={styles.segments}>
         {breadcrumbs.map((segment, index) => {
           const isCurrent = index === breadcrumbs.length - 1;
 
           return (
-            <div className="m-path-bar__segments" key={segment.id}>
+            <div className={styles.segmentGroup} key={segment.id}>
               <button
-                className={["m-path-segment", isCurrent ? "is-current" : ""]
+                className={[styles.segment, isCurrent ? styles.current : ""]
                   .filter(Boolean)
                   .join(" ")}
                 disabled={isCurrent}
@@ -32,14 +31,12 @@ export function PathBar({ breadcrumbs, onNavigate }: PathBarProps) {
               >
                 {segment.title}
               </button>
-              {isCurrent ? null : (
-                <span className="m-path-segment__separator">/</span>
-              )}
+              {isCurrent ? null : <span className={styles.separator}>/</span>}
             </div>
           );
         })}
       </nav>
-      <div className="m-path-bar__tools">
+      <div className={styles.tools}>
         <ThemeToggle />
       </div>
     </header>

@@ -1,0 +1,68 @@
+@layer primitives {
+  .m-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sys-space-8);
+    min-block-size: 2.25rem;
+    padding-inline: var(--sys-space-12);
+    border-radius: var(--sys-radius-8);
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-13);
+    font-weight: var(--sys-font-weight-medium);
+  }
+
+  .m-button--primary {
+    border: var(--sys-border-width-1) solid var(--sys-color-accent);
+    background: var(--sys-color-accent);
+    color: var(--sys-color-text-inverse);
+  }
+
+  .m-button--secondary {
+    border: var(--sys-border-width-1) solid var(--sys-color-border-default);
+    background: transparent;
+    color: var(--sys-color-text-secondary);
+  }
+
+  .m-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sys-space-4);
+    padding: var(--sys-space-4) var(--sys-space-10);
+    border: var(--sys-border-width-1) solid var(--sys-color-border-default);
+    border-radius: var(--sys-radius-pill);
+    background: var(--tag-bg-default);
+    color: var(--sys-color-text-secondary);
+    font-family: var(--sys-font-ui);
+    font-size: var(--sys-font-size-12);
+    line-height: var(--sys-line-height-tight);
+  }
+
+  .m-tag--article {
+    background: var(--tag-bg-article);
+    color: var(--sys-color-accent);
+  }
+
+  .m-tag--game {
+    background: var(--tag-bg-game);
+    color: var(--sys-color-warm);
+  }
+
+  .m-tag--media {
+    background: var(--tag-bg-media);
+    color: var(--sys-color-info);
+  }
+
+  .m-footnote-popover {
+    max-inline-size: 20rem;
+    padding: var(--sys-space-12) var(--sys-space-14);
+    border: var(--sys-border-width-1) solid var(--sys-color-border-default);
+    border-radius: var(--sys-radius-12);
+    background: var(--sys-color-panel);
+    box-shadow: var(--sys-shadow-soft);
+    color: var(--sys-color-text-primary);
+    font-family: var(--sys-font-body);
+    font-size: var(--sys-font-size-14);
+    line-height: var(--sys-line-height-body);
+  }
+}

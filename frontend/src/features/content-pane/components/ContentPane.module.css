@@ -1,11 +1,11 @@
 @layer component {
-  :global(.m-content-pane) {
+  .root {
     inline-size: 100%;
     display: flex;
     justify-content: center;
   }
 
-  :global(.m-content-pane__inner) {
+  .inner {
     inline-size: min(100%, var(--sys-layout-reading-max));
     min-inline-size: 0;
     padding:
@@ -14,7 +14,7 @@
       var(--sys-space-48);
   }
 
-  :global(.m-directory-view) {
+  .directoryRoot {
     inline-size: min(100%, var(--sys-layout-reading-max));
     min-inline-size: 0;
     display: flex;
@@ -26,20 +26,20 @@
       var(--sys-space-48);
   }
 
-  :global(.m-directory-view__header) {
+  .directoryHeader {
     display: flex;
     flex-direction: column;
     gap: var(--sys-space-12);
   }
 
-  :global(.m-directory-view__eyebrow) {
+  .directoryEyebrow {
     font-family: var(--sys-font-mono);
     font-size: var(--sys-font-size-12);
     line-height: var(--sys-line-height-ui);
     color: var(--sys-color-text-muted);
   }
 
-  :global(.m-directory-view__title) {
+  .directoryTitle {
     margin: 0;
     font-family: var(--sys-font-ui);
     font-size: var(--sys-font-size-32);
@@ -48,7 +48,7 @@
     color: var(--sys-color-text-primary);
   }
 
-  :global(.m-directory-view__summary) {
+  .directorySummary {
     max-inline-size: var(--sys-layout-reading-measure);
     font-family: var(--sys-font-body);
     font-size: var(--sys-font-size-18);
@@ -56,7 +56,7 @@
     color: var(--sys-color-text-secondary);
   }
 
-  :global(.m-directory-view__meta) {
+  .directoryMeta {
     display: flex;
     flex-wrap: wrap;
     gap: var(--sys-space-8) var(--sys-space-12);
@@ -66,13 +66,13 @@
     color: var(--sys-color-text-muted);
   }
 
-  :global(.m-directory-view__list) {
+  .directoryList {
     display: flex;
     flex-direction: column;
     gap: var(--sys-space-12);
   }
 
-  :global(.m-directory-entry) {
+  .directoryEntry {
     display: grid;
     grid-template-columns: 1.25rem minmax(0, 1fr) auto;
     align-items: start;
@@ -90,24 +90,24 @@
     text-align: left;
   }
 
-  :global(.m-directory-entry:hover) {
+  .directoryEntry:hover {
     background: var(--sys-color-panel);
     border-color: var(--sys-color-border-default);
     transform: translateY(-1px);
   }
 
-  :global(.m-directory-entry.is-coming-soon) {
+  .directoryEntryComingSoon {
     color: var(--sys-color-text-muted);
   }
 
-  :global(.m-directory-entry__body) {
+  .directoryEntryBody {
     min-inline-size: 0;
     display: flex;
     flex-direction: column;
     gap: var(--sys-space-4);
   }
 
-  :global(.m-directory-entry__title) {
+  .directoryEntryTitle {
     min-inline-size: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -118,7 +118,7 @@
     line-height: var(--sys-line-height-ui);
   }
 
-  :global(.m-directory-entry__meta) {
+  .directoryEntryMeta {
     display: flex;
     flex-wrap: wrap;
     gap: var(--sys-space-6) var(--sys-space-8);
@@ -128,14 +128,14 @@
     color: var(--sys-color-text-muted);
   }
 
-  :global(.m-directory-entry__summary) {
+  .directoryEntrySummary {
     color: var(--sys-color-text-secondary);
     font-family: var(--sys-font-body);
     font-size: var(--sys-font-size-14);
     line-height: var(--sys-line-height-ui);
   }
 
-  :global(.m-empty-state) {
+  .emptyState {
     display: flex;
     flex-direction: column;
     gap: var(--sys-space-16);
@@ -146,7 +146,7 @@
     color: var(--sys-color-text-primary);
   }
 
-  :global(.m-empty-state__title) {
+  .emptyTitle {
     margin: 0;
     font-family: var(--sys-font-ui);
     font-size: var(--sys-font-size-24);
@@ -154,8 +154,8 @@
   }
 
   @media (width <= 800px) {
-    :global(.m-content-pane__inner),
-    :global(.m-directory-view) {
+    .inner,
+    .directoryRoot {
       padding:
         var(--sys-space-32)
         var(--sys-space-20)

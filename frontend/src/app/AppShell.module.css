@@ -1,5 +1,5 @@
 @layer component {
-  :global(.m-shell) {
+  .root {
     min-block-size: 100vh;
     display: grid;
     grid-template-rows: var(--sys-layout-pathbar-height) minmax(0, 1fr);
@@ -7,7 +7,7 @@
     color: var(--sys-color-text-primary);
   }
 
-  :global(.m-shell__body) {
+  .body {
     min-block-size: 0;
     display: grid;
     grid-template-columns:
@@ -16,28 +16,28 @@
       var(--sys-layout-right-rail);
   }
 
-  :global(.m-shell__left),
-  :global(.m-shell__main),
-  :global(.m-shell__right) {
+  .left,
+  .main,
+  .right {
     min-inline-size: 0;
     min-block-size: 0;
   }
 
-  :global(.m-shell__left) {
+  .left {
     background: rgb(255 255 255 / 12%);
     border-inline-end: var(--sys-border-width-1) solid
       var(--sys-color-border-default);
     overflow: auto;
   }
 
-  :global(.m-shell__main) {
+  .main {
     display: flex;
     justify-content: center;
     overflow: auto;
     background: transparent;
   }
 
-  :global(.m-shell__right) {
+  .right {
     background: rgb(255 255 255 / 14%);
     border-inline-start: var(--sys-border-width-1) solid
       var(--sys-color-border-default);
@@ -45,24 +45,24 @@
   }
 
   @media (width <= 1120px) {
-    :global(.m-shell__body) {
+    .body {
       grid-template-columns: minmax(15rem, var(--sys-layout-left-rail)) minmax(
           0,
           1fr
         );
     }
 
-    :global(.m-shell__right) {
+    .right {
       display: none;
     }
   }
 
   @media (width <= 800px) {
-    :global(.m-shell__body) {
+    .body {
       grid-template-columns: minmax(0, 1fr);
     }
 
-    :global(.m-shell__left) {
+    .left {
       display: none;
     }
   }

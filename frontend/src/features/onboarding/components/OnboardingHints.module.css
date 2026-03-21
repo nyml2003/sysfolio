@@ -1,12 +1,12 @@
 @layer component {
-  :global(.m-onboarding-hints) {
+  .root {
     position: fixed;
     inset: 0;
     z-index: 30;
     background: var(--sys-color-onboarding-scrim);
   }
 
-  :global(.m-hint-dot) {
+  .dot {
     position: absolute;
     inline-size: 24px;
     block-size: 24px;
@@ -16,8 +16,8 @@
     cursor: pointer;
   }
 
-  :global(.m-hint-dot::before),
-  :global(.m-hint-dot::after) {
+  .dot::before,
+  .dot::after {
     content: "";
     position: absolute;
     inset: 50%;
@@ -25,19 +25,19 @@
     transform: translate(-50%, -50%);
   }
 
-  :global(.m-hint-dot::before) {
+  .dot::before {
     inline-size: 12px;
     block-size: 12px;
     background: var(--sys-color-onboarding-dot);
   }
 
-  :global(.m-hint-dot::after) {
+  .dot::after {
     inline-size: 24px;
     block-size: 24px;
     border: 1px solid var(--sys-color-onboarding-dot-ring);
   }
 
-  :global(.m-hint-popover) {
+  .popover {
     position: absolute;
     max-inline-size: 18rem;
     padding: var(--sys-space-12) var(--sys-space-16);

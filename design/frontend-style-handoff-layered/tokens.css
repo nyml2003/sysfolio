@@ -1,0 +1,211 @@
+@layer tokens {
+  :root {
+    color-scheme: light;
+
+    --sys-color-canvas: #fbf3de;
+    --sys-color-canvas-soft: #f7efd9;
+    --sys-color-panel: #f4e8d1;
+    --sys-color-panel-alt: #ede2c6;
+    --sys-color-panel-strong: #e7dbc0;
+    --sys-color-surface-hover: #efe1c7;
+    --sys-color-surface-active: #e7d9be;
+
+    --sys-color-border-subtle: #e2d4bb;
+    --sys-color-border-default: #d9cab0;
+    --sys-color-border-strong: #bcaf97;
+    --sys-color-focus-ring: #7487d8;
+
+    --sys-color-text-primary: #433a30;
+    --sys-color-text-secondary: #51463a;
+    --sys-color-text-muted: #847765;
+    --sys-color-text-faint: #9c8f7c;
+    --sys-color-text-inverse: #f9f1e4;
+    --sys-color-icon-default: #847765;
+    --sys-color-icon-active: #564a3c;
+
+    --sys-color-accent: #7487d8;
+    --sys-color-accent-hover: #8597e2;
+    --sys-color-accent-soft: #dce3fa;
+    --sys-color-warm: #a3722d;
+    --sys-color-warm-soft: #f1e2c8;
+    --sys-color-success: #7e9d63;
+    --sys-color-success-soft: #e4ecd8;
+    --sys-color-danger: #c75e74;
+    --sys-color-danger-soft: #f3dde3;
+    --sys-color-info: #7f94c1;
+    --sys-color-info-soft: #e0e6f2;
+
+    --sys-color-link: #6f82d1;
+    --sys-color-link-hover: #5f73c7;
+    --sys-color-code-bg: #f0e3cb;
+    --sys-color-code-border: #d9cab0;
+    --sys-color-code-text: #3a352e;
+    --sys-color-inline-code-bg: #ebddc3;
+    --sys-color-quote-border: #a3722d;
+    --sys-color-selection: #e6d7bc;
+    --sys-color-search-highlight: #f1e2c8;
+    --sys-color-search-highlight-text: #433a30;
+    --sys-color-onboarding-dot: rgb(116 135 216 / 72%);
+    --sys-color-onboarding-dot-ring: rgb(251 243 222 / 82%);
+    --sys-color-onboarding-popover: #f4e8d1;
+    --sys-color-onboarding-scrim: rgb(67 58 48 / 8%);
+
+    --sys-code-keyword: #8973c1;
+    --sys-code-function: #7487d8;
+    --sys-code-type: #8b7ec0;
+    --sys-code-string: #b66f58;
+    --sys-code-number: #a3722d;
+    --sys-code-variable: #3a352e;
+    --sys-code-comment: #998b79;
+
+    --sys-font-body: "Source Han Sans SC", "Noto Sans SC", "PingFang SC",
+      sans-serif;
+    --sys-font-ui: "IBM Plex Sans", "Noto Sans SC", sans-serif;
+    --sys-font-mono: "JetBrains Mono", "Maple Mono", monospace;
+
+    --sys-font-size-11: 0.6875rem;
+    --sys-font-size-12: 0.75rem;
+    --sys-font-size-13: 0.8125rem;
+    --sys-font-size-14: 0.875rem;
+    --sys-font-size-16: 1rem;
+    --sys-font-size-18: 1.125rem;
+    --sys-font-size-24: 1.5rem;
+    --sys-font-size-32: 2rem;
+    --sys-font-size-40: 2.5rem;
+
+    --sys-line-height-tight: 1.25;
+    --sys-line-height-ui: 1.45;
+    --sys-line-height-body: 1.8;
+    --sys-line-height-body-loose: 1.92;
+
+    --sys-font-weight-regular: 400;
+    --sys-font-weight-medium: 500;
+    --sys-font-weight-semibold: 600;
+    --sys-font-weight-bold: 700;
+
+    --sys-space-2: 0.125rem;
+    --sys-space-4: 0.25rem;
+    --sys-space-6: 0.375rem;
+    --sys-space-8: 0.5rem;
+    --sys-space-10: 0.625rem;
+    --sys-space-12: 0.75rem;
+    --sys-space-16: 1rem;
+    --sys-space-20: 1.25rem;
+    --sys-space-24: 1.5rem;
+    --sys-space-32: 2rem;
+    --sys-space-40: 2.5rem;
+    --sys-space-48: 3rem;
+    --sys-space-64: 4rem;
+
+    --sys-radius-4: 0.25rem;
+    --sys-radius-8: 0.5rem;
+    --sys-radius-12: 0.75rem;
+    --sys-radius-16: 1rem;
+    --sys-radius-pill: 999px;
+
+    --sys-border-width-1: 1px;
+    --sys-border-width-2: 2px;
+
+    --sys-shadow-soft: 0 8px 24px rgb(67 58 48 / 8%);
+    --sys-shadow-panel: 0 4px 12px rgb(67 58 48 / 5%);
+    --sys-shadow-none: none;
+
+    --sys-duration-fast: 120ms;
+    --sys-duration-base: 180ms;
+    --sys-duration-slow: 260ms;
+    --sys-duration-overlay: 160ms;
+    --sys-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --sys-ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    --sys-layout-max-width: 1600px;
+    --sys-layout-left-rail: 280px;
+    --sys-layout-right-rail: 280px;
+    --sys-layout-reading-max: 820px;
+    --sys-layout-reading-measure-min: 60ch;
+    --sys-layout-reading-measure-max: 80ch;
+    --sys-layout-reading-measure: clamp(
+      var(--sys-layout-reading-measure-min),
+      72ch,
+      var(--sys-layout-reading-measure-max)
+    );
+    --sys-layout-pathbar-height: 48px;
+    --sys-layout-header-offset: 64px;
+    --sys-layout-tree-search-height: 36px;
+
+    --shell-left-bg: var(--sys-color-panel-alt);
+    --shell-right-bg: var(--sys-color-panel);
+    --path-bar-bg: var(--sys-color-panel-alt);
+    --path-bar-border: var(--sys-color-border-default);
+    --file-tree-bg: var(--sys-color-panel-alt);
+    --file-tree-node-bg-hover: var(--sys-color-surface-hover);
+    --file-tree-node-bg-active: var(--sys-color-surface-active);
+    --file-tree-node-border-active: var(--sys-color-accent);
+    --toc-item-bg-active: var(--sys-color-warm-soft);
+    --toc-item-border-active: var(--sys-color-warm);
+    --tag-bg-default: var(--sys-color-panel-alt);
+    --tag-bg-article: var(--sys-color-accent-soft);
+    --tag-bg-game: var(--sys-color-warm-soft);
+    --tag-bg-media: var(--sys-color-info-soft);
+    --empty-state-bg: var(--sys-color-panel);
+  }
+
+  [data-theme="dark"] {
+    color-scheme: dark;
+
+    --sys-color-canvas: #2e333b;
+    --sys-color-canvas-soft: #30353d;
+    --sys-color-panel: #2a2e36;
+    --sys-color-panel-alt: #24272d;
+    --sys-color-panel-strong: #31363f;
+    --sys-color-surface-hover: #343942;
+    --sys-color-surface-active: #393f49;
+
+    --sys-color-border-subtle: #424853;
+    --sys-color-border-default: #444b57;
+    --sys-color-border-strong: #596270;
+    --sys-color-focus-ring: #88a3f7;
+
+    --sys-color-text-primary: #e0e5ec;
+    --sys-color-text-secondary: #c5cad3;
+    --sys-color-text-muted: #8c94a1;
+    --sys-color-text-faint: #69727f;
+    --sys-color-text-inverse: #17191e;
+    --sys-color-icon-default: #8c94a1;
+    --sys-color-icon-active: #e0e5ec;
+
+    --sys-color-accent: #88a3f7;
+    --sys-color-accent-hover: #9ab0fb;
+    --sys-color-accent-soft: #34415f;
+    --sys-color-warm: #d9b574;
+    --sys-color-warm-soft: #4c402a;
+    --sys-color-success: #8fbf8a;
+    --sys-color-success-soft: #314035;
+    --sys-color-danger: #e1848f;
+    --sys-color-danger-soft: #4b3137;
+    --sys-color-info: #9fb0da;
+    --sys-color-info-soft: #313a4c;
+
+    --sys-color-link: #9cb4ff;
+    --sys-color-link-hover: #b1c2ff;
+    --sys-color-code-bg: #2a2e36;
+    --sys-color-code-border: #444b57;
+    --sys-color-code-text: #d8dde4;
+    --sys-color-inline-code-bg: #333840;
+    --sys-color-quote-border: #d9b574;
+    --sys-color-selection: #404651;
+    --sys-color-search-highlight: #4c402a;
+    --sys-color-search-highlight-text: #e0e5ec;
+    --sys-color-onboarding-dot: rgb(136 163 247 / 78%);
+    --sys-color-onboarding-dot-ring: rgb(23 25 30 / 82%);
+    --sys-color-onboarding-popover: #2a2e36;
+    --sys-color-onboarding-scrim: rgb(23 25 30 / 18%);
+
+    --sys-code-keyword: #c4a1f6;
+    --sys-code-function: #88a3f7;
+    --sys-code-type: #a99edc;
+    --sys-code-string: #d8b4a0;
+    --sys-code-number: #d9b574;
+    --sys-code-variable: #e0e5ec;
+    --sys-code-comment: #69707c;
+  }
+}

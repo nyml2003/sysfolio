@@ -1,8 +1,8 @@
-import "./OnboardingHints.module.css";
-
 import { useState } from "react";
 
 import { usePreferences } from "@/shared/store/preferences/PreferencesProvider";
+
+import styles from "./OnboardingHints.module.css";
 
 const tips = [
   {
@@ -37,7 +37,7 @@ export function OnboardingHints() {
 
   return (
     <div
-      className="m-onboarding-hints"
+      className={styles.root}
       onClick={dismissOnboarding}
       onKeyDown={(event) => {
         if (event.key === "Escape") {
@@ -48,7 +48,7 @@ export function OnboardingHints() {
     >
       {tips.map((tip) => (
         <button
-          className="m-hint-dot"
+          className={styles.dot}
           key={tip.id}
           onClick={(event) => {
             event.stopPropagation();
@@ -59,7 +59,7 @@ export function OnboardingHints() {
         />
       ))}
       <div
-        className="m-hint-popover"
+        className={styles.popover}
         onClick={(event) => {
           event.stopPropagation();
         }}

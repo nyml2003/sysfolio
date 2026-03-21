@@ -1,5 +1,3 @@
-import "./AppShell.module.css";
-
 import { startTransition, useEffect, useRef, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
@@ -11,6 +9,7 @@ import { FileTree } from "@/features/file-tree/components/FileTree";
 import { OnboardingHints } from "@/features/onboarding/components/OnboardingHints";
 import { PathBar } from "@/features/path-bar/components/PathBar";
 import { ROOT_PATH, normalizePath, splitPathSegments } from "@/shared/lib/path/content-path";
+import styles from "./AppShell.module.css";
 
 function buildFallbackBreadcrumbs(path: string): BreadcrumbSegment[] {
   const segments = splitPathSegments(path);
@@ -76,15 +75,15 @@ function ShellRoute() {
       : buildFallbackBreadcrumbs(currentPath);
 
   return (
-    <div className="m-shell">
+    <div className={styles.root}>
       <PathBar
         breadcrumbs={breadcrumbs}
         onNavigate={(path) => {
           navigate(path);
         }}
       />
-      <div className="m-shell__body">
-        <div className="m-shell__left">
+      <div className={styles.body}>
+        <div className={styles.left}>
           <FileTree
             currentPath={currentPath}
             onNavigate={(path) => {
@@ -92,7 +91,7 @@ function ShellRoute() {
             }}
           />
         </div>
-        <main className="m-shell__main" ref={scrollContainerRef}>
+        <main className={styles.main} ref={scrollContainerRef}>
           <ContentPane
             onActiveHeadingChange={setActiveHeadingId}
             onNavigate={(path) => {
@@ -103,7 +102,7 @@ function ShellRoute() {
             scrollContainerRef={scrollContainerRef}
           />
         </main>
-        <div className="m-shell__right">
+        <div className={styles.right}>
           <ContextPanel
             activeHeadingId={activeHeadingId}
             onNavigate={(path) => {
