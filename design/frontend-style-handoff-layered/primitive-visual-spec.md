@@ -109,6 +109,7 @@ primitive 内部统一按以下顺序表达状态：
 - `Label`
 - `Link`
 - `CodeInline`
+- `CodeBlockSurface`
 - `Kbd`
 
 ### 家族目标
@@ -124,6 +125,7 @@ primitive 内部统一按以下顺序表达状态：
 | `Label` | 主要被 Field 吸收 | 控件名称、结构清楚 | required / optional 语气要稳定，不抢 message |
 | `Link` | 多数还混在业务文本里 | 可点击但克制 | 导航感清楚，不按钮化 |
 | `CodeInline` | 仅有零散样式需求 | 技术字面量 | 与正文区分，但不变成高亮标签 |
+| `CodeBlockSurface` | 主要散落在 reading pattern 的 `pre / code` 样式里 | 稳定代码表面 | 块级代码不再靠业务层自由配 `pre` 外观 |
 | `Kbd` | 仍未正式纳入 | 快捷键标记 | 轻量、规则、对齐稳定 |
 
 ### 具体要求
@@ -149,7 +151,17 @@ primitive 内部统一按以下顺序表达状态：
 - 默认应清楚可点击，但视觉重量低于按钮。
 - hover 和 focus-visible 必须可感知，visited 应存在但不能破坏整体色阶。
 
-`CodeInline / Kbd`
+`CodeInline`
+
+- 应保持句内语气，不应把一行里的 inline code 做成强标签块。
+- 与正文和 UI 文本都要能共存，不打断阅读节奏。
+
+`CodeBlockSurface`
+
+- 只负责块级代码的表面能力，不负责 line number、copy、language badge 这类 richer viewer 功能。
+- 应和正文区块明确分层，但不能比 dialog / drawer 更重。
+
+`Kbd`
 
 - 应靠字族、底色和边框轻度区分，不靠高饱和色。
 - 与正文行高、基线对齐优先于“像代码块”。
@@ -160,12 +172,14 @@ primitive 内部统一按以下顺序表达状态：
 - 不要让业务层通过局部样式去重写 `h1 / h2 / p` 的字面表现。
 - 不要把 label 做成近似标题。
 - 不要把 code inline 做成和 tag 一样的胶囊块。
+- 不要让页面各自去写一套 `pre / code` 容器样式。
 
 ### Phase 1 验收点
 
 - 页面中的普通文本、标签文本、链接文本和技术字面量能在 1 秒内区分职责。
 - heading 的等级感主要靠系统 scale，而不是靠业务层手调。
 - link 看起来像导航，不像次级按钮。
+- inline code 和 code block 的气质一眼可区分，但仍属于同一套系统。
 - label、hint、message 形成稳定文本层级。
 
 ## 三、Actions 家族
@@ -642,4 +656,4 @@ Phase 1 完成时，至少应满足：
 1. 继续补齐 `Combobox / Menu / DialogContent / DrawerContent / TableRow` 的高级子场景。
 2. 收完整体 primitive 的 `success / warning / destructive` 在不同家族中的重量边界。
 3. 再校准 coarse pointer 下 icon-only 控件、trigger 类控件和 overlay 关闭控件的点击基线。
-4. 继续把 `Text / Label / Link / SearchInput / NumberInput / DateInput / Slider / Toolbar / ListItem / MessageBar / Banner` 从家族级视觉原则细化到对象级视觉合同。
+4. 继续把 `Heading / Text / Label / Link / SearchInput / NumberInput / DateInput / Slider / Toolbar / ListItem / MessageBar / Banner / CodeBlockSurface` 从家族级视觉原则细化到对象级视觉合同。

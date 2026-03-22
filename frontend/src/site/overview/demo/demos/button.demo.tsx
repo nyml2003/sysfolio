@@ -5,6 +5,7 @@ import {
   Button,
   ButtonGroup,
   ButtonGroupItem,
+  Heading,
   IconButton,
   IconButtonGhostMd,
   IconButtonGhostSm,
@@ -13,6 +14,7 @@ import {
 import { MoonIcon } from "@/shared/ui/primitives/Icon";
 
 import { useOverviewCopy } from "../../overview-copy";
+import { overviewDemoSectionHeadingBase } from "../demo-section-heading";
 import { DemoBulletList } from "../overview-demo-frame";
 
 const btnBase: Pick<
@@ -41,12 +43,16 @@ export function ButtonDemo() {
   return (
     <Stack gap="xl">
       <Stack className="overview-demo__subsection" gap="sm">
-        <div className="overview-eyebrow">{copy.demos.buttonIntroHeading}</div>
+        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+          {copy.demos.buttonIntroHeading}
+        </Heading>
         <DemoBulletList items={copy.demos.buttonIntroBullets} />
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <div className="overview-eyebrow">{copy.demos.buttonToneHeading}</div>
+        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+          {copy.demos.buttonToneHeading}
+        </Heading>
         <DemoBulletList items={copy.demos.buttonToneBullets} />
         <Inline wrap>
           <Button {...btnBase} tone="primary">
@@ -73,7 +79,9 @@ export function ButtonDemo() {
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <div className="overview-eyebrow">{copy.demos.buttonSizeHeading}</div>
+        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+          {copy.demos.buttonSizeHeading}
+        </Heading>
         <DemoBulletList items={copy.demos.buttonSizeBullets} />
         <Inline align="center" gap="md" wrap>
           <Button {...btnBase} tone="secondary">
@@ -86,7 +94,9 @@ export function ButtonDemo() {
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <div className="overview-eyebrow">{copy.demos.buttonA11yHeading}</div>
+        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+          {copy.demos.buttonA11yHeading}
+        </Heading>
         <DemoBulletList items={copy.demos.buttonA11yBullets} />
         <Inline align="center" gap="sm">
           <Button
@@ -102,12 +112,16 @@ export function ButtonDemo() {
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <div className="overview-eyebrow">{copy.demos.buttonDenseHeading}</div>
+        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+          {copy.demos.buttonDenseHeading}
+        </Heading>
         <DemoBulletList items={copy.demos.buttonDenseBullets} />
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <div className="overview-eyebrow">{copy.demos.buttonLoadingHeading}</div>
+        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+          {copy.demos.buttonLoadingHeading}
+        </Heading>
         <DemoBulletList items={copy.demos.buttonLoadingBullets} />
         <Inline wrap>
           <Button {...btnBase} loading tone="primary">
@@ -120,7 +134,9 @@ export function ButtonDemo() {
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <div className="overview-eyebrow">{copy.demos.buttonLayoutHeading}</div>
+        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+          {copy.demos.buttonLayoutHeading}
+        </Heading>
         <DemoBulletList items={copy.demos.buttonLayoutBullets} />
         <Stack gap="md" style={{ inlineSize: "min(100%, 22rem)" }}>
           <Button {...btnBase} fullWidth tone="primary">
@@ -145,7 +161,9 @@ export function ButtonDemo() {
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <div className="overview-eyebrow">{copy.demos.buttonIconButtonHeading}</div>
+        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+          {copy.demos.buttonIconButtonHeading}
+        </Heading>
         <DemoBulletList items={copy.demos.buttonIconButtonBullets} />
         <Inline align="center" gap="sm" wrap>
           <IconButtonGhostSm srLabel={copy.demos.buttonIconAriaLabel}>
@@ -173,7 +191,9 @@ export function ButtonDemo() {
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <div className="overview-eyebrow">{copy.demos.buttonGroupHeading}</div>
+        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+          {copy.demos.buttonGroupHeading}
+        </Heading>
         <DemoBulletList items={copy.demos.buttonGroupBullets} />
         <Inline gap="md" wrap>
           <ButtonGroup label={copy.demos.buttonGroupSegmentLabel} variant="default">

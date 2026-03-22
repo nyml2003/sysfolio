@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import type { OverviewDemoId } from "../overview-copy";
 import { AppShellDemo } from "./demos/app-shell.demo";
 import { ButtonDemo } from "./demos/button.demo";
+import { HeadingDemo } from "./demos/heading.demo";
+import { LabelDemo } from "./demos/label.demo";
 import { DesignGapsDemo } from "./demos/design-gaps.demo";
 import { FieldInputDemo } from "./demos/field-input.demo";
 import { LayoutPrimitivesDemo } from "./demos/layout-primitives.demo";
@@ -22,6 +24,8 @@ export const overviewDemoRenderers: Record<OverviewDemoId, () => ReactNode> = {
   "layout-primitives": () => <LayoutPrimitivesDemo />,
   "app-shell": () => <AppShellDemo />,
   button: () => <ButtonDemo />,
+  heading: () => <HeadingDemo />,
+  label: () => <LabelDemo />,
   "field-input": () => <FieldInputDemo />,
   "tree-nav": () => <TreeNavDemo />,
   "view-state-layout": () => <ViewStateLayoutDemo />,

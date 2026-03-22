@@ -284,7 +284,75 @@ Document 的唯一主任务是：
 - 辅助信息要退到阅读边缘
 - 不要在正文列里不断插入强容器打断阅读
 
-## 3. Document 的 view state
+## 3. Typography Ownership
+
+`DocumentView` 不应让上层业务组件逐个配置 `h1 / h2 / p / span / pre / code` 的样式。  
+这里必须分成两层承接：
+
+### Primitive 层
+
+- `Heading`
+  提供标题的 typographic scale、字重和语气基线
+- `Text`
+  提供普通 UI 文本和说明文本基线
+- `Link / CodeInline / Kbd / CodeBlockSurface`
+  提供受控 inline 与 code 表面能力
+
+### Pattern 层
+
+- `m-doc-header`
+  承接阅读前奏里的 title、summary、meta
+- `m-article-body`
+  承接 prose 容器内的 `h2 / h3 / h4 / p / ul / ol / a / code / pre / blockquote`
+- `CodeBlock`
+  承接 richer code viewer 能力，例如 `language label / copy / line number / wrap / highlight line`
+
+也就是说：
+
+- 上层决定“这里是不是标题、是不是段落、是不是链接、是不是代码”
+- `primitive / pattern` 决定它们长什么样
+- 上层不再逐段调字号、字重、margin、code block 容器
+
+### Tag Rules
+
+`h1`
+
+- 页面或文档主标题，只应由 `doc header` 或明确的 page heading 容器承接
+- 不应在普通正文中重复出现多个视觉主标题
+
+`h2 - h4`
+
+- 在 prose 容器里由 `m-article-body` 接管视觉表现
+- 在非 prose 的 UI 结构中，应映射到 `Heading primitive` 的受控 level
+
+`p`
+
+- 在 prose 容器中由 pattern 自动接管段落节奏
+- 在普通 UI 中不应直接把裸 `p` 当样式方案，而应落到 `Text.body`
+
+`span`
+
+- 默认只是 inline wrapper，不承担独立设计语义
+- 只有在它承接 `Link / CodeInline / Kbd / emphasis / search-hit` 时才进入系统合同
+
+`code`
+
+- 句内时由 `CodeInline` 承接
+- 块级时由 `CodeBlockSurface` 或 `CodeBlock pattern` 承接
+
+`pre > code`
+
+- 不允许业务层直接自由配样式
+- 需要由 `ArticleBody` 的 prose contract 或受控 `CodeBlock` pattern 接管
+
+### 实施原则
+
+1. tag 负责语义，不负责视觉自由度。
+2. `Heading primitive` 负责标题 scale，`ArticleBody pattern` 负责 prose 节奏。
+3. 不允许业务层通过局部样式去逐个重写 `h1 / h2 / p / pre / code` 的字面表现。
+4. prose 容器外的文案，一律优先走 `Text / Label / Heading / Link` 原件，而不是裸标签样式。
+
+## 4. Document 的 view state
 
 `loading`
 
@@ -400,6 +468,8 @@ Document 的唯一主任务是：
 
 - `m-doc-header` 的前奏节奏
 - `m-article-body` 的段落与标题距离
+- `m-article-body` 对 `h2 / h3 / h4 / p / a / code / pre / blockquote / list` 的受控 prose contract
+- `m-code-block` 与 `m-article-body pre` 的共享 code block 表面，避免业务层另起一套 `pre / code`
 - 代码块、引用块与正文的插入节奏
 
 ## 3. `styles/patterns/view-states.css`

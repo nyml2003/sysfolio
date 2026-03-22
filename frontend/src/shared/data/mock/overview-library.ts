@@ -231,6 +231,48 @@ function createOverviewDocumentMetaByLocale(
       ],
       relatedPaths: ["/primitives/data-entry/field-and-input"],
     },
+    "doc-heading": {
+      documentId: "doc-heading",
+      layer: "primitive",
+      status: "partial",
+      designStatus: "needs-review",
+      demoIds: ["heading"],
+      tags: ["heading", "typography"],
+      gaps: [
+        {
+          id: "heading-anchor",
+          title: localize(locale, "Anchor and grouping", "锚点与分组"),
+          description: localize(
+            locale,
+            "Anchor affordance and heading-group plus summary composition still need design follow-up.",
+            "锚点 affordance、heading group 与 summary 的组合仍需设计补齐。",
+          ),
+          owner: "design",
+        },
+      ],
+      relatedPaths: ["/primitives/content/label", "/primitives/actions/button"],
+    },
+    "doc-label": {
+      documentId: "doc-label",
+      layer: "primitive",
+      status: "partial",
+      designStatus: "needs-review",
+      demoIds: ["label"],
+      tags: ["label", "typography", "inline-semantics"],
+      gaps: [
+        {
+          id: "label-multiline",
+          title: localize(locale, "Multiline label and actions", "多行标签与操作"),
+          description: localize(
+            locale,
+            "Multiline label boundaries and label-action combinations still need design closure.",
+            "多行 label、label action 与 info affordance 的组合边界仍需设计补齐。",
+          ),
+          owner: "design",
+        },
+      ],
+      relatedPaths: ["/primitives/content/heading", "/primitives/data-entry/field-and-input"],
+    },
     "doc-field-input": {
       documentId: "doc-field-input",
       layer: "primitive",
@@ -598,6 +640,78 @@ function createOverviewArticleDocuments(
         ),
       ],
     }),
+    "doc-heading": createArticle({
+      id: "doc-heading",
+      title: localize(locale, "Heading", "Heading"),
+      summary: localize(
+        locale,
+        "Heading anchors structured titles on the shared typographic scale instead of page-local font tweaks.",
+        "Heading 把结构化标题锚定在共享的打字阶梯上，而不是让页面各自改字号。",
+      ),
+      eyebrow: localize(locale, "primitives / inline semantics", "基础组件 / 文本与语义"),
+      sections: [
+        createSection(
+          "heading-scale",
+          localize(locale, "Variant-first scale", "变体优先的阶梯"),
+          2,
+          [
+            localize(
+              locale,
+              "Semantic level chooses the tag; visual density comes from display, section, subsection, and caption-heading variants.",
+              "语义 level 决定标签；视觉密度来自 display、section、subsection 与 caption-heading 等变体。",
+            ),
+          ],
+        ),
+        createSection(
+          "heading-gaps",
+          localize(locale, "What is still open", "仍待收敛"),
+          2,
+          [
+            localize(
+              locale,
+              "Anchor copy targets, heading groups with disclosure, and prose-specific spacing still belong to pattern follow-up.",
+              "锚点文案目标、可折叠 heading group 以及长文专用间距仍由 pattern 层跟进。",
+            ),
+          ],
+        ),
+      ],
+    }),
+    "doc-label": createArticle({
+      id: "doc-label",
+      title: localize(locale, "Label", "Label"),
+      summary: localize(
+        locale,
+        "Label gives controls a shared name treatment so required, optional, and helper affordances stay consistent.",
+        "Label 为控件提供统一的名称语气，让必填、选填与辅助入口保持一致。",
+      ),
+      eyebrow: localize(locale, "primitives / inline semantics", "基础组件 / 文本与语义"),
+      sections: [
+        createSection(
+          "label-contract",
+          localize(locale, "Variant and state first", "变体与状态优先"),
+          2,
+          [
+            localize(
+              locale,
+              "Default, strong, and subtle variants pair with default, disabled, required, and optional states without page-local overrides.",
+              "default、strong、subtle 变体与 default、disabled、required、optional 状态成对出现，不靠页面局部覆盖。",
+            ),
+          ],
+        ),
+        createSection(
+          "label-gaps",
+          localize(locale, "Known gaps", "已知缺口"),
+          2,
+          [
+            localize(
+              locale,
+              "Multiline labels, inline actions, and info affordance combinations still need pattern-level follow-up.",
+              "多行 label、行内操作与 info affordance 的组合仍由 pattern 层跟进。",
+            ),
+          ],
+        ),
+      ],
+    }),
     "doc-field-input": createArticle({
       id: "doc-field-input",
       title: localize(locale, "Field And Input", "Field 与 Input"),
@@ -753,6 +867,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
   const patternsTitle = localize(locale, "Patterns", "模式");
   const auditTitle = localize(locale, "Audit", "审计");
   const actionsTitle = localize(locale, "Actions", "操作");
+  const contentTitle = localize(locale, "Content", "文本与语义");
   const dataEntryTitle = localize(locale, "Data Entry", "数据录入");
   const navigationTitle = localize(locale, "Navigation", "导航");
   const statesTitle = localize(locale, "States", "状态");
@@ -811,6 +926,13 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
         locale,
         "Field and input surfaces share one calm data-entry contract.",
         "Field 和 input 表面共享同一套克制的数据录入契约。",
+      ),
+    ),
+    "primitives-content": some(
+      localize(
+        locale,
+        "Typography primitives for headings and inline semantics.",
+        "标题与行内语义的排版原语。",
       ),
     ),
     "patterns-navigation": some(
@@ -887,7 +1009,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: ROOT_NODE_ID,
       ancestorIds: [ROOT_NODE_ID],
       pathSegments: ["primitives"],
-      childrenCount: some(2),
+      childrenCount: some(3),
     }),
     createNode({
       ...defaultNodeMeta,
@@ -1005,6 +1127,17 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
     }),
     createNode({
       ...defaultNodeMeta,
+      id: "primitives-content",
+      kind: "folder",
+      title: contentTitle,
+      slug: "content",
+      parentId: "primitives",
+      ancestorIds: [ROOT_NODE_ID, "primitives"],
+      pathSegments: ["primitives", "content"],
+      childrenCount: some(2),
+    }),
+    createNode({
+      ...defaultNodeMeta,
       id: "article-button",
       kind: "article",
       title: articleDocuments["doc-button"].title,
@@ -1030,6 +1163,34 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       publishedAt: some("2026-03-18T07:50:00.000Z"),
       updatedAt: some("2026-03-21T16:20:00.000Z"),
       readingMinutes: some(4),
+    }),
+    createNode({
+      ...defaultNodeMeta,
+      id: "article-heading",
+      kind: "article",
+      title: articleDocuments["doc-heading"].title,
+      slug: "heading",
+      parentId: "primitives-content",
+      ancestorIds: [ROOT_NODE_ID, "primitives", "primitives-content"],
+      pathSegments: ["primitives", "content", "heading"],
+      documentId: some("doc-heading"),
+      publishedAt: some("2026-03-22T08:10:00.000Z"),
+      updatedAt: some("2026-03-22T08:10:00.000Z"),
+      readingMinutes: some(3),
+    }),
+    createNode({
+      ...defaultNodeMeta,
+      id: "article-label",
+      kind: "article",
+      title: articleDocuments["doc-label"].title,
+      slug: "label",
+      parentId: "primitives-content",
+      ancestorIds: [ROOT_NODE_ID, "primitives", "primitives-content"],
+      pathSegments: ["primitives", "content", "label"],
+      documentId: some("doc-label"),
+      publishedAt: some("2026-03-22T08:25:00.000Z"),
+      updatedAt: some("2026-03-22T08:25:00.000Z"),
+      readingMinutes: some(3),
     }),
     createNode({
       ...defaultNodeMeta,

@@ -24,6 +24,8 @@ export type OverviewDemoId =
   | "layout-primitives"
   | "app-shell"
   | "button"
+  | "heading"
+  | "label"
   | "field-input"
   | "tree-nav"
   | "view-state-layout"
@@ -140,6 +142,41 @@ type OverviewCopy = {
     buttonGroupItemA: string;
     buttonGroupItemB: string;
     buttonGroupItemC: string;
+    headingIntroHeading: string;
+    headingIntroBullets: readonly string[];
+    headingVariantHeading: string;
+    headingVariantBullets: readonly string[];
+    headingSampleDisplay: string;
+    headingSampleSection: string;
+    headingSampleSubsection: string;
+    headingSampleCaption: string;
+    headingToneHeading: string;
+    headingToneBullets: readonly string[];
+    headingToneDefault: string;
+    headingToneMuted: string;
+    headingToneCurrent: string;
+    headingSlotsHeading: string;
+    headingSlotsBullets: readonly string[];
+    headingSlotTitle: string;
+    headingTrailingTag: string;
+    labelIntroHeading: string;
+    labelIntroBullets: readonly string[];
+    labelVariantHeading: string;
+    labelVariantBullets: readonly string[];
+    labelSampleDefault: string;
+    labelSampleStrong: string;
+    labelSampleSubtle: string;
+    labelStateHeading: string;
+    labelStateBullets: readonly string[];
+    labelStateDefault: string;
+    labelStateDisabled: string;
+    labelStateRequired: string;
+    labelStateOptional: string;
+    labelOptionalMarkText: string;
+    labelAffordanceHeading: string;
+    labelAffordanceBullets: readonly string[];
+    labelInfoIconSrLabel: string;
+    labelWithInfoSlot: string;
     fieldTextInputLabel: string;
     fieldTextInputDescription: string;
     fieldTextInputValue: string;
@@ -342,6 +379,14 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
           return "按钮";
         }
 
+        if (demoId === "heading") {
+          return "标题 Heading";
+        }
+
+        if (demoId === "label") {
+          return "标签 Label";
+        }
+
         if (demoId === "field-input") {
           return "Field 家族";
         }
@@ -452,6 +497,71 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
       buttonGroupItemA: "左",
       buttonGroupItemB: "中",
       buttonGroupItemC: "右",
+      headingIntroHeading: "概述",
+      headingIntroBullets: [
+        "入口：从 @/shared/ui/primitives 导入 Heading；语义层级 level 与视觉 variant 分离，避免页面手调字号。",
+        "变体：display / section / subsection / caption-heading（primitive-component-catalog）。",
+        "语气：default / muted / current；前后缀插槽用 Option（none/some）。",
+      ],
+      headingVariantHeading: "视觉变体 variant",
+      headingVariantBullets: [
+        "display：页面主标题气质。",
+        "section：区块标题。",
+        "subsection：小节标题。",
+        "caption-heading：全大写标签型标题（类似 eyebrow）。",
+      ],
+      headingSampleDisplay: "Display：主标题",
+      headingSampleSection: "Section：区块标题",
+      headingSampleSubsection: "Subsection：小节标题",
+      headingSampleCaption: "Caption heading",
+      headingToneHeading: "语气 tone",
+      headingToneBullets: [
+        "default：正文强调色阶。",
+        "muted：退后说明。",
+        "current：导航或选中上下文（accent）。",
+      ],
+      headingToneDefault: "默认",
+      headingToneMuted: "弱化",
+      headingToneCurrent: "当前",
+      headingSlotsHeading: "插槽",
+      headingSlotsBullets: [
+        "leadingIcon / trailingMeta：Option；用于图标与右侧元信息（如 Tag）。",
+        "锚点与 heading group 组合仍待设计补齐（catalog known gaps）。",
+      ],
+      headingSlotTitle: "带图标与标签的区块标题",
+      headingTrailingTag: "Live",
+      labelIntroHeading: "概述",
+      labelIntroBullets: [
+        "入口：从 @/shared/ui/primitives 导入 Label；Field 已用 Label 作为标签层。",
+        "变体：default / strong / subtle；状态：default / disabled / required / optional。",
+        "插槽：requiredMark / optionalMark / infoAffordance 使用 Option；optional 文案须 i18n。",
+      ],
+      labelVariantHeading: "变体 variant",
+      labelVariantBullets: [
+        "default：与 Field 默认标签一致（小号大写）。",
+        "strong：略强调，适合分区标题式 label。",
+        "subtle：更退后，用于次要字段名。",
+      ],
+      labelSampleDefault: "Default",
+      labelSampleStrong: "Strong",
+      labelSampleSubtle: "Subtle",
+      labelStateHeading: "状态 state",
+      labelStateBullets: [
+        "required：默认星号；可用 requiredMark 覆盖。",
+        "optional：仅当 optionalMark 为 some 时渲染（示例用短文案）。",
+        "disabled：降低透明度并 aria-disabled。",
+      ],
+      labelStateDefault: "普通",
+      labelStateDisabled: "禁用态",
+      labelStateRequired: "必填",
+      labelStateOptional: "选填字段",
+      labelOptionalMarkText: "（可选）",
+      labelAffordanceHeading: "信息入口",
+      labelAffordanceBullets: [
+        "infoAffordance：右侧放置 IconButton 等轻量入口；与控件本身的帮助文案分工。",
+      ],
+      labelInfoIconSrLabel: "字段说明",
+      labelWithInfoSlot: "带说明入口",
       fieldTextInputLabel: "文本输入",
       fieldTextInputDescription: "共享的平静输入表面。",
       fieldTextInputValue: "按钮文案",
@@ -652,6 +762,14 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
           return "Button";
         }
 
+        if (demoId === "heading") {
+          return "Heading";
+        }
+
+        if (demoId === "label") {
+          return "Label";
+        }
+
         if (demoId === "field-input") {
           return "Field family";
         }
@@ -764,6 +882,71 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
       buttonGroupItemA: "Left",
       buttonGroupItemB: "Center",
       buttonGroupItemC: "Right",
+      headingIntroHeading: "Overview",
+      headingIntroBullets: [
+        "Import Heading from @/shared/ui/primitives; semantic level is separate from visual variant so pages do not hand-tune font sizes.",
+        "Variants: display / section / subsection / caption-heading (primitive-component-catalog).",
+        "Tones: default / muted / current; leading/trailing slots use Option (none/some).",
+      ],
+      headingVariantHeading: "Variants",
+      headingVariantBullets: [
+        "display: page hero title presence.",
+        "section: block titles.",
+        "subsection: nested section titles.",
+        "caption-heading: uppercase label-style heading (eyebrow-like).",
+      ],
+      headingSampleDisplay: "Display: hero title",
+      headingSampleSection: "Section: block title",
+      headingSampleSubsection: "Subsection: nested title",
+      headingSampleCaption: "Caption heading",
+      headingToneHeading: "Tones",
+      headingToneBullets: [
+        "default: standard text emphasis.",
+        "muted: de-emphasized supporting context.",
+        "current: navigation or selection context (accent).",
+      ],
+      headingToneDefault: "Default",
+      headingToneMuted: "Muted",
+      headingToneCurrent: "Current",
+      headingSlotsHeading: "Slots",
+      headingSlotsBullets: [
+        "leadingIcon / trailingMeta: Option-based; for icons and trailing metadata (such as Tag).",
+        "Anchor affordances and heading groups are still tracked as catalog gaps.",
+      ],
+      headingSlotTitle: "Block title with icon and trailing tag",
+      headingTrailingTag: "Live",
+      labelIntroHeading: "Overview",
+      labelIntroBullets: [
+        "Import Label from @/shared/ui/primitives; Field now uses Label for the label surface.",
+        "Variants: default / strong / subtle; states: default / disabled / required / optional.",
+        "Slots: requiredMark, optionalMark, and infoAffordance use Option; optional copy must be localized.",
+      ],
+      labelVariantHeading: "Variants",
+      labelVariantBullets: [
+        "default: matches the default Field label treatment (small caps).",
+        "strong: slightly heavier for section-like labels.",
+        "subtle: more de-emphasized for secondary field names.",
+      ],
+      labelSampleDefault: "Default",
+      labelSampleStrong: "Strong",
+      labelSampleSubtle: "Subtle",
+      labelStateHeading: "States",
+      labelStateBullets: [
+        "required: default asterisk; override with requiredMark when needed.",
+        "optional: renders only when optionalMark is some (demo uses short copy).",
+        "disabled: lowers contrast and sets aria-disabled.",
+      ],
+      labelStateDefault: "Normal",
+      labelStateDisabled: "Disabled",
+      labelStateRequired: "Required",
+      labelStateOptional: "Optional field",
+      labelOptionalMarkText: "(optional)",
+      labelAffordanceHeading: "Info affordance",
+      labelAffordanceBullets: [
+        "infoAffordance: trailing slot for IconButton or similar; separate from control help text.",
+      ],
+      labelInfoIconSrLabel: "Field help",
+      labelWithInfoSlot: "With info affordance",
       fieldTextInputLabel: "Text input",
       fieldTextInputDescription: "Shared calm field surface.",
       fieldTextInputValue: "Button copy",

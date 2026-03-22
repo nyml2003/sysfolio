@@ -139,7 +139,12 @@
   支持 `default / muted / required / optional / disabled`
 - `Link`
   支持 `default / hover / focus-visible / visited / current`
-- `CodeInline / Kbd`
+- `CodeInline`
+  支持 `default / selected`
+- `CodeBlockSurface`
+  支持 `default / focus-within`
+  `wrapped / scrollable` 默认保留为对象局部表现，不提升成跨系统主状态
+- `Kbd`
   只承接局部强调，不承接业务 ownership
 
 ### 2. Actions And Tooling

@@ -116,6 +116,15 @@
 - States: `default / selected`
 - Known gaps: copy affordance 是否属于 primitive 还未最终定稿。
 
+### CodeBlockSurface
+
+- Support: `priority-next`
+- Purpose: 承接块级代码的基础表面能力，而不是让业务层直接给 `pre / code` 自由写样式。
+- Structure/slots: `header? / language? / meta? / actions? / body / footer?`
+- Variants: `default / command / diff-neutral`
+- States: `default / focus-within / wrapped / scrollable`
+- Known gaps: line numbers、highlighted lines、copy feedback、folding 和 diff semantics 不属于 surface，需要交给更上层 pattern。
+
 ### Kbd
 
 - Support: `later`
@@ -128,9 +137,13 @@
 ### Tag Ownership Note
 
 - `h1 - h6`
-  语义层级由上层结构决定，但视觉必须通过 `Heading primitive` 或 `Prose pattern` 统一承接。
+  语义层级由上层结构决定，但视觉必须通过 `Heading primitive` 或 `ArticleBody / Prose pattern` 统一承接。
 - `p`
   在 prose/reading 容器中由 pattern 自动接管；在普通 UI 中应落到 `Text.body`。
+- `code`
+  句内时由 `CodeInline` 承接；块级时必须落到 `CodeBlockSurface` 或更上层 `CodeBlock pattern`。
+- `pre > code`
+  不允许业务层直接自由配样式，应由 `CodeBlock pattern` 或 `ArticleBody` 的受控 prose contract 接管。
 - `span`
   默认只是 inline wrapper，不是设计对象；只有承担明确角色时才升级成 `Link / CodeInline / Kbd / emphasis / hit` 等受控原件。
 
@@ -590,7 +603,7 @@
 1. 继续补齐 `Combobox / Menu / DialogContent / DrawerContent / TableRow` 的高级子场景。
 2. 收完整体 primitive 的 `success / warning / destructive` 在不同家族中的重量边界。
 3. 再校准 coarse pointer 下 icon-only 控件、trigger 类控件和 overlay 关闭控件的点击基线。
-4. 把新增的 `Text / Label / Link / SearchInput / NumberInput / DateInput / Slider / Toolbar / ListItem / MessageBar / Banner` 继续细化到视觉 spec 和状态矩阵。
+4. 把新增的 `Heading / Text / Label / Link / SearchInput / NumberInput / DateInput / Slider / Toolbar / ListItem / MessageBar / Banner / CodeBlockSurface` 继续细化到视觉 spec 和状态矩阵。
 
 ## 当前边界
 
