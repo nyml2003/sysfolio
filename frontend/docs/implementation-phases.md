@@ -1,5 +1,8 @@
 # Implementation Phases
 
+> **本文档**：Phase 0 / 0.5 / 1 目标与完成定义。  
+> **相关**：[文档索引](./README.md) · [架构范围](./architecture.md) · [测试](./testing-strategy.md)
+
 ## Phase 0
 
 - 补齐并确认规范文档

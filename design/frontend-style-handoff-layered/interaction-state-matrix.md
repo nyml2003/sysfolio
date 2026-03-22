@@ -77,6 +77,8 @@
 
 这些局部对象态不应被误用成全局 ownership 或页面主状态。
 
+像 `required / optional / entering / visible / exiting / persistent / emphasis` 这类更强对象私有态，默认保留在具体组件合同里，不全部提升为跨系统全局状态。
+
 ## 二、优先级
 
 ### 1. Primitive 交互优先级
@@ -111,7 +113,7 @@
 | `expanded` | `patterns + business` | `[aria-expanded=\"true\"]` | 主要作用于 toggle，不抢 current |
 | `collapsed` | `patterns + business` | 默认态 / `[aria-expanded=\"false\"]` | 与 expanded 成对出现 |
 | `read-only` | `primitives` 局部对象态 | `[readonly]` / `.is-read-only` | 主要用于 `Input / NumberInput / DateInput / Textarea`，不等于 disabled |
-| `filled` | `primitives` 局部对象态 | `.is-filled` / `[data-filled=\"true\"]` | 主要用于 `SearchInput / SelectTrigger / Combobox / TokenInput` 一类有值表面 |
+| `filled` | `primitives` 局部对象态 | `.is-filled` / `[data-filled=\"true\"]` | 主要用于 `SearchInput / SelectTrigger / Combobox / multi-value trigger` 一类有值表面 |
 | `visited` | `primitives` 局部对象态 | `:visited` | 仅用于 `Link`，不应扩散到按钮或菜单项 |
 | `dragging` | `primitives + business` 局部对象态 | `.is-dragging` / `[data-dragging=\"true\"]` | 主要用于 `Slider thumb / drag handle / file drop interaction` |
 | `drag-target` | `business` | `.is-drag-target` | 当前已落在 `FileTree / TableRow` |
@@ -127,14 +129,68 @@
 
 ## 四、对象级契约
 
-### 1. Data Entry
+### 1. Text And Inline Semantics
+
+- `Text`
+  支持 `default / muted / success / warning / destructive / disabled`
+- `Label`
+  支持 `default / muted / required / optional / disabled`
+- `Link`
+  支持 `default / hover / focus-visible / visited / current`
+- `CodeInline / Kbd`
+  只承接局部强调，不承接业务 ownership
+
+### 2. Actions And Tooling
+
+- `Button / IconButton / SplitButton`
+  支持 `default / hover / focus-visible / active-press / disabled / loading`
+- `ButtonGroup / Segmented`
+  支持 `default / hover / focus-visible / current / disabled`
+- `Toolbar`
+  支持 `focus-within / disabled-item / overflow-open`
+  但不应自行承接 `current` 语义
+
+### 3. Data Entry
 
 - `Input / Textarea / SelectTrigger / Combobox`
   支持 `default / focus-visible / disabled / loading / invalid / warning / success`
 - 当前类名：
   `.is-invalid / .is-warning / .is-success / .is-loading / .is-disabled`
+- `SearchInput`
+  在 input 基础上补 `filled`
+- `NumberInput / DateInput`
+  在 input 基础上补 `read-only`
+- `Slider`
+  支持 `default / hover / focus-visible / dragging / disabled`
+- `FileTrigger`
+  支持 `default / hover / focus-visible / drag-target / loading / disabled / error`
 
-### 2. Overlay / Menu
+### 4. Data Display
+
+- `List / ListItem`
+  支持 `default / hover / focus-visible / selected / current / disabled / drag-target`
+  但 `current` 仅在被 pattern/business 借用时才成立
+- `KeyValue`
+  支持 `default / loading`
+- `Token`
+  支持 `default / hover / focus-visible / selected / disabled`
+- `TableRow`
+  支持 `default / hover / focus-visible / selected / drag-target / reordering / disabled`
+
+### 5. Feedback
+
+- `InlineNotice`
+  支持 `default / emphasis / dismissible`
+- `MessageBar`
+  支持 `default / emphasis / persistent / dismissible`
+- `Banner`
+  支持 `default / sticky / dismissible`
+- `Toast`
+  支持 `entering / visible / exiting / paused`
+- `Progress`
+  支持 `default / indeterminate / complete / error`
+
+### 6. Overlay / Menu
 
 - `MenuItem`
   支持 `default / hover / focus-visible / selected / warning / destructive / disabled`
@@ -143,7 +199,7 @@
 - `OverlayScrim`
   支持 `data-state=\"closed\"`
 
-### 3. Tree Navigation
+### 7. Tree Navigation
 
 - `TreeNav`
   共享 `current / hover / focus-visible / expanded`
@@ -152,14 +208,14 @@
 - `FileTree`
   主状态拆成 `current / selected / search-match / drag-target / reordering`
 
-### 4. PathBar
+### 8. PathBar
 
 - `Path segment`
   使用 `.is-current / .is-clickable / .is-collapsible / .is-ellipsis`
 - `Path entry`
   使用 `.m-path-entry`，激活态用 `.is-active`
 
-### 5. View States
+### 9. View States
 
 - `Idle / Ready / Loading / Empty / Error`
   统一由 `patterns/view-states.css` 提供
@@ -195,3 +251,4 @@
 1. 继续补齐 `success / warning / destructive / drag-target / reordering` 在所有 relevant primitives 与 patterns 中的完整覆盖。
 2. 收紧复杂叠加态，重点是 `current + hover`、`selected + search-match`、`drag-target + reordering`。
 3. 把 view-state 分层再对照真实业务视图核一遍，避免局部刷新被错误升级成整页状态。
+4. 把 `visited / filled / read-only / dragging / dismissible / sticky / paused / muted` 这批局部对象态继续回写到具体组件规范与未来 CSS 契约。

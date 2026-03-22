@@ -6,6 +6,7 @@ import {
   buildVisibleRows,
   createTreeIndex,
   getDefaultExpandedIds,
+  mergeExpandedIds,
   mergeNodes,
   toggleExpanded,
 } from "./file-tree.model";
@@ -62,5 +63,21 @@ describe("file-tree.model", () => {
       "primitives-actions",
       "primitives-data-entry",
     ]);
+  });
+
+  it("mergeExpandedIds appends without duplicates", () => {
+    expect(mergeExpandedIds(["a"], ["b", "a"])).toEqual(["a", "b"]);
+  });
+
+  it("toggleExpanded removes when already expanded", () => {
+    expect(toggleExpanded(["x", "y"], "x")).toEqual(["y"]);
+  });
+
+  it("buildVisibleRows marks root path selection", () => {
+    const index = createTreeIndex(createTreePayload());
+    const expanded = getDefaultExpandedIds(index);
+    const rows = buildVisibleRows(index, expanded, "/");
+
+    expect(rows.some((row) => row.isSelected && row.node.kind === "home")).toBe(true);
   });
 });

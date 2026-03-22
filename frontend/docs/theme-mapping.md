@@ -1,5 +1,8 @@
 # Theme Mapping
 
+> **本文档**：light/dark、token 与组件职责、语义色映射。  
+> **相关**：[文档索引](./README.md) · [样式体系](./styling-system.md)
+
 ## Goal
 
 - 支持 light / dark 双主题

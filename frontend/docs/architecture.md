@@ -1,5 +1,8 @@
 # Architecture
 
+> **本文档**：产品范围、目录分层（含 `site`）、运行时数据规则、资源状态形状、渲染约束。  
+> **相关**：[文档索引](./README.md) · [代码组织 · UI 库与原生标签](./code-organization.md) · [状态与偏好](./state-management.md) · [`Option`/`Result`](./option-result.md) · [UI 文案](./i18n.md) · [数据边界](./repository-contract.md)
+
 ## Scope
 
 - `0.5` 期只实现文件系统视图。
@@ -13,20 +16,23 @@
 ## Layers
 
 1. `app`
-   - 路由入口、页面壳、少量全局 providers
-2. `shared/data`
+   - 路由入口、主产品页面壳、少量全局 providers
+2. `site`（可选，与 `app` 并列）
+   - 内部文档站、组件库总览等独立入口；复用 `features` 与 `shared`。
+   - 共享业务逻辑应沉淀在 `features` / `shared`，避免 `site` 专有模块被主工程依赖。
+3. `shared/data`
    - repository 接口
    - mock repository
    - 偏好层 adapter
-3. `entities/content`
+4. `entities/content`
    - 内容实体、导航视图、taxonomy 预留结构
-4. `shared/store`
+5. `shared/store`
    - 极少数全局统一状态
-5. `features/*`
+6. `features/*`
    - 文件树、内容区、右栏、主题、引导
-6. `shared/ui`
+7. `shared/ui`
    - tokens、atomic、molecular、primitives
-7. `shared/lib`
+8. `shared/lib`
    - 纯 TS 模型与算法
    - DOM hooks / browser adapter
 
@@ -74,7 +80,7 @@
 - 业务层不直接触碰 DOM / browser API。
 - 所有 DOM 读写、事件监听、observer、滚动测量和浏览器调度，统一收口到 `shared/lib/dom` 或 `shared/lib/layout`。
 - 业务层默认不直接写散落字面量。
-- 业务常量按 feature 或 shared 维度收口到 `constant.ts`，避免阈值、默认值和配置在多个文件分叉。
+- 业务常量（阈值、路由片段、开关等）按 feature 或 shared 维度收口到 `constant.ts`，避免在多个文件分叉；**用户可见多语言文案**、locale 与 DOM `lang` 等见 **`i18n.md`**（与 `constant.ts` 分工见 `code-organization.md`）。
 
 ## Error And Loading Semantics
 

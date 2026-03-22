@@ -1,5 +1,8 @@
 # Content Model
 
+> **本文档**：内容实体、节点 kind、渲染态与 `0.5` 范围。  
+> **相关**：[文档索引](./README.md) · [repository 契约](./repository-contract.md) · [mock](./mock-data-spec.md)
+
 ## 0.5 Scope
 
 - 当前正式中心区渲染态只有：

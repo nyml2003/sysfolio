@@ -1,5 +1,8 @@
 # Performance Rules
 
+> **本文档**：树虚拟化、按需加载、memo、搜索相关复杂度归属。  
+> **相关**：[文档索引](./README.md) · [状态管理](./state-management.md) · [架构](./architecture.md)
+
 ## Baseline
 
 - 左侧树必须虚拟化

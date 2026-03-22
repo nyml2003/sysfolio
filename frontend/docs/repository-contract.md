@@ -1,5 +1,8 @@
 # Repository Contract
 
+> **本文档**：前端唯一数据访问边界、API 约定、返回形状（资源状态、`Option`）、预留接口。  
+> **相关**：[文档索引](./README.md) · [架构](./architecture.md) · [内容模型](./content-model.md) · [mock](./mock-data-spec.md)
+
 ## Core Rule
 
 - repository 是前端唯一数据访问边界。

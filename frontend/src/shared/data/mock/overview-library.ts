@@ -757,11 +757,11 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
   const navigationTitle = localize(locale, "Navigation", "导航");
   const statesTitle = localize(locale, "States", "状态");
   const defaultNodeMeta = {
-    childrenCount: none<number>(),
-    documentId: none<DocumentId>(),
-    publishedAt: none<string>(),
-    updatedAt: none<string>(),
-    readingMinutes: none<number>(),
+    childrenCount: none(),
+    documentId: none(),
+    publishedAt: none(),
+    updatedAt: none(),
+    readingMinutes: none(),
   };
   const directoryDescriptions: Record<NodeId, DirectoryContent["description"]> = {
     foundation: some(

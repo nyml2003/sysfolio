@@ -41,10 +41,20 @@
 | --- | --- | --- |
 | `Tokens` | 颜色、字体、间距、阴影、层级、动效、布局宽度等变量 | 组件语义、业务流程 |
 | `Utilities` | 排版、布局、focus、scroll、transition 等低层能力 | 业务命名、产品状态 |
-| `Primitives` | Button、Input、Menu、DialogContent、TableRow 等基础控件与状态原件 | 业务数据结构、页面级五态 |
+| `Primitives` | Button、Link、Label、Input、SearchInput、Menu、ListItem、MessageBar、DialogContent、TableRow 等基础控件与状态原件 | 业务数据结构、页面级五态 |
 | `Patterns` | TreeNav、ReadingPane、Shell、ViewStates 等可复用结构模式 | 产品语义、具体业务计算 |
 | `Business` | TOC、FileTree、PathBar、三类主视图等产品语义组件 | 重复定义基础交互或共享骨架 |
 | `Component` | feature/page 级编排、状态升级范围、页面任务路径 | 反向破坏下层契约 |
+
+当前 primitive 盘面已不只包含“按钮和输入框”，也覆盖：
+
+- 文本与语义原件：`Text / Label / Link / CodeInline / Kbd`
+- 工具与动作原件：`Toolbar / SplitButton`
+- 常见专项输入：`SearchInput / NumberInput / DateInput / Slider / FileTrigger`
+- 通用信息行：`List / ListItem / KeyValue / Token`
+- 通用反馈面：`InlineNotice / MessageBar / Banner / Toast`
+
+这些对象必须保持非业务语义，供 `patterns / business` 继续组合。
 
 ## 环境能力矩阵
 

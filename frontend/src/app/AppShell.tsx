@@ -20,59 +20,11 @@ import {
   some,
   type Option,
 } from "@/shared/lib/monads/option";
-import { ROOT_PATH, normalizePath, splitPathSegments } from "@/shared/lib/path/content-path";
+import { normalizePath } from "@/shared/lib/path/content-path";
 
-import {
-  APP_SHELL_HOME_BREADCRUMB_ID,
-  APP_SHELL_ROOT_BREADCRUMB_ID,
-  APP_SHELL_ROOT_BREADCRUMB_TITLE,
-  APP_SHELL_ROUTE_PATH,
-} from "./constant";
+import { APP_SHELL_ROUTE_PATH } from "./constant";
+import { buildFallbackBreadcrumbs } from "./app-shell.model";
 import styles from "./AppShell.module.css";
-
-function buildFallbackBreadcrumbs(path: string, homeTitle: string): BreadcrumbSegment[] {
-  const segments = splitPathSegments(path);
-  const rootBreadcrumb: BreadcrumbSegment = {
-    id: APP_SHELL_ROOT_BREADCRUMB_ID,
-    title: APP_SHELL_ROOT_BREADCRUMB_TITLE,
-    path: ROOT_PATH,
-  };
-  const resolvedBreadcrumbs = segments.reduce<{
-    breadcrumbs: BreadcrumbSegment[];
-    currentSegments: string[];
-  }>(
-    (state, segment) => {
-      const currentSegments = [...state.currentSegments, segment];
-
-      return {
-        currentSegments,
-        breadcrumbs: [
-          ...state.breadcrumbs,
-          {
-            id: currentSegments.join("/"),
-            title: segment,
-            path: `/${currentSegments.join("/")}`,
-          },
-        ],
-      };
-    },
-    {
-      breadcrumbs: [rootBreadcrumb],
-      currentSegments: [],
-    },
-  );
-
-  return resolvedBreadcrumbs.breadcrumbs.length === 1
-    ? [
-        ...resolvedBreadcrumbs.breadcrumbs,
-        {
-          id: APP_SHELL_HOME_BREADCRUMB_ID,
-          title: homeTitle,
-          path: ROOT_PATH,
-        },
-      ]
-    : resolvedBreadcrumbs.breadcrumbs;
-}
 
 type ShellContentProps = {
   currentPath: string;

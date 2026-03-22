@@ -50,6 +50,8 @@
 | `priority-next` | 应尽快进入 primitive 层，支撑后续 patterns / business |
 | `later` | 仍属于 primitive，但应排在当前主线之后 |
 
+未单独标注 `Support` 的既有组件，默认按 `baseline` 理解。
+
 补齐方向上，优先补：
 
 1. `text / link / label` 这类基础语义原件

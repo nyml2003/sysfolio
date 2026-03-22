@@ -38,11 +38,11 @@ import { resolveLayoutModeFromWidth, resolveMotionMode } from "./style.utils";
 
 type StyleProviderProps = {
   children: ReactNode;
-  theme: Option<ThemePreference>;
-  density: Option<DensityPreference>;
-  layoutMode: Option<LayoutMode>;
-  motion: Option<MotionMode>;
-  className: Option<string>;
+  theme?: Option<ThemePreference>;
+  density?: Option<DensityPreference>;
+  layoutMode?: Option<LayoutMode>;
+  motion?: Option<MotionMode>;
+  className?: Option<string>;
 };
 
 function toStableScopeOption(

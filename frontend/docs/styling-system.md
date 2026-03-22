@@ -1,5 +1,8 @@
 # Styling System
 
+> **本文档**：CSS 分层、tokens / atomic / molecular、与 `design` 目录关系、新增 class 审批。  
+> **相关**：[文档索引](./README.md) · [代码组织（UI 库与原生 HTML）](./code-organization.md) · [主题映射](./theme-mapping.md) · [架构](./architecture.md)
+
 ## Stack
 
 - CSS Modules

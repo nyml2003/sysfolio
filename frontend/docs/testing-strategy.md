@@ -1,10 +1,20 @@
 # Testing Strategy
 
+> **本文档**：合并前必跑命令、测试分层、`0.5` 聚焦范围、必覆盖场景。  
+> **相关**：[文档索引](./README.md) · [依赖](./dependencies.md) · [实现阶段](./implementation-phases.md)
+
 ## Required Checks
 
 - `pnpm lint`
 - `pnpm typecheck`
 - `pnpm test`
+- `pnpm test:coverage`（见下「覆盖率」）
+
+## 覆盖率
+
+- 命令：`pnpm test:coverage`（Vitest + `@vitest/coverage-v8`，报告输出到 `coverage/`）。
+- **阈值**：对下列**纯 TS 模块**（`vite.config.ts` 中 `coverage.include`）要求 **语句/行/函数/分支均 ≥ 80%**：路径工具、`format-date`、资源状态、`detach-promise`、`Option`/`Result` helpers、文件树 model、`app-shell.model`（面包屑纯函数）。
+- 全仓 `.tsx` 与未列入 `include` 的文件**不计入**该阈值，避免与 UI 混测；新增纯逻辑文件时，应同步加入 `include` 并补测。
 
 ## 0.5 Focus
 

@@ -1,26 +1,24 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { forwardRef } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
 import { clsx } from "clsx";
 
 type ButtonTone = "primary" | "secondary" | "ghost";
 type ButtonSize = "sm" | "md";
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  children: ReactNode;
+export type ButtonProps = ComponentPropsWithoutRef<"button"> & {
   tone?: ButtonTone;
   size?: ButtonSize;
+  children: ReactNode;
 };
 
-export function Button({
-  children,
-  tone = "secondary",
-  size = "md",
-  className,
-  type = "button",
-  ...rest
-}: ButtonProps) {
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { children, tone = "secondary", size = "md", className, type = "button", ...rest },
+  ref,
+) {
   return (
     <button
+      ref={ref}
       className={clsx("sf-button", `sf-button--${tone}`, `sf-button--${size}`, className)}
       type={type}
       {...rest}
@@ -28,5 +26,6 @@ export function Button({
       {children}
     </button>
   );
-}
+});
 
+Button.displayName = "Button";

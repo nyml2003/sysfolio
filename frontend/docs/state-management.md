@@ -1,5 +1,8 @@
 # State Management
 
+> **本文档**：全局 store / Context / 局部状态如何选、偏好与全局范围、为何不滥用 `Result` 表达页面资源。  
+> **相关**：[文档索引](./README.md) · [架构 · ResourceState](./architecture.md) · [repository 偏好 API](./repository-contract.md)
+
 ## Rule
 
 - 真正全局统一的状态才进全局 store / 全局 Provider

@@ -1,5 +1,8 @@
 # Search And Tag Navigation
 
+> **本文档**：搜索/标签/时间线导航的**数据与契约预留**，`0.5` 不定 UI。  
+> **相关**：[文档索引](./README.md) · [架构范围](./architecture.md) · [repository 预留 API](./repository-contract.md)
+
 ## 0.5 Scope
 
 - `0.5` 期不实现搜索 UI

@@ -1,5 +1,8 @@
 # Option And Result
 
+> **本文档**：`Option` / `Result` 运行时形状、helper 命名、允许与禁止出现的代码层级、序列化约定。  
+> **相关**：[文档索引](./README.md) · [架构 · 数据形状](./architecture.md) · [状态管理](./state-management.md)
+
 ## Purpose
 
 - `Option<T>` 和 `Result<E, T>` 都是项目内 `shared` 基础工具类型。

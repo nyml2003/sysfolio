@@ -4,12 +4,9 @@
 
 ## Scripts
 
-- `npm run dev`
-- `npm run build`
-- `npm run preview`
-- `npm run lint`
-- `npm run typecheck`
-- `npm run test`
+- `pnpm dev` / `pnpm build` / `pnpm preview`
+- `pnpm lint` / `pnpm typecheck`
+- `pnpm test` / `pnpm test:coverage`（纯 TS 模块覆盖率阈值见 `vite.config.ts` 与 `docs/testing-strategy.md`）
 
 ## Structure
 

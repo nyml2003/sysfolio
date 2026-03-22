@@ -1,4 +1,4 @@
-export { Button } from "./Button";
+export { Button, type ButtonProps } from "./Button";
 export { Field, FieldRow, SelectInput, TextArea, TextInput } from "./Field";
 export { Notice } from "./Notice";
 export { ProgressBar } from "./ProgressBar";

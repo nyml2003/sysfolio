@@ -1,5 +1,8 @@
 # Dependencies
 
+> **本文档**：包管理器、构建链、允许的第三方、`zod` 使用边界。  
+> **相关**：[文档索引](./README.md) · [测试策略](./testing-strategy.md)
+
 ## Tooling
 
 - 包管理器：`pnpm`

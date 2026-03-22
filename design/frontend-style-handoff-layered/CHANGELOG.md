@@ -49,3 +49,6 @@
 - 新增 `Text / Label / Link / CodeInline / Kbd` 这组基础语义原件。
 - 新增 `Toolbar / SplitButton / SearchInput / NumberInput / DateInput / Slider / FileTrigger / Disclosure / List / ListItem / KeyValue / Token / MessageBar / Banner / Toast` 等补充组件。
 - 为新增组件补充 `Support` 等级、职责、slot、变体、状态与 known gaps，并同步更新 `design-todo.md` 的 primitive 主线。
+- 在 `primitive-visual-spec.md` 中补充 `Text And Inline Semantics` 家族，并把 `Toolbar / SearchInput / DateInput / Slider / ListItem / MessageBar / Banner / Toast` 等纳入现有家族的视觉基线。
+- 在 `interaction-state-matrix.md` 中补充 `read-only / filled / visited / dragging / dismissible / sticky / paused / muted` 这批局部对象态，并扩展对象级状态合同。
+- 在 `design-overview.md` 中更新 primitive 层示例与当前 primitive 盘面范围，明确它已覆盖语义文本、工具原件、通用信息行与反馈面。

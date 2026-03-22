@@ -1,5 +1,8 @@
 # Mock Data Spec
 
+> **本文档**：fixtures、generator、树规模、可复现策略。  
+> **相关**：[文档索引](./README.md) · [repository](./repository-contract.md) · [内容模型](./content-model.md)
+
 ## Strategy
 
 - 不使用 `mockjs`
