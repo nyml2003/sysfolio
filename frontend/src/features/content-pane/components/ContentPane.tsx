@@ -5,8 +5,8 @@ import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import { isSome, none, unwrapOr } from "@/shared/lib/monads/option";
 import { ROOT_PATH } from "@/shared/lib/path/content-path";
 import type { ResourceState } from "@/shared/lib/resource/resource-state";
-import buttonStyles from "@/shared/ui/primitives/Button.module.css";
 import { ArticleIcon, FolderIcon, GameIcon, MediaIcon } from "@/shared/ui/primitives/Icon";
+import { Button } from "@/shared/ui/primitives";
 
 import styles from "./ContentPane.module.css";
 
@@ -61,7 +61,7 @@ function renderDirectoryView(
       </div>
       <div className={styles.directoryList}>
         {payload.content.children.map((entry) => (
-          <button
+          <Button
             className={[
               styles.directoryEntry,
               entry.status === "coming_soon" ? styles.directoryEntryComingSoon : "",
@@ -72,6 +72,7 @@ function renderDirectoryView(
             onClick={() => {
               onNavigate(entry.path);
             }}
+            tone="ghost"
             type="button"
           >
             {renderDirectoryIcon(entry.kind)}
@@ -89,7 +90,7 @@ function renderDirectoryView(
                 </div>
               )}
             </div>
-          </button>
+          </Button>
         ))}
       </div>
     </section>
@@ -114,15 +115,15 @@ function renderUnsupportedState(
         <div className={styles.emptyState}>
           <h2 className={styles.emptyTitle}>{copy.contentPane.unsupportedTitle}</h2>
           <p>{copy.contentPane.unsupportedBody}</p>
-          <button
-            className={[buttonStyles.root, buttonStyles.secondary].join(" ")}
+          <Button
             onClick={() => {
               onNavigate(fallbackPath);
             }}
+            tone="secondary"
             type="button"
           >
             {copy.contentPane.backToParent}
-          </button>
+          </Button>
         </div>
       </div>
     </section>

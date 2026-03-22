@@ -102,12 +102,18 @@ export function OverviewHomePage({
           <div className="overview-section-title">{copy.home.recentDocsTitle}</div>
           <Grid columns={3}>
             {context.recentEntries.map((entry) => (
-              <button className="overview-link-card" key={entry.id} onClick={() => onNavigate(entry.path)} type="button">
+              <Button
+                className="overview-link-card"
+                key={entry.id}
+                onClick={() => onNavigate(entry.path)}
+                tone="ghost"
+                type="button"
+              >
                 <Stack gap="xs">
                   <strong>{entry.title}</strong>
                   <div className="overview-copy">{unwrapOr(entry.description, "")}</div>
                 </Stack>
-              </button>
+              </Button>
             ))}
           </Grid>
         </Stack>
@@ -137,7 +143,13 @@ export function OverviewDirectoryPage({
       </Stack>
       <Grid columns={3}>
         {content.children.map((entry) => (
-          <button className="overview-link-card" key={entry.id} onClick={() => onNavigate(entry.path)} type="button">
+          <Button
+            className="overview-link-card"
+            key={entry.id}
+            onClick={() => onNavigate(entry.path)}
+            tone="ghost"
+            type="button"
+          >
             <Stack gap="sm">
               <Inline align="between" wrap>
                 <strong>{entry.title}</strong>
@@ -152,7 +164,7 @@ export function OverviewDirectoryPage({
                 {unwrapOr(entry.description, copy.directory.entryFallbackDescription)}
               </div>
             </Stack>
-          </button>
+          </Button>
         ))}
       </Grid>
     </Stack>

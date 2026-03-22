@@ -2,6 +2,7 @@ import type { ContextInfo, HomeContent } from "@/entities/content";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import { isSome, unwrapOr } from "@/shared/lib/monads/option";
 import { ArticleIcon, FolderIcon } from "@/shared/ui/primitives/Icon";
+import { Button } from "@/shared/ui/primitives";
 import styles from "./HomeView.module.css";
 
 type HomeViewProps = {
@@ -29,7 +30,7 @@ export function HomeView({ content, context, onNavigate }: HomeViewProps) {
         <div className={styles.sectionTitle}>{copy.home.quickEntriesTitle}</div>
         <div className={styles.list}>
           {context.recentEntries.map((entry) => (
-            <button
+            <Button
               className={[styles.entry, entry.status === "coming_soon" ? styles.entryComingSoon : ""]
                 .filter(Boolean)
                 .join(" ")}
@@ -37,6 +38,7 @@ export function HomeView({ content, context, onNavigate }: HomeViewProps) {
               onClick={() => {
                 onNavigate(entry.path);
               }}
+              tone="ghost"
               type="button"
             >
               {renderEntryIcon(entry.kind)}
@@ -54,7 +56,7 @@ export function HomeView({ content, context, onNavigate }: HomeViewProps) {
                   </div>
                 )}
               </div>
-            </button>
+            </Button>
           ))}
         </div>
       </section>

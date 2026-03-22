@@ -88,7 +88,7 @@ export function OverviewPathBar({
 
             return (
               <Inline className="overview-breadcrumbs__group" gap="xs" key={segment.id}>
-                <button
+                <Button
                   aria-current={isCurrent ? "page" : false}
                   className="overview-breadcrumbs__button"
                   disabled={isCurrent}
@@ -97,10 +97,11 @@ export function OverviewPathBar({
                       onNavigate(segment.path);
                     }
                   }}
+                  tone="ghost"
                   type="button"
                 >
                   {segment.title}
-                </button>
+                </Button>
                 {isCurrent ? null : <span className="overview-breadcrumbs__separator">/</span>}
               </Inline>
             );
@@ -195,7 +196,7 @@ export function OverviewFileTree({
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
               >
-                <button
+                <Button
                   aria-expanded={showDisclosure ? isExpanded : undefined}
                   className="overview-tree__trigger"
                   disabled={!showDisclosure}
@@ -204,24 +205,26 @@ export function OverviewFileTree({
                       toggleNode(row.node.id);
                     }
                   }}
+                  tone="ghost"
                   type="button"
                 >
                   {showDisclosure ? (
                     isExpanded ? <ChevronDownIcon size={14} /> : <ChevronRightIcon size={14} />
                   ) : null}
-                </button>
+                </Button>
                 {renderNodeIcon(row.node.kind)}
-                <button
+                <Button
                   className="overview-tree__label"
                   onClick={() => {
                     startTransition(() => {
                       onNavigate(nodePath);
                     });
                   }}
+                  tone="ghost"
                   type="button"
                 >
                   {row.node.title}
-                </button>
+                </Button>
               </div>
             );
           })}
@@ -287,7 +290,7 @@ export function OverviewContextPanel({
           <Stack gap="sm">
             <div className="overview-section-title">{copy.context.onThisPageTitle}</div>
             {resource.value.content.toc.map((item) => (
-              <button
+              <Button
                 className={[
                   "overview-context-link",
                   item.id === activeHeadingId ? "overview-context-link--active" : "",
@@ -298,10 +301,11 @@ export function OverviewContextPanel({
                 onClick={() => {
                   onScrollToHeading(item.id);
                 }}
+                tone="ghost"
                 type="button"
               >
                 {item.title}
-              </button>
+              </Button>
             ))}
           </Stack>
         </Surface>
@@ -332,16 +336,17 @@ export function OverviewContextPanel({
           <Stack gap="sm">
             <div className="overview-section-title">{copy.context.recentEntriesTitle}</div>
             {context.recentEntries.map((entry) => (
-              <button
+              <Button
                 className="overview-context-link"
                 key={entry.id}
                 onClick={() => {
                   onNavigate(entry.path);
                 }}
+                tone="ghost"
                 type="button"
               >
                 {entry.title}
-              </button>
+              </Button>
             ))}
           </Stack>
         </Surface>

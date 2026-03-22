@@ -21,6 +21,7 @@ import {
   MediaIcon,
 } from "@/shared/ui/primitives/Icon";
 import { iconStyle } from "@/shared/ui/primitives/Icon.style";
+import { Button } from "@/shared/ui/primitives";
 import styles from "./FileTree.module.css";
 
 import {
@@ -135,7 +136,7 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                   paddingInlineStart: `calc(var(--sys-space-8) + ${row.depth} * var(--sys-space-12))`,
                 }}
               >
-                <button
+                <Button
                   aria-expanded={showDisclosure ? isExpanded : undefined}
                   aria-label={
                     showDisclosure
@@ -153,6 +154,7 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
 
                     toggleNode(row.node.id);
                   }}
+                  tone="ghost"
                   type="button"
                 >
                   {showDisclosure ? (
@@ -162,9 +164,9 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                       <ChevronRightIcon size={FILE_TREE_DISCLOSURE_ICON_SIZE} />
                     )
                   ) : null}
-                </button>
+                </Button>
                 {renderNodeIcon(row.node)}
-                <button
+                <Button
                   aria-current={row.isSelected ? "page" : false}
                   className={styles.label}
                   onClick={() => {
@@ -172,10 +174,11 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                       onNavigate(nodePath);
                     });
                   }}
+                  tone="ghost"
                   type="button"
                 >
                   {row.node.title}
-                </button>
+                </Button>
                 {row.node.status === "coming_soon" ? (
                   <span className={styles.statusDot} />
                 ) : null}

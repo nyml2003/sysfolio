@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import { usePreferences } from "@/shared/store/preferences";
+import { Button } from "@/shared/ui/primitives";
 
 import styles from "./OnboardingHints.module.css";
 
@@ -51,7 +52,7 @@ export function OnboardingHints() {
       role="presentation"
     >
       {tips.map((tip) => (
-        <button
+        <Button
           className={styles.dot}
           key={tip.id}
           onClick={(event) => {
@@ -59,8 +60,11 @@ export function OnboardingHints() {
             setActiveTipId(tip.id);
           }}
           style={tip.dotStyle}
+          tone="ghost"
           type="button"
-        />
+        >
+          {null}
+        </Button>
       ))}
       <div
         className={styles.popover}
@@ -70,15 +74,16 @@ export function OnboardingHints() {
         style={activeTip.popoverStyle}
       >
         <div className={styles.popoverBody}>{activeTip.label}</div>
-        <button
+        <Button
           className={styles.dismiss}
           onClick={() => {
             dismissOnboarding();
           }}
+          tone="ghost"
           type="button"
         >
           {copy.onboarding.dismiss}
-        </button>
+        </Button>
       </div>
     </div>
   );

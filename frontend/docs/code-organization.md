@@ -84,6 +84,14 @@
   - **用户可见文案**（多语言）、**locale 类型**、**接入方式**（`useUiCopy`、场景 `useXxxCopy`、`document` 语言同步等）一律按 **`i18n.md`** 执行；**不**与「魔法数字、路由 path」混在同一常量文件里，除非该文件只负责 re-export 分组导出。
 - 类型判别值、协议固定值、框架要求的最小字面量和测试 fixture，不强制抽到 `constant.ts`。
 
+### 公共 API：默认值、预设对象与偏函数
+
+- **倾向**：在**可组合的公共 API**（函数参数、组件 props、工厂选项对象）上，**不要**依赖一长串**有业务含义的隐蔽默认值**（例如调用方不读实现就不知道实际生效的是哪一档），以免行为隐式分叉。
+- **可以**用下列方式表达「常见组合」，且比裸默认值更可读、可检索：
+  - **命名预设对象**：集中定义并导出（如 `export const buttonTone = { secondary: { tone: "secondary" as const }, ghost: { tone: "ghost" as const } }`），调用处显式 `...buttonTone.secondary` 或与 props 合并，读者能直接看到选了哪套预设。
+  - **偏函数 / 工厂**：先固定一部分参数，再返回函数、hook 或包装组件（如 `function createXxxWithDefaults(partial)`、`const withTone = (tone) => (props) => <Button tone={tone} {...props} />`），把「已绑定的组合」收口到单一命名处。
+- **例外**：无歧义的**技术性**默认（如按钮 `type="button"`、与 DOM/React 约定一致的最小属性）可保留；**存量**签名上的默认值不强制一次性改掉，**新代码**优先按上款。
+
 ## UI 库与原生 HTML
 
 - **原则**：除 **`shared/ui`** 内部实现组件外，**`app` / `features` / `site` 中的业务 TSX 不直接使用浏览器原生交互/表单类标签**（如 `button`、`input`、`select`、`textarea` 以及用于表单联动的 `label` 等）搭建产品界面；应使用 `shared/ui` 已提供的 **primitives**、**layout**、**patterns**（如 `Button`、`Field`、`Stack` 等）。

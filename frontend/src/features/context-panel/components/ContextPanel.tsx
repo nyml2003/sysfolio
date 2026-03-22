@@ -7,7 +7,7 @@ import { isSome, none, unwrapOr } from "@/shared/lib/monads/option";
 import type { Option } from "@/shared/lib/monads/option";
 import type { ResourceState } from "@/shared/lib/resource/resource-state";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
-import buttonStyles from "@/shared/ui/primitives/Button.module.css";
+import { Button } from "@/shared/ui/primitives";
 
 import styles from "./ContextPanel.module.css";
 
@@ -31,15 +31,15 @@ function renderParentSection(
   return (
     <section className={styles.section}>
       <div className={styles.title}>{title}</div>
-      <button
-        className={[buttonStyles.root, buttonStyles.secondary].join(" ")}
+      <Button
         onClick={() => {
           onNavigate(parent.value.path);
         }}
+        tone="secondary"
         type="button"
       >
         {backToLabel(parent.value.title)}
-      </button>
+      </Button>
     </section>
   );
 }
@@ -84,7 +84,7 @@ export function ContextPanel({
           <div className={styles.title}>{copy.contextPanel.tocTitle}</div>
           <div className={styles.toc}>
             {resource.value.content.toc.map((item) => (
-              <button
+              <Button
                 aria-current={item.id === activeHeadingId ? "location" : false}
                 className={[
                   styles.tocItem,
@@ -96,10 +96,11 @@ export function ContextPanel({
                 onClick={() => {
                   onScrollToHeading(item.id);
                 }}
+                tone="ghost"
                 type="button"
               >
                 {item.title}
-              </button>
+              </Button>
             ))}
           </div>
         </section>
@@ -120,16 +121,17 @@ export function ContextPanel({
         <section className={styles.section}>
           <div className={styles.title}>{copy.contextPanel.recentTitle}</div>
           {context.recentEntries.map((entry) => (
-            <button
+            <Button
               className={styles.tocItem}
               key={entry.id}
               onClick={() => {
                 onNavigate(entry.path);
               }}
+              tone="ghost"
               type="button"
             >
               {entry.title}
-            </button>
+            </Button>
           ))}
         </section>
       ) : null}

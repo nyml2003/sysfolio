@@ -3,6 +3,8 @@ import type { BreadcrumbSegment } from "@/entities/content";
 import { LocaleToggle } from "@/features/locale/components/LocaleToggle";
 import { ThemeToggle } from "@/features/theme/components/ThemeToggle";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
+import { Button } from "@/shared/ui/primitives";
+
 import styles from "./PathBar.module.css";
 
 type PathBarProps = {
@@ -46,7 +48,7 @@ export function PathBar({ breadcrumbs, isLoading, onNavigate }: PathBarProps) {
                   style={{ width: getSkeletonWidth(segment.title, isCurrent) }}
                 />
               ) : (
-                <button
+                <Button
                   aria-current={isCurrent ? "page" : false}
                   className={[styles.segment, isCurrent ? styles.current : ""]
                     .filter(Boolean)
@@ -57,10 +59,11 @@ export function PathBar({ breadcrumbs, isLoading, onNavigate }: PathBarProps) {
                       onNavigate(segment.path);
                     }
                   }}
+                  tone="ghost"
                   type="button"
                 >
                   {segment.title}
-                </button>
+                </Button>
               )}
               {isCurrent ? null : <span className={styles.separator}>/</span>}
             </div>
