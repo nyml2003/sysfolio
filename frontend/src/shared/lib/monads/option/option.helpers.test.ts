@@ -11,7 +11,7 @@ import {
   orElse,
   some,
   unwrapOr,
-} from "./option.helpers";
+} from "./index";
 
 describe("option.helpers", () => {
   it("normalizes nullish values at boundaries", () => {

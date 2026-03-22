@@ -1,14 +1,12 @@
 export type { Err, Ok, Result } from "./result.types";
-export {
-  andThen,
-  err,
-  fromThrowable,
-  isErr,
-  isOk,
-  map,
-  mapErr,
-  match,
-  ok,
-  tryCatch,
-  unwrapOr,
-} from "./result.helpers";
+export { andThen } from "./and-then";
+export { err } from "./err";
+export { fromThrowable } from "./from-throwable";
+export { isErr } from "./is-err";
+export { isOk } from "./is-ok";
+export { map } from "./map";
+export { mapErr } from "./map-err";
+export { match } from "./match";
+export { ok } from "./ok";
+export { tryCatch } from "./try-catch";
+export { unwrapOr } from "./unwrap-or";

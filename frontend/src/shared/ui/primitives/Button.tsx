@@ -1,16 +1,8 @@
 import { forwardRef } from "react";
-import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
 import { clsx } from "clsx";
 
-type ButtonTone = "primary" | "secondary" | "ghost";
-type ButtonSize = "sm" | "md";
-
-export type ButtonProps = ComponentPropsWithoutRef<"button"> & {
-  tone?: ButtonTone;
-  size?: ButtonSize;
-  children: ReactNode;
-};
+import type { ButtonProps } from "./button.types";
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   { children, tone = "secondary", size = "md", className, type = "button", ...rest },

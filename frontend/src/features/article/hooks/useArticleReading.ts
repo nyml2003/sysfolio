@@ -10,13 +10,11 @@ import type { ArticleDocument, RepositoryError } from "@/entities/content";
 import { useArticleDom } from "@/features/article/context/article-dom.context";
 import { useContentRepository } from "@/shared/data/repository";
 import { detachPromise } from "@/shared/lib/async/detach-promise";
-import {
-  cancelScheduledAnimationFrame,
-  clearScheduledTimeout,
-  getPerformanceNow,
-  scheduleAnimationFrame,
-  scheduleTimeout,
-} from "@/shared/lib/dom/browser-timing";
+import { cancelScheduledAnimationFrame } from "@/shared/lib/dom/cancel-scheduled-animation-frame";
+import { clearScheduledTimeout } from "@/shared/lib/dom/clear-scheduled-timeout";
+import { getPerformanceNow } from "@/shared/lib/dom/get-performance-now";
+import { scheduleAnimationFrame } from "@/shared/lib/dom/schedule-animation-frame";
+import { scheduleTimeout } from "@/shared/lib/dom/schedule-timeout";
 import { getElementScrollTop, setElementScrollTop } from "@/shared/lib/dom/scroll-element";
 import { isSome, none, some, unwrapOr, type Option } from "@/shared/lib/monads/option";
 

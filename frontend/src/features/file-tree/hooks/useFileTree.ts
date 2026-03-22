@@ -14,7 +14,7 @@ import {
   mergeNodes,
   toggleExpanded,
   type TreeIndex,
-} from "../model/file-tree.model";
+} from "../model";
 
 type UseFileTreeResult = {
   rows: ReturnType<typeof buildVisibleRows>;

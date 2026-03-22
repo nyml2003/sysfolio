@@ -1,13 +1,11 @@
 export type { None, Option, Some } from "./option.types";
-export {
-  flatMap,
-  fromNullable,
-  isNone,
-  isSome,
-  map,
-  match,
-  none,
-  orElse,
-  some,
-  unwrapOr,
-} from "./option.helpers";
+export { flatMap } from "./flat-map";
+export { fromNullable } from "./from-nullable";
+export { isNone } from "./is-none";
+export { isSome } from "./is-some";
+export { map } from "./map";
+export { match } from "./match";
+export { none } from "./none";
+export { orElse } from "./or-else";
+export { some } from "./some";
+export { unwrapOr } from "./unwrap-or";

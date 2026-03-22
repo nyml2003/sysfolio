@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 
 import { isSome, type Option } from "@/shared/lib/monads/option";
 
+import { hasIntersectionObserverSupport } from "./has-intersection-observer-support";
+
 type UseIntersectionObserverOptions = {
   root: Option<Element>;
   getTargets: () => ReadonlyArray<Option<Element>>;
@@ -24,10 +26,6 @@ function collectObservedTargets(targets: ReadonlyArray<Option<Element>>): Elemen
   }
 
   return observedTargets;
-}
-
-export function hasIntersectionObserverSupport(): boolean {
-  return typeof IntersectionObserver !== "undefined";
 }
 
 export function useIntersectionObserver({

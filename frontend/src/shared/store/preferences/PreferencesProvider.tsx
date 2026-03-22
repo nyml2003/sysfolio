@@ -10,9 +10,7 @@ import {
 import type { OnboardingState } from "@/entities/content";
 import { useContentRepository } from "@/shared/data/repository";
 import { detachPromise } from "@/shared/lib/async/detach-promise";
-import {
-  useDocumentElementLanguage,
-} from "@/shared/lib/dom/useDocumentElementAttribute";
+import { useDocumentElementLanguage } from "@/shared/lib/dom/use-document-element-language";
 import {
   DEFAULT_LOCALE,
   type AppLocale,

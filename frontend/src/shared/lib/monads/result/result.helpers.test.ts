@@ -12,7 +12,7 @@ import {
   ok,
   tryCatch,
   unwrapOr,
-} from "./result.helpers";
+} from "./index";
 
 describe("result.helpers", () => {
   it("constructs and narrows ok/err", () => {

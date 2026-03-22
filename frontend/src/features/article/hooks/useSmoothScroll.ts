@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { animate, useMotionValue, useMotionValueEvent } from "motion/react";
 
-import { getWindowOption } from "@/shared/lib/dom/browser-globals";
+import { getWindowOption } from "@/shared/lib/dom/get-window-option";
 import {
   getElementClientHeight,
   getElementScrollHeight,

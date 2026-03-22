@@ -34,7 +34,8 @@ import {
   STYLE_SCOPE_CLASS_NAME,
 } from "./style.constants";
 import { StyleContext } from "./style-context";
-import { resolveLayoutModeFromWidth, resolveMotionMode } from "./style.utils";
+import { resolveLayoutModeFromWidth } from "./resolve-layout-mode-from-width";
+import { resolveMotionMode } from "./resolve-motion-mode";
 
 type StyleProviderProps = {
   children: ReactNode;

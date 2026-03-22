@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useRef } from "react";
 
-import { getWindowOption } from "@/shared/lib/dom/browser-globals";
+import { getWindowOption } from "@/shared/lib/dom/get-window-option";
 import {
   getElementClientHeight,
   getElementScrollHeight,
@@ -8,10 +8,8 @@ import {
   getElementScrollTopWithinContainer,
 } from "@/shared/lib/dom/scroll-element";
 import { useEventListener } from "@/shared/lib/dom/useEventListener";
-import {
-  hasIntersectionObserverSupport,
-  useIntersectionObserver,
-} from "@/shared/lib/dom/useIntersectionObserver";
+import { hasIntersectionObserverSupport } from "@/shared/lib/dom/has-intersection-observer-support";
+import { useIntersectionObserver } from "@/shared/lib/dom/useIntersectionObserver";
 import { isSome, none, some, type Option } from "@/shared/lib/monads/option";
 
 import {

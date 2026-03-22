@@ -1,9 +1,6 @@
 import { clsx } from "clsx";
 
-export type SegmentedOption<T extends string> = {
-  value: T;
-  label: string;
-};
+import type { SegmentedOption } from "./segmented-control.types";
 
 type SegmentedControlProps<T extends string> = {
   label: string;
@@ -41,4 +38,3 @@ export function SegmentedControl<T extends string>({
     </div>
   );
 }
-

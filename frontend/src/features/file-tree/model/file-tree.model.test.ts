@@ -9,7 +9,7 @@ import {
   mergeExpandedIds,
   mergeNodes,
   toggleExpanded,
-} from "./file-tree.model";
+} from ".";
 
 function createTreePayload() {
   const fixtures = createMockContentFixtures("en-US");

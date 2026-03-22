@@ -27,10 +27,35 @@
 ### 允许的例外（须克制）
 
 - **`index.ts`**：只做 re-export，不写实现。
-- **成套基础工具**：如 `shared/lib/monads/option/option.helpers.ts` 内多个紧密耦合的 `none`/`some`/…，视为**一个工具模块**；**新增**同类 helper 时优先 **新文件** 或先报备，避免无限膨胀。
+- **成套基础工具**：`shared/lib/monads/option`、`…/result` 等已按**一函数一文件**落地；**新增** helper 时仍优先 **新文件**，避免在单文件堆叠多个并列导出。
 - **i18n / design token 大表**：`ui-copy`、`Record<Locale, …>` 等视为**单一数据源文件**，不按「每字符串一文件」拆。
 - **测试**：`*.test.ts` 内允许多个 `it`。
 - **存量代码**：未拆分前不强制阻断合并；**新代码**按本节约束执行。
+
+### 仍与「一主抽象」有差距的存量（盘点）
+
+以下用 `scripts/list-multi-export.mjs`（统计以 `export ` 开头的行数 **> 1**，且不含 `*.test.*`）做辅助盘点；**行数多不等于必须拆**，需结合豁免项判断。
+
+**不纳入「问题清单」**（按约定可保持多导出）：
+
+- 各处的 **`constant.ts` / `*.constants.ts`**：多常量名为常态，**不**按「一文件一导出」拆（见上「常量」小节）。
+- **`index.ts`**：仅 re-export 的 barrel。
+- **i18n / mock 大表**：如 `shared/lib/i18n/ui-copy.ts`、`site/overview/overview-copy.ts`、`shared/data/mock/overview-library.ts`、`shared/data/mock/content.en.ts` 等（见上「例外」）。
+- **`*.types.ts`**：纯类型聚合（见上「类型」）；体量特别大时是否再拆由团队单独定策略。
+
+**仍待对齐或需策略取舍的实现文件**（新代码尽量别再堆并列导出）：
+
+| 区域 | 文件 | 说明 |
+| --- | --- | --- |
+| 实体 | `entities/content/content.types.ts` | 类型导出集中、体量最大；是否按子域拆文件需单独决策。 |
+| UI | `shared/ui/primitives/Icon.tsx` | 多图标/子组件同文件导出。 |
+| Article | `features/article/context/article-dom.context.ts` | Context / Provider 等多导出。 |
+| Site | `site/overview/components/OverviewPages.tsx`、`OverviewPanels.tsx` | 多组件/多导出同文件。 |
+| Store | `shared/store/preferences/preferences-context.ts` | 多导出（类型 + Context 等）。 |
+
+已按「一主抽象」拆过一轮的模块（实现已一文件一主导出；目录内 **`index.ts` 仍为 re-export barrel**）：`shared/lib/dom`（`get-window-option`、定时/帧、`scroll-element/*`、`has-intersection-observer-support`、`use-document-element-*`、`useIntersectionObserver`）、`features/article/model/toc-activation/*`、`shared/ui/foundation` 的 `resolve-*-mode`、`shared/ui/primitives` 的 `button.types` / `segmented-control.types` 与对应组件文件。
+
+> **提示**：再次全量盘点可执行：`node scripts/list-multi-export.mjs`（工作目录为 `frontend/`）。
 
 ### 反例
 
