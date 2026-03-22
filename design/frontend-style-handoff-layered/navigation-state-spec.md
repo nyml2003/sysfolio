@@ -28,6 +28,21 @@
 - `FileTree`
 - `PathBar`
 
+## 当前落地契约
+
+当前 CSS 已经把几组关键类名固定下来：
+
+- `FileTree`
+  `.is-current / .is-selected / .is-search-match / .is-drag-target / .is-reordering`
+- `FileTree` 搜索命中局部高亮
+  `.m-file-node__hit`
+- `TOC`
+  设计语义统一视为 `current`，当前兼容 `.is-current` 和 `.is-active`
+- `PathBar`
+  `.is-current / .is-clickable / .is-collapsible / .is-ellipsis`
+- `PathBar` 小屏稳定入口
+  `.m-path-entry`，激活态为 `.m-path-entry.is-active`
+
 ## 一、核心原则
 
 ### 1. 先定义“谁拥有当前状态”，再定义视觉
@@ -192,8 +207,33 @@ TOC 的行主状态只有一个：
 
 ### TOC 的特殊说明
 
-哪一项成为 `current`，由 [toc-activation-strategy.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/toc-activation-strategy.md) 决定。  
-这份文档只定义它一旦成为 `current`，视觉应该如何表达。
+TOC 的 `current` 不是纯 scrollspy，而是“由轻量状态机调度的 scrollspy”。
+
+当前推荐状态：
+
+- `initial`
+- `short_content`
+- `navigating`
+- `reading`
+
+当前推荐优先级：
+
+`short_content / initial > navigating > reading > natural-bottom-fallback`
+
+规则摘要：
+
+- 页面首次进入且正文可滚动时，先进入 `initial`，默认高亮第一项。
+- 正文不足一屏时，进入 `short_content`，固定高亮第一项，不让第二项抢高亮。
+- 用户点击 TOC 或 hash 导航时，进入 `navigating`，立即高亮目标项，并暂停“滚到底=最后一项”的兜底逻辑。
+- 用户主动滚动后，进入 `reading`，再按激活线更新 `current`。
+- 只有在 `reading` 中自然滚动到底，才允许最后一项兜底激活。
+
+实现约束：
+
+- 激活线只在 `reading` 中启用。
+- 到底兜底只在 `reading` 中启用。
+- `navigating` 期间不允许最后一项抢走点击目标。
+- 正文内容区应保留适度底部留白，帮助尾部章节自然进入激活区。
 
 ## 3. FileTree
 
@@ -369,16 +409,14 @@ expanded 优先作用在 toggle。
 
 - expanded 行直接变成 current 权重
 
-## 六、与已有文档的关系
+## 六、与当前文档体系的关系
 
-- [tree-navigation-pattern.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/tree-navigation-pattern.md)
-  定义共享树结构、共享状态边界和交互边界
-- [toc-activation-strategy.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/toc-activation-strategy.md)
-  定义 TOC 当前项的状态机和 ownership 来源
-- [visual-refinement-strategy.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/visual-refinement-strategy.md)
-  定义 current / selected / search-match 的总体视觉方向
+- [design-overview.md](design-overview.md)
+  说明 `TreeNav pattern` 与 `TOC / FileTree` 的层级关系
+- [interaction-state-matrix.md](interaction-state-matrix.md)
+  说明状态优先级、类名契约和 view-state 分层
 - 这份文档
-  负责把这些方向压成可执行的导航状态规范
+  负责把 `TOC / FileTree / PathBar` 的 ownership、叠加态与 TOC 激活规则压成导航规范
 
 ## 七、Phase 2 推荐实施边界
 
@@ -412,3 +450,9 @@ Phase 2 完成时，至少应满足：
 `Phase 2` 的核心不是“再加更多状态”，而是：
 
 `把 ownership state、interaction overlay 和 informational state 彻底拆开。`
+
+## Remaining TODO
+
+1. 继续收紧 `TOC / FileTree / PathBar` 中 `current / selected / search-match / clickable` 的视觉差异。
+2. 再验证尾部短章节、短内容页和点击倒数章节时的 TOC 激活策略是否完全覆盖。
+3. 补完整树导航在 coarse pointer 与键盘模式下的交互说明，确保共享 `TreeNav pattern` 时不会漏状态。

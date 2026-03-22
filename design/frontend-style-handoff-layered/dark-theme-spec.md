@@ -326,3 +326,9 @@ Phase 5 完成时，至少应满足：
 `Phase 5` 的核心不是“做出一个更暗的界面”，而是：
 
 `让深色主题在阅读、导航和语义表达上都继续成立。`
+
+## Remaining TODO
+
+1. 继续复核长文阅读、代码块、inline code 与导航 ownership 在 dark 下的舒适度和区分度。
+2. 再检查 `success / warning / destructive / search highlight` 在 dark 下的饱和度与对比边界。
+3. 等中小屏交互定稿后，再回看 overlay、sheet、drawer 在 dark 下的层级是否仍然成立。

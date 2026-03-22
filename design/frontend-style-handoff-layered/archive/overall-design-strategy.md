@@ -1,3 +1,7 @@
+# Archived: SysFolio Overall Design Strategy
+
+> 已归档。当前请优先阅读 `../design-overview.md` 与 `../design-todo.md`。
+
 # SysFolio Overall Design Strategy
 
 ## 文档目的
@@ -364,17 +368,17 @@
 
 当前仍需继续设计的重点有：
 
-- 基础控件视觉规范还不完整
-- 交互状态矩阵还没完全收齐
-- 小屏导航层和右侧面板的具体交互还没定稿
 - 深色主题对比度还没做完整复核
-- 动效规则已有专项规范，但还没正式回写到 CSS
+- `Combobox / Menu / Dialog` 的高级子场景还没完全展开
+- 小屏导航层和右侧面板的交互契约已经落地，但还没经过真实前端接线验证
+- footer / 评论 / 推荐内容等业务内容模块还没进入这一轮
 
 这些内容的下一轮细化，已经单独整理到：
 
 - [visual-refinement-strategy.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/visual-refinement-strategy.md)
 - [visual-delivery-roadmap.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/visual-delivery-roadmap.md)
 - [navigation-state-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/navigation-state-spec.md)
+- [interaction-state-matrix.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/interaction-state-matrix.md)
 - [layout-behavior-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/layout-behavior-spec.md)
 - [view-density-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/view-density-spec.md)
 - [dark-theme-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/dark-theme-spec.md)

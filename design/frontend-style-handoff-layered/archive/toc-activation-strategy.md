@@ -1,3 +1,7 @@
+# Archived: SysFolio TOC Activation Strategy
+
+> 已归档。当前 TOC 激活规则已吸收到 `../navigation-state-spec.md`。
+
 # SysFolio TOC Activation Strategy
 
 ## 文档目的

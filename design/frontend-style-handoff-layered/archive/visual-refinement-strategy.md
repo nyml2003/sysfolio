@@ -1,3 +1,7 @@
+# Archived: SysFolio Visual Refinement Strategy
+
+> 已归档。当前待办请优先阅读 `../design-todo.md`，当前规范请阅读对应 active specs。
+
 # SysFolio Visual Refinement Strategy
 
 ## 文档目的
@@ -15,15 +19,13 @@
 
 当前 SysFolio 的视觉问题已经不是“有没有方向”，而是“方向有了，但细化层级还不够稳定”。
 
-主要矛盾有七个：
+主要矛盾现在收敛为五个：
 
-1. primitive 家族已经有了骨架，但缺少统一外观规范。
-2. 状态表达还不够系统，尤其是 `warning / destructive / drag / reorder`。
-3. 响应式布局目前还是工程收缩，不是任务优先级重排。
-4. 树状导航和路径栏的语义层级已经接近，但区分还不够稳。
-5. `home / directory / document` 三类视图的密度节奏还没拉开。
-6. 深色主题虽然有 token，但阅读舒适度和对比度还没正式校准。
-7. 动效只有过渡，没有完整节奏规则。
+1. primitive 主家族已经补齐，但高级子场景还没完全展开。
+2. 状态矩阵已经进入 CSS 契约，但复杂组合态还需要继续收紧。
+3. 响应式布局的角色分工已经定下，但还没经过真实前端交互验证。
+4. `home / directory / document` 的第一轮密度差已经建立，但还没到最终视觉稿级别。
+5. 深色主题虽然有 token 和对象级样式，但阅读舒适度和对比度还没正式校准。
 
 一句话：
 
@@ -66,14 +68,14 @@
 | Feedback | 状态明确、形态节制 | 告知发生了什么，但不制造视觉噪音 |
 | Overlays | 表面比底层更聚焦，但不是独立宇宙 | 临时上下文，而不是新的主舞台 |
 
-### 下一批要补齐的基础控件
+### 下一批要继续收紧的基础控件
 
 优先级建议如下：
 
-1. `Select / Combobox`
-2. `Menu / Dropdown item`
-3. `Dialog content`
-4. `Table row / dense list row`
+1. `Combobox` 的 async / multi-select / empty-result
+2. `Menu` 的 submenu / shortcut / checkable
+3. `Dialog / Drawer` 的 destructive confirm / form layout
+4. `Table row / dense list row` 的 drag handle 与批量操作态
 5. `Empty illustration` 是否需要引入极简插图语言
 
 ### 具体设计要求
@@ -105,9 +107,14 @@
 
 ### 当前问题
 
-目前状态设计主要停留在 `hover / focus / selected / disabled / loading`，这对于产品级 handoff 不够。
+第一版状态矩阵已经落到 CSS，但产品级 handoff 还需要继续明确“复杂叠加态到底靠什么变量表达”。
 
-真正需要统一的是“不同状态到底靠什么视觉变量表达”。
+现在要继续收紧的重点是：
+
+- `selected + search-match`
+- `current + hover`
+- `drag-target + reorder-guide`
+- `warning / destructive` 在 overlay 和 data row 里的重量边界
 
 ### 建议统一的状态变量
 
@@ -148,9 +155,15 @@
 
 ### 设计判断
 
-当前 `1120px` 隐藏右栏、`800px` 隐藏左栏，只是工程层防溢出，不是完整布局方案。
+当前三档布局契约已经明确为：
 
-真正应该定义的是：
+- `spacious >= 1280px`
+- `medium 960px - 1279px`
+- `compact < 960px`
+
+并且已经不是“直接隐藏”，而是常驻层与临时层重排。
+
+接下来真正需要继续验证的是：
 
 - 不同宽度下谁是主任务
 - 左右栏是常驻、临时层，还是上下文弹出

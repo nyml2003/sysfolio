@@ -6,8 +6,8 @@
 
 它主要解决两个问题：
 
-1. `home / directory / document` 三类视图现在还太像同一个容器换内容
-2. `loading / empty / error` 在不同视图中的重量和密度还没有跟随主视图语义变化
+1. `home / directory / document` 三类视图虽然已经拉开第一轮差异，但还需要继续稳固主任务节奏
+2. `loading / empty / error` 已经进入视图语义分层，但还需要继续校准重量与语气
 
 ## 使用范围
 
@@ -22,9 +22,27 @@
 - `HomeView`
 - `DirectoryView`
 - `DocumentView`
+- `IdleState`
+- `ReadyState`
 - `LoadingState`
 - `EmptyState`
 - `ErrorState`
+
+## 当前落地契约
+
+当前 `patterns/view-states.css` 已经提供：
+
+- `.m-idle-state`
+- `.m-ready-state`
+- `.m-loading-state`
+- `.m-empty-state`
+- `.m-error-state`
+
+并通过以下视图变体类区分语气：
+
+- `.is-home`
+- `.is-directory`
+- `.is-document`
 
 ## 一、核心原则
 
@@ -395,3 +413,9 @@ Phase 4 完成时，至少应满足：
 `Phase 4` 的核心不是“把三个页面做得更不一样”，而是：
 
 `让每个主视图都围绕自己的主任务建立稳定节奏。`
+
+## Remaining TODO
+
+1. 再校准 `Home / Directory / Document` 在真实内容长度下的密度差，尤其是中屏与小屏。
+2. 继续补齐 `loading / empty / error` 在三类主视图中的语气、动作区和容器重量差异。
+3. 后续业务内容模块接入时，需要按这份文档补 `footer / comments / recommendations` 的密度与状态容器规则。

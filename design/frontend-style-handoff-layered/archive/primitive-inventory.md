@@ -1,3 +1,7 @@
+# Archived: SysFolio Primitive Inventory
+
+> 已归档。当前请优先阅读 `../primitive-component-catalog.md` 与 `../primitive-visual-spec.md`。
+
 # SysFolio Primitive Inventory
 
 ## 文档目的
@@ -24,15 +28,15 @@ SysFolio 仍然按自己的 6 层架构划分职责。
 - `styles/primitives/actions.css`
   `Button / IconButton / ButtonGroup`
 - `styles/primitives/data-entry.css`
-  `Field / Input / Textarea / SelectTrigger / Checkbox / Radio / Switch`
+  `Field / Input / Textarea / Select / SelectTrigger / Combobox / Checkbox / Radio / Switch`
 - `styles/primitives/navigation.css`
   `Breadcrumb / Segmented / TabsNav / Pagination`
 - `styles/primitives/data-display.css`
-  `Tag / Badge / Avatar / Card / Divider / Stat`
+  `Tag / Badge / Avatar / Card / Divider / Stat / Table / TableRow`
 - `styles/primitives/feedback.css`
   `Spinner / SkeletonBlock / InlineNotice / Progress`
 - `styles/primitives/overlays.css`
-  `SurfacePopover / FootnotePopover / Tooltip / DropdownSurface / DialogSurface / DrawerSurface`
+  `SurfacePopover / FootnotePopover / Tooltip / DropdownSurface / Menu / DialogSurface / DialogContent / DrawerSurface / DrawerContent`
 
 ## 这些组件应该进 primitives
 
@@ -53,7 +57,9 @@ SysFolio 仍然按自己的 6 层架构划分职责。
 - `Field`
 - `Input`
 - `Textarea`
+- `Select`
 - `SelectTrigger`
+- `Combobox`
 - `Checkbox`
 - `Radio`
 - `Switch`
@@ -89,6 +95,8 @@ SysFolio 仍然按自己的 6 层架构划分职责。
 - `Card`
 - `Divider`
 - `Stat`
+- `Table`
+- `TableRow`
 
 判断标准：
 
@@ -114,8 +122,11 @@ SysFolio 仍然按自己的 6 层架构划分职责。
 - `FootnotePopover`
 - `Tooltip`
 - `DropdownSurface`
+- `Menu`
 - `DialogSurface`
+- `DialogContent`
 - `DrawerSurface`
+- `DrawerContent`
 
 判断标准：
 
@@ -193,12 +204,12 @@ SysFolio 仍然按自己的 6 层架构划分职责。
 
 ## 当前建议
 
-如果后面继续补基础控件，优先顺序建议是：
+如果后面继续补基础控件，优先顺序建议改为：
 
-1. `Select / Combobox`
-2. `Menu / Dropdown item skeleton`
-3. `Dialog / Drawer content skeleton`
-4. `Tabs` 的内容区联动规范
-5. `Table / List row` 这类更重的数据展示原件
+1. `List row / Description list / KeyValue row`
+2. `Combobox` 的 async / multi-select / empty-result 细分契约
+3. `Menu` 的 shortcut / checkable / nested submenu 扩展
+4. `Dialog / Drawer` 的 header-action / destructive confirm / form layout 细分
+5. `Drag handle / Reorder affordance` 这类数据搬运型 primitive
 
 但在这一步之前，不建议把 `Sidebar`、`TOC`、`FileTree` 重新塞回 `primitives`。

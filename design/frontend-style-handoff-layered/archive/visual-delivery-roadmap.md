@@ -1,3 +1,7 @@
+# Archived: SysFolio Visual Delivery Roadmap
+
+> 已归档。当前推进顺序请优先阅读 `../design-todo.md` 与对应 active specs。
+
 # SysFolio Visual Delivery Roadmap
 
 ## 文档目的
@@ -88,6 +92,7 @@
 详细规范见：
 
 - [navigation-state-spec.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/navigation-state-spec.md)
+- [interaction-state-matrix.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/interaction-state-matrix.md)
 
 ### 范围
 
@@ -109,6 +114,7 @@
 - current 始终是最稳定、最优先的导航信号
 - hover 只做轻增强，不再和主要状态争抢
 - PathBar 当前 segment 与普通 segment 的差异可以在 1 秒内看明白
+- `success / warning / destructive / drag / reorder` 的类名契约可以直接给前端复用
 
 ### 这一轮不做的事
 
@@ -181,7 +187,7 @@
 - Home 的视觉重点是导览，不是列表堆叠
 - Directory 更利于扫描、比较和进入
 - Document 的标题、摘要、正文、代码块、引用块节奏稳定
-- View states 在三类视图中都能保持结构感，不塌
+- `idle / ready / loading / empty / error` 在三类视图中都能保持结构感，不塌
 
 ### 这一轮不做的事
 

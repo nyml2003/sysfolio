@@ -480,3 +480,9 @@ Phase 6 做完后，至少要满足以下标准：
 对 SysFolio 来说，最合理的 motion 方向不是“做更多”，而是：
 
 `把反馈动效做轻，把结构动效做稳，把注意力动效做少，并把 reduced motion 视为同等级契约。`
+
+## Remaining TODO
+
+1. 把 `feedback / state / structure / attention` 四档动效再对照真实组件实现收一遍。
+2. 补完整 `TreeNav / ContextPanel / Drawer / TOC` 在 reduced motion 下的明确降级表现。
+3. 等布局与导航交互定稿后，再统一核对 panel、sheet、drawer、overlay 的进入退出节奏。

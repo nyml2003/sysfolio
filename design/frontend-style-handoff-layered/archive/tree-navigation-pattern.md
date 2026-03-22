@@ -1,3 +1,7 @@
+# Archived: SysFolio Tree Navigation Pattern
+
+> 已归档。当前树导航边界请优先阅读 `../design-overview.md` 与 `../navigation-state-spec.md`。
+
 # SysFolio Tree Navigation Pattern
 
 ## 文档目的

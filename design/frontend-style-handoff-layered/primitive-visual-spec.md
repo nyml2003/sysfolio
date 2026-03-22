@@ -22,7 +22,22 @@
 - `styles/primitives/feedback.css`
 - `styles/primitives/overlays.css`
 
-如果后面新增 `Select / Combobox / Menu / Dialog content / Table row`，也应先对齐这份规范，再写具体样式。
+这份规范现在已经覆盖 `Select / Combobox / Menu / Dialog content / Table row` 这批新增 primitive；后续继续扩展同家族控件时，也应先对齐这份规范，再写具体样式。
+
+## 文档边界
+
+这份文档只定义 primitive 的视觉基线、家族气质和控件级状态表达。
+
+它不负责：
+
+- `Shell / TreeNav / ReadingPane / ViewState` 这类 pattern 级结构
+- `TOC / FileTree / PathBar / HomeView / DirectoryView / DocumentView` 这类 business 级对象
+- 页面级状态升级与布局入口策略
+
+配套文档：
+
+- primitive 组件范围、slot、变体与缺口见 [primitive-component-catalog.md](primitive-component-catalog.md)
+- 状态优先级与类名契约见 [interaction-state-matrix.md](interaction-state-matrix.md)
 
 ## 一、Primitive 的共同基线
 
@@ -73,8 +88,12 @@ primitive 内部统一按以下顺序表达状态：
 
 补充说明：
 
-- `success / warning / destructive` 属于语义变体，不属于基础交互优先级
+- `invalid / success / warning / destructive` 属于语义变体，不属于基础交互优先级
 - `current / selected / search-match` 不在 primitive 里承担主语义
+
+补充：
+
+- 具体类名契约见 [interaction-state-matrix.md](/C:/Users/nyml/code/work-context/repos/sysfolio/design/frontend-style-handoff-layered/interaction-state-matrix.md)
 
 ## 二、Actions 家族
 
@@ -460,3 +479,9 @@ Phase 1 完成时，至少应满足：
 `Phase 1` 的目标不是“把 primitives 做得更花”，而是：
 
 `把所有基础控件做成一个稳定、克制、可继承的视觉系统。`
+
+## Remaining TODO
+
+1. 继续补齐 `Combobox / Menu / DialogContent / DrawerContent / TableRow` 的高级子场景。
+2. 收完整体 primitive 的 `success / warning / destructive` 在不同家族中的重量边界。
+3. 再校准 coarse pointer 下 icon-only 控件、trigger 类控件和 overlay 关闭控件的点击基线。

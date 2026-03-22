@@ -1,3 +1,7 @@
+# Archived: SysFolio Responsive And Multi-Input Strategy
+
+> 已归档。当前响应式与多端交互请优先阅读 `../layout-behavior-spec.md` 与 `../design-overview.md`。
+
 # SysFolio Responsive And Multi-Input Strategy
 
 ## 文档目的

@@ -1,3 +1,7 @@
+# Archived: SysFolio View State Layering Strategy
+
+> 已归档。当前 view-state 分层请优先阅读 `../interaction-state-matrix.md` 与 `../view-density-spec.md`。
+
 # SysFolio View State Layering Strategy
 
 ## 文档目的
