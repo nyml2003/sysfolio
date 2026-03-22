@@ -1,6 +1,6 @@
-import { clsx } from "clsx";
+import { clsx } from 'clsx';
 
-import type { SegmentedOption } from "./segmented-control.types";
+import type { SegmentedOption } from './segmented-control.types';
 
 type SegmentedControlProps<T extends string> = {
   label: string;
@@ -18,13 +18,13 @@ export function SegmentedControl<T extends string>({
   className,
 }: SegmentedControlProps<T>) {
   return (
-    <div aria-label={label} className={clsx("sf-segmented", className)} role="group">
+    <div aria-label={label} className={clsx('sf-segmented', className)} role="group">
       {options.map((option) => (
         <button
           aria-pressed={option.value === value}
           className={clsx(
-            "sf-segmented__button",
-            option.value === value && "sf-segmented__button--active",
+            'sf-segmented__button',
+            option.value === value && 'sf-segmented__button--active'
           )}
           key={option.value}
           onClick={() => {

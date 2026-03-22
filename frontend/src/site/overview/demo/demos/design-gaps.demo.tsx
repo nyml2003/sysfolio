@@ -1,6 +1,6 @@
-import { listOverviewDesignGaps } from "@/shared/data/mock/content.fixtures";
-import { Inline, Stack, Surface } from "@/shared/ui/layout";
-import { Tag } from "@/shared/ui/primitives";
+import { listOverviewDesignGaps } from '@/shared/data/mock/content.fixtures';
+import { Inline, Stack, Surface } from '@/shared/ui/layout';
+import { Tag } from '@/shared/ui/primitives';
 
 export function DesignGapsDemo() {
   const gaps = listOverviewDesignGaps();

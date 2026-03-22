@@ -1,4 +1,4 @@
-import { Stack } from "@/shared/ui/layout";
+import { Stack } from '@/shared/ui/layout';
 
 export function TreeNavDemo() {
   return (

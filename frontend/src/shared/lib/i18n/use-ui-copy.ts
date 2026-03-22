@@ -1,6 +1,6 @@
-import { usePreferences } from "@/shared/store/preferences";
+import { usePreferences } from '@/shared/store/preferences';
 
-import { getUiCopy } from "./ui-copy";
+import { getUiCopy } from './ui-copy';
 
 export function useUiCopy() {
   const { locale } = usePreferences();

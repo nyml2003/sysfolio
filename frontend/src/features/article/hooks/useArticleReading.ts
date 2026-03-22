@@ -1,22 +1,16 @@
-import {
-  startTransition,
-  useEffect,
-  useEffectEvent,
-  useRef,
-  useState,
-} from "react";
+import { startTransition, useEffect, useEffectEvent, useRef, useState } from 'react';
 
-import type { ArticleDocument, RepositoryError } from "@/entities/content";
-import { useArticleDom } from "@/features/article/context/article-dom.context";
-import { useContentRepository } from "@/shared/data/repository";
-import { detachPromise } from "@/shared/lib/async/detach-promise";
-import { cancelScheduledAnimationFrame } from "@/shared/lib/dom/cancel-scheduled-animation-frame";
-import { clearScheduledTimeout } from "@/shared/lib/dom/clear-scheduled-timeout";
-import { getPerformanceNow } from "@/shared/lib/dom/get-performance-now";
-import { scheduleAnimationFrame } from "@/shared/lib/dom/schedule-animation-frame";
-import { scheduleTimeout } from "@/shared/lib/dom/schedule-timeout";
-import { getElementScrollTop, setElementScrollTop } from "@/shared/lib/dom/scroll-element";
-import { isSome, none, some, unwrapOr, type Option } from "@/shared/lib/monads/option";
+import type { ArticleDocument, RepositoryError } from '@/entities/content';
+import { useArticleDom } from '@/features/article/context/article-dom.context';
+import { useContentRepository } from '@/shared/data/repository';
+import { detachPromise } from '@/shared/lib/async/detach-promise';
+import { cancelScheduledAnimationFrame } from '@/shared/lib/dom/cancel-scheduled-animation-frame';
+import { clearScheduledTimeout } from '@/shared/lib/dom/clear-scheduled-timeout';
+import { getPerformanceNow } from '@/shared/lib/dom/get-performance-now';
+import { scheduleAnimationFrame } from '@/shared/lib/dom/schedule-animation-frame';
+import { scheduleTimeout } from '@/shared/lib/dom/schedule-timeout';
+import { getElementScrollTop, setElementScrollTop } from '@/shared/lib/dom/scroll-element';
+import { isSome, none, some, unwrapOr, type Option } from '@/shared/lib/monads/option';
 
 import {
   ARTICLE_EMPTY_ACTIVE_HEADING_ID,
@@ -25,11 +19,11 @@ import {
   TOC_NAVIGATING_TIMEOUT_MS,
   TOC_READING_PROGRESS_DEBOUNCE_MS,
   TOC_USER_SCROLL_IDLE_MS,
-} from "../constant";
-import type { TocReadingState } from "../model/toc-activation";
-import { useHeadingActivationObserver } from "./useHeadingActivationObserver";
-import { useHeadingLayout } from "./useHeadingLayout";
-import { useSmoothScroll } from "./useSmoothScroll";
+} from '../constant';
+import type { TocReadingState } from '../model/toc-activation';
+import { useHeadingActivationObserver } from './useHeadingActivationObserver';
+import { useHeadingLayout } from './useHeadingLayout';
+import { useSmoothScroll } from './useSmoothScroll';
 
 type UseArticleReadingOptions = {
   path: string;
@@ -51,8 +45,8 @@ export function useArticleReading({
   const repository = useContentRepository();
   const [activeHeadingId, setActiveHeadingId] = useState(ARTICLE_EMPTY_ACTIVE_HEADING_ID);
   const [restoreNoticeVisible, setRestoreNoticeVisible] = useState(false);
-  const [tocState, setTocStateState] = useState<TocReadingState>("idle");
-  const tocStateRef = useRef<TocReadingState>("idle");
+  const [tocState, setTocStateState] = useState<TocReadingState>('idle');
+  const tocStateRef = useRef<TocReadingState>('idle');
   const observedActiveHeadingIdRef = useRef<Option<string>>(none());
   const bottomVisibleRef = useRef(false);
   const saveTimeoutIdRef = useRef(0);
@@ -140,11 +134,11 @@ export function useArticleReading({
         updatedAt: new Date().toISOString(),
       });
 
-      if (result.tag === "error") {
-        reportRepositoryError("Failed to save reading progress", result.error);
+      if (result.tag === 'error') {
+        reportRepositoryError('Failed to save reading progress', result.error);
       }
     } catch (error) {
-      reportUnexpectedError("Unexpected reading progress save failure", error);
+      reportUnexpectedError('Unexpected reading progress save failure', error);
     }
   });
 
@@ -175,11 +169,8 @@ export function useArticleReading({
       clearSaveTimeout();
       clearNavigatingTimeout();
 
-      if (
-        tocStateRef.current === "initial" ||
-        tocStateRef.current === "navigating"
-      ) {
-        setTocState("reading");
+      if (tocStateRef.current === 'initial' || tocStateRef.current === 'navigating') {
+        setTocState('reading');
         setCurrentHeadingFromOptionImmediate(getResolvedHeadingId());
       }
 
@@ -205,16 +196,16 @@ export function useArticleReading({
           lastObservedScrollTopRef.current = currentScrollTop;
           lastObservedScrollChangeAtRef.current = getPerformanceNow();
 
-          if (
-            tocStateRef.current === "initial" ||
-            tocStateRef.current === "navigating"
-          ) {
-            setTocState("reading");
+          if (tocStateRef.current === 'initial' || tocStateRef.current === 'navigating') {
+            setTocState('reading');
             setCurrentHeadingFromOptionImmediate(getResolvedHeadingId());
           }
         }
 
-        if (getPerformanceNow() - lastObservedScrollChangeAtRef.current >= TOC_USER_SCROLL_IDLE_MS) {
+        if (
+          getPerformanceNow() - lastObservedScrollChangeAtRef.current >=
+          TOC_USER_SCROLL_IDLE_MS
+        ) {
           stopUserScrollWatch();
           scheduleReadingProgressSave();
           return;
@@ -243,18 +234,18 @@ export function useArticleReading({
     navigatingTimeoutIdRef.current = scheduleTimeout(() => {
       navigatingTimeoutIdRef.current = 0;
 
-      if (tocStateRef.current !== "navigating") {
+      if (tocStateRef.current !== 'navigating') {
         return;
       }
 
       cancelSmoothScroll();
-      setTocState("reading");
+      setTocState('reading');
       syncReadingHeading();
     }, TOC_NAVIGATING_TIMEOUT_MS);
   });
 
   const enterNavigatingState = useEffectEvent((headingId: string) => {
-    setTocState("navigating");
+    setTocState('navigating');
     setCurrentHeadingDeferred(headingId);
     scheduleNavigatingTimeout();
   });
@@ -264,20 +255,19 @@ export function useArticleReading({
     cancelSmoothScroll();
     observedActiveHeadingIdRef.current = none();
     bottomVisibleRef.current = false;
-    setTocState("idle");
+    setTocState('idle');
     setRestoreNotice(false);
     setCurrentHeadingFromOptionDeferred(none());
   });
 
   useHeadingActivationObserver({
     activationLineRatio: TOC_ACTIVATION_LINE_RATIO,
-    disabled:
-      !isSome(document) || tocState !== "reading" || isProgrammaticScrolling,
+    disabled: !isSome(document) || tocState !== 'reading' || isProgrammaticScrolling,
     layoutVersion: layout.layoutVersion,
     onActiveHeadingChange: (headingId) => {
       observedActiveHeadingIdRef.current = some(headingId);
 
-      if (tocStateRef.current !== "reading" || bottomVisibleRef.current) {
+      if (tocStateRef.current !== 'reading' || bottomVisibleRef.current) {
         return;
       }
 
@@ -286,7 +276,7 @@ export function useArticleReading({
     onBottomVisibilityChange: (visible) => {
       bottomVisibleRef.current = visible;
 
-      if (tocStateRef.current !== "reading") {
+      if (tocStateRef.current !== 'reading') {
         return;
       }
 
@@ -316,14 +306,14 @@ export function useArticleReading({
     const firstHeadingId = layout.getFirstHeadingId();
 
     if (!isSome(firstHeadingId)) {
-      setTocState("idle");
+      setTocState('idle');
       setCurrentHeadingFromOptionDeferred(none());
       return;
     }
 
     if (!layout.hasScrollableContent()) {
       setElementScrollTop(scrollContainerElement, 0);
-      setTocState("short_content");
+      setTocState('short_content');
       observedActiveHeadingIdRef.current = firstHeadingId;
       setCurrentHeadingDeferred(firstHeadingId.value);
       return;
@@ -338,7 +328,7 @@ export function useArticleReading({
     }
 
     observedActiveHeadingIdRef.current = firstHeadingId;
-    setTocState("initial");
+    setTocState('initial');
     setCurrentHeadingDeferred(firstHeadingId.value);
   });
 
@@ -358,12 +348,9 @@ export function useArticleReading({
       return;
     }
 
-    if (!layout.hasScrollableContent() || tocStateRef.current === "short_content") {
-      setElementScrollTop(
-        scrollContainerElement,
-        layout.getHeadingTargetScrollTop(headingId),
-      );
-      setTocState("short_content");
+    if (!layout.hasScrollableContent() || tocStateRef.current === 'short_content') {
+      setElementScrollTop(scrollContainerElement, layout.getHeadingTargetScrollTop(headingId));
+      setTocState('short_content');
       observedActiveHeadingIdRef.current = firstHeadingId;
       setCurrentHeadingDeferred(firstHeadingId.value);
       return;
@@ -394,7 +381,7 @@ export function useArticleReading({
 
     if (!layout.hasScrollableContent()) {
       setElementScrollTop(scrollContainerElement, 0);
-      setTocState("short_content");
+      setTocState('short_content');
       observedActiveHeadingIdRef.current = firstHeadingId;
       setCurrentHeadingDeferred(firstHeadingId.value);
       return;
@@ -434,12 +421,12 @@ export function useArticleReading({
           return;
         }
 
-        if (progressResource.tag === "error") {
-          reportRepositoryError("Failed to restore reading progress", progressResource.error);
+        if (progressResource.tag === 'error') {
+          reportRepositoryError('Failed to restore reading progress', progressResource.error);
         }
 
         const restoredScrollTop =
-          progressResource.tag === "ready" &&
+          progressResource.tag === 'ready' &&
           isSome(progressResource.value) &&
           progressResource.value.value.scrollTop > 0
             ? progressResource.value.value.scrollTop
@@ -451,7 +438,7 @@ export function useArticleReading({
           return;
         }
 
-        reportUnexpectedError("Unexpected reading progress restore failure", error);
+        reportUnexpectedError('Unexpected reading progress restore failure', error);
         scheduleApplyEntryState(0);
       }
     };

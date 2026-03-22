@@ -1,8 +1,8 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
-import { clsx } from "clsx";
+import { clsx } from 'clsx';
 
-type TagTone = "default" | "accent" | "success" | "warning" | "danger";
+type TagTone = 'default' | 'accent' | 'success' | 'warning' | 'danger';
 
 type TagProps = {
   children: ReactNode;
@@ -10,7 +10,6 @@ type TagProps = {
   className?: string;
 };
 
-export function Tag({ children, tone = "default", className }: TagProps) {
-  return <span className={clsx("sf-tag", `sf-tag--${tone}`, className)}>{children}</span>;
+export function Tag({ children, tone = 'default', className }: TagProps) {
+  return <span className={clsx('sf-tag', `sf-tag--${tone}`, className)}>{children}</span>;
 }
-

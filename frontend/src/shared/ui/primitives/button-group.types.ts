@@ -1,8 +1,8 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
-import type { ButtonProps } from "./button.types";
+import type { ButtonProps } from './button.types';
 
-export type ButtonGroupVariant = "default" | "attached";
+export type ButtonGroupVariant = 'default' | 'attached';
 
 export type ButtonGroupProps = {
   /** 用于 role="group" 的可访问名称 */

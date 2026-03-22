@@ -1,10 +1,10 @@
-import { startTransition, useCallback, useEffect, useRef, useState } from "react";
+import { startTransition, useCallback, useEffect, useRef, useState } from 'react';
 
-import type { RepositoryError } from "@/entities/content";
-import { useContentRepository } from "@/shared/data/repository";
-import { detachPromise } from "@/shared/lib/async/detach-promise";
-import { idleState, loadingState, type ResourceState } from "@/shared/lib/resource/resource-state";
-import { usePreferences } from "@/shared/store/preferences";
+import type { RepositoryError } from '@/entities/content';
+import { useContentRepository } from '@/shared/data/repository';
+import { detachPromise } from '@/shared/lib/async/detach-promise';
+import { idleState, loadingState, type ResourceState } from '@/shared/lib/resource/resource-state';
+import { usePreferences } from '@/shared/store/preferences';
 
 import {
   buildVisibleRows,
@@ -14,7 +14,7 @@ import {
   mergeNodes,
   toggleExpanded,
   type TreeIndex,
-} from "../model";
+} from '../model';
 
 type UseFileTreeResult = {
   rows: ReturnType<typeof buildVisibleRows>;
@@ -24,26 +24,23 @@ type UseFileTreeResult = {
   toggleNode: (nodeId: string) => void;
 };
 
-function getExpandedIdsForNode(node: TreeIndex["nodesById"][string]): string[] {
-  return node.kind === "folder" ? [...node.ancestorIds, node.id] : node.ancestorIds;
+function getExpandedIdsForNode(node: TreeIndex['nodesById'][string]): string[] {
+  return node.kind === 'folder' ? [...node.ancestorIds, node.id] : node.ancestorIds;
 }
 
 async function ensureNodeBranchLoaded(
-  currentNode: TreeIndex["nodesById"][string],
+  currentNode: TreeIndex['nodesById'][string],
   rootIndex: TreeIndex,
-  loadChildren: (nodeId: string) => Promise<void>,
+  loadChildren: (nodeId: string) => Promise<void>
 ) {
   for (const ancestorId of currentNode.ancestorIds) {
-    if (
-      ancestorId !== rootIndex.rootId &&
-      rootIndex.childrenByParentId[ancestorId] === undefined
-    ) {
+    if (ancestorId !== rootIndex.rootId && rootIndex.childrenByParentId[ancestorId] === undefined) {
       await loadChildren(ancestorId);
     }
   }
 
   if (
-    currentNode.kind === "folder" &&
+    currentNode.kind === 'folder' &&
     currentNode.hasChildren &&
     rootIndex.childrenByParentId[currentNode.id] === undefined
   ) {
@@ -54,9 +51,8 @@ async function ensureNodeBranchLoaded(
 export function useFileTree(currentPath: string): UseFileTreeResult {
   const repository = useContentRepository();
   const { locale } = usePreferences();
-  const [rootState, setRootState] = useState<ResourceState<TreeIndex, RepositoryError>>(
-    idleState(),
-  );
+  const [rootState, setRootState] =
+    useState<ResourceState<TreeIndex, RepositoryError>>(idleState());
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
   const [loadingNodeIds, setLoadingNodeIds] = useState<string[]>([]);
   const loadingNodeIdsRef = useRef<string[]>([]);
@@ -65,35 +61,38 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
     loadingNodeIdsRef.current = loadingNodeIds;
   }, [loadingNodeIds]);
 
-  const loadChildren = useCallback(async (nodeId: string) => {
-    if (loadingNodeIdsRef.current.includes(nodeId)) {
-      return;
-    }
-
-    loadingNodeIdsRef.current = [...loadingNodeIdsRef.current, nodeId];
-    setLoadingNodeIds(loadingNodeIdsRef.current);
-    const childrenResource = await repository.loadChildren(nodeId, 1);
-
-    startTransition(() => {
-      loadingNodeIdsRef.current = loadingNodeIdsRef.current.filter((id) => id !== nodeId);
-      setLoadingNodeIds(loadingNodeIdsRef.current);
-
-      if (childrenResource.tag !== "ready") {
+  const loadChildren = useCallback(
+    async (nodeId: string) => {
+      if (loadingNodeIdsRef.current.includes(nodeId)) {
         return;
       }
 
-      setRootState((currentState) => {
-        if (currentState.tag !== "ready") {
-          return currentState;
+      loadingNodeIdsRef.current = [...loadingNodeIdsRef.current, nodeId];
+      setLoadingNodeIds(loadingNodeIdsRef.current);
+      const childrenResource = await repository.loadChildren(nodeId, 1);
+
+      startTransition(() => {
+        loadingNodeIdsRef.current = loadingNodeIdsRef.current.filter((id) => id !== nodeId);
+        setLoadingNodeIds(loadingNodeIdsRef.current);
+
+        if (childrenResource.tag !== 'ready') {
+          return;
         }
 
-        return {
-          tag: "ready",
-          value: mergeNodes(currentState.value, childrenResource.value.nodes),
-        };
+        setRootState((currentState) => {
+          if (currentState.tag !== 'ready') {
+            return currentState;
+          }
+
+          return {
+            tag: 'ready',
+            value: mergeNodes(currentState.value, childrenResource.value.nodes),
+          };
+        });
       });
-    });
-  }, [repository]);
+    },
+    [repository]
+  );
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -104,7 +103,7 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
         return;
       }
 
-      if (treeRootResource.tag !== "ready") {
+      if (treeRootResource.tag !== 'ready') {
         setRootState(treeRootResource);
         return;
       }
@@ -113,7 +112,7 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
 
       startTransition(() => {
         setRootState({
-          tag: "ready",
+          tag: 'ready',
           value: nextIndex,
         });
         setExpandedIds(getDefaultExpandedIds(nextIndex));
@@ -129,7 +128,7 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
   }, [locale, repository]);
 
   useEffect(() => {
-    if (rootState.tag !== "ready") {
+    if (rootState.tag !== 'ready') {
       return;
     }
 
@@ -137,7 +136,7 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
     const syncExpandedBranch = async () => {
       const nodeResource = await repository.getNodeByPath(currentPath);
 
-      if (abortController.signal.aborted || nodeResource.tag !== "ready") {
+      if (abortController.signal.aborted || nodeResource.tag !== 'ready') {
         return;
       }
 
@@ -151,7 +150,7 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
 
       startTransition(() => {
         setExpandedIds((currentIds) =>
-          mergeExpandedIds(currentIds, getExpandedIdsForNode(currentNode)),
+          mergeExpandedIds(currentIds, getExpandedIdsForNode(currentNode))
         );
       });
     };
@@ -164,9 +163,7 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
   }, [currentPath, repository, rootState, loadChildren]);
 
   const rows =
-    rootState.tag === "ready"
-      ? buildVisibleRows(rootState.value, expandedIds, currentPath)
-      : [];
+    rootState.tag === 'ready' ? buildVisibleRows(rootState.value, expandedIds, currentPath) : [];
 
   return {
     rows,
@@ -175,8 +172,8 @@ export function useFileTree(currentPath: string): UseFileTreeResult {
     expandedIds,
     toggleNode(nodeId) {
       if (
-        rootState.tag === "ready" &&
-        rootState.value.nodesById[nodeId]?.kind === "folder" &&
+        rootState.tag === 'ready' &&
+        rootState.value.nodesById[nodeId]?.kind === 'folder' &&
         rootState.value.nodesById[nodeId]?.hasChildren &&
         rootState.value.childrenByParentId[nodeId] === undefined
       ) {

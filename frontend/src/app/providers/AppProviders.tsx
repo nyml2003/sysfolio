@@ -1,13 +1,13 @@
-import { useState, type ReactNode } from "react";
+import { useState, type ReactNode } from 'react';
 
 import {
   ContentRepositoryProvider,
   createInMemoryContentRepository,
   type ContentRepository,
-} from "@/shared/data/repository";
-import { none, type Option, unwrapOr } from "@/shared/lib/monads/option";
-import { PreferencesProvider } from "@/shared/store/preferences";
-import { StyleProvider } from "@/shared/ui/foundation";
+} from '@/shared/data/repository';
+import { none, type Option, unwrapOr } from '@/shared/lib/monads/option';
+import { PreferencesProvider } from '@/shared/store/preferences';
+import { StyleProvider } from '@/shared/ui/foundation';
 
 type AppProvidersProps = {
   children: ReactNode;
@@ -20,8 +20,8 @@ export function AppProviders({ children, repository }: AppProvidersProps) {
       repository,
       createInMemoryContentRepository({
         latencyMs: none(),
-      }),
-    ),
+      })
+    )
   );
 
   return (

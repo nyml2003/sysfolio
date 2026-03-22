@@ -1,7 +1,7 @@
-import type { ContentNode, NodeId, TreeRootPayload } from "@/entities/content";
-import { isSome } from "@/shared/lib/monads/option";
+import type { ContentNode, NodeId, TreeRootPayload } from '@/entities/content';
+import { isSome } from '@/shared/lib/monads/option';
 
-import type { TreeIndex } from "./tree-index.types";
+import type { TreeIndex } from './tree-index.types';
 
 export function createTreeIndex(payload: TreeRootPayload): TreeIndex {
   const nodesById: Record<NodeId, ContentNode> = {};

@@ -1,6 +1,6 @@
-import { useStyleContext } from "@/shared/ui/foundation";
-import { Inline, Surface } from "@/shared/ui/layout";
-import { Tag } from "@/shared/ui/primitives";
+import { useStyleContext } from '@/shared/ui/foundation';
+import { Inline, Surface } from '@/shared/ui/layout';
+import { Tag } from '@/shared/ui/primitives';
 
 export function AppShellDemo() {
   const { layoutMode } = useStyleContext();

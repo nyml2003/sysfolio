@@ -1,14 +1,14 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from 'react';
 
-import type { ArticleDocument, ContentNode } from "@/entities/content";
-import { useArticleDom } from "@/features/article/context/article-dom.context";
-import { formatDate } from "@/shared/lib/date/format-date";
-import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
-import { fromNullable, unwrapOr } from "@/shared/lib/monads/option";
-import { usePreferences } from "@/shared/store/preferences";
-import { ButtonSecondaryMd } from "@/shared/ui/primitives";
+import type { ArticleDocument, ContentNode } from '@/entities/content';
+import { useArticleDom } from '@/features/article/context/article-dom.context';
+import { formatDate } from '@/shared/lib/date/format-date';
+import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
+import { fromNullable, unwrapOr } from '@/shared/lib/monads/option';
+import { usePreferences } from '@/shared/store/preferences';
+import { ButtonSecondaryMd } from '@/shared/ui/primitives';
 
-import styles from "./ArticleView.module.css";
+import styles from './ArticleView.module.css';
 
 type ArticleViewProps = {
   node: ContentNode;
@@ -29,7 +29,7 @@ function ArticleHeading({ id, level, title }: ArticleHeadingProps) {
     (node: HTMLHeadingElement | null) => {
       registerHeading(id, fromNullable(node));
     },
-    [id, registerHeading],
+    [id, registerHeading]
   );
 
   if (level === 3) {
@@ -64,24 +64,24 @@ export function ArticleView({
   const { locale } = usePreferences();
   const copy = useUiCopy();
   const { registerArticleBody, registerBottomSentinel, registerHeadingOrder } = useArticleDom();
-  const updatedAt = unwrapOr(node.updatedAt, "");
-  const publishedAt = unwrapOr(node.publishedAt, "");
+  const updatedAt = unwrapOr(node.updatedAt, '');
+  const publishedAt = unwrapOr(node.publishedAt, '');
   const readingMinutes = unwrapOr(node.readingMinutes, 0);
   const headingIds = useMemo(
     () => document.sections.map((section) => section.id),
-    [document.sections],
+    [document.sections]
   );
   const registerArticleBodyElement = useCallback(
     (node: HTMLDivElement | null) => {
       registerArticleBody(fromNullable(node));
     },
-    [registerArticleBody],
+    [registerArticleBody]
   );
   const registerBottomSentinelElement = useCallback(
     (node: HTMLDivElement | null) => {
       registerBottomSentinel(fromNullable(node));
     },
-    [registerBottomSentinel],
+    [registerBottomSentinel]
   );
 
   useEffect(() => {
@@ -101,10 +101,10 @@ export function ArticleView({
           <div className={styles.eyebrow}>{document.eyebrow}</div>
           <h1 className={styles.title}>{document.title}</h1>
           <div className={styles.meta}>
-            {publishedAt === "" ? null : (
+            {publishedAt === '' ? null : (
               <span>{copy.article.publishedAt(formatDate(publishedAt, locale))}</span>
             )}
-            {updatedAt === "" ? null : (
+            {updatedAt === '' ? null : (
               <span>{copy.article.updatedAt(formatDate(updatedAt, locale))}</span>
             )}
             {readingMinutes === 0 ? null : <span>{copy.common.minuteCount(readingMinutes)}</span>}
@@ -126,7 +126,11 @@ export function ArticleView({
               ))}
             </section>
           ))}
-          <div aria-hidden="true" className={styles.bottomSentinel} ref={registerBottomSentinelElement} />
+          <div
+            aria-hidden="true"
+            className={styles.bottomSentinel}
+            ref={registerBottomSentinelElement}
+          />
         </div>
       </div>
     </article>

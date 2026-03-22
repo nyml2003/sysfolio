@@ -1,16 +1,11 @@
-import { startTransition, useCallback, useState } from "react";
+import { startTransition, useCallback, useState } from 'react';
 
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { useVirtualizer } from '@tanstack/react-virtual';
 
-import type { ContentNode } from "@/entities/content";
-import {
-  fromNullable,
-  isSome,
-  none,
-  type Option,
-} from "@/shared/lib/monads/option";
-import { ROOT_PATH, pathFromSegments } from "@/shared/lib/path/content-path";
-import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
+import type { ContentNode } from '@/entities/content';
+import { fromNullable, isSome, none, type Option } from '@/shared/lib/monads/option';
+import { ROOT_PATH, pathFromSegments } from '@/shared/lib/path/content-path';
+import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
 import {
   ArticleIcon,
   ChevronDownIcon,
@@ -19,10 +14,10 @@ import {
   GameIcon,
   HomeIcon,
   MediaIcon,
-} from "@/shared/ui/primitives/Icon";
-import { iconStyle } from "@/shared/ui/primitives/Icon.style";
-import { ButtonGhostMd } from "@/shared/ui/primitives";
-import styles from "./FileTree.module.css";
+} from '@/shared/ui/primitives/Icon';
+import { iconStyle } from '@/shared/ui/primitives/Icon.style';
+import { ButtonGhostMd } from '@/shared/ui/primitives';
+import styles from './FileTree.module.css';
 
 import {
   FILE_TREE_DEFAULT_ICON_COLOR,
@@ -31,8 +26,8 @@ import {
   FILE_TREE_NODE_ICON_SIZE,
   FILE_TREE_OVERSCAN,
   FILE_TREE_ROW_HEIGHT,
-} from "../constant";
-import { useFileTree } from "../hooks/useFileTree";
+} from '../constant';
+import { useFileTree } from '../hooks/useFileTree';
 
 type FileTreeProps = {
   currentPath: string;
@@ -40,28 +35,26 @@ type FileTreeProps = {
 };
 
 function getNodePath(node: ContentNode): string {
-  return node.kind === "home" ? ROOT_PATH : pathFromSegments(node.pathSegments);
+  return node.kind === 'home' ? ROOT_PATH : pathFromSegments(node.pathSegments);
 }
 
 function renderNodeIcon(node: ContentNode) {
   const color =
-    node.status === "coming_soon"
-      ? FILE_TREE_MUTED_ICON_COLOR
-      : FILE_TREE_DEFAULT_ICON_COLOR;
+    node.status === 'coming_soon' ? FILE_TREE_MUTED_ICON_COLOR : FILE_TREE_DEFAULT_ICON_COLOR;
 
-  if (node.kind === "home") {
+  if (node.kind === 'home') {
     return <HomeIcon size={FILE_TREE_NODE_ICON_SIZE} style={iconStyle(color)} />;
   }
 
-  if (node.kind === "folder") {
+  if (node.kind === 'folder') {
     return <FolderIcon size={FILE_TREE_NODE_ICON_SIZE} style={iconStyle(color)} />;
   }
 
-  if (node.kind === "game") {
+  if (node.kind === 'game') {
     return <GameIcon size={FILE_TREE_NODE_ICON_SIZE} style={iconStyle(color)} />;
   }
 
-  if (node.kind === "media") {
+  if (node.kind === 'media') {
     return <MediaIcon size={FILE_TREE_NODE_ICON_SIZE} style={iconStyle(color)} />;
   }
 
@@ -70,7 +63,7 @@ function renderNodeIcon(node: ContentNode) {
 
 function toStableElementOption(
   currentElement: Option<HTMLDivElement>,
-  nextElement: HTMLDivElement | null,
+  nextElement: HTMLDivElement | null
 ): Option<HTMLDivElement> {
   const nextOption = fromNullable(nextElement);
 
@@ -102,34 +95,35 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
   return (
     <aside className={styles.root} aria-label={copy.fileTree.ariaLabel}>
       <div className={styles.title}>{copy.fileTree.title}</div>
-      {rootState.tag === "error" ? (
+      {rootState.tag === 'error' ? (
         <div className={styles.status}>{rootState.error.message}</div>
       ) : null}
-      {rootState.tag === "loading" ? (
+      {rootState.tag === 'loading' ? (
         <div className={styles.status}>{copy.fileTree.loading}</div>
       ) : null}
       <div
-        aria-busy={rootState.tag === "loading" || loadingNodeIds.length > 0}
+        aria-busy={rootState.tag === 'loading' || loadingNodeIds.length > 0}
         className={styles.list}
         ref={registerScrollElement}
       >
-        <div
-          className={styles.viewport}
-          style={{ height: `${virtualizer.getTotalSize()}px` }}
-        >
+        <div className={styles.viewport} style={{ height: `${virtualizer.getTotalSize()}px` }}>
           {virtualizer.getVirtualItems().map((virtualRow) => {
             const row = rows[virtualRow.index];
             const nodePath = getNodePath(row.node);
-            const isFolder = row.node.kind === "folder";
+            const isFolder = row.node.kind === 'folder';
             const isLoading = loadingNodeIds.includes(row.node.id);
             const showDisclosure = isFolder && row.node.hasChildren;
             const isExpanded = row.isExpanded || expandedIds.includes(row.node.id);
 
             return (
               <div
-                className={[styles.row, row.isSelected ? styles.selected : "", row.node.status !== "available" ? styles.muted : ""]
+                className={[
+                  styles.row,
+                  row.isSelected ? styles.selected : '',
+                  row.node.status !== 'available' ? styles.muted : '',
+                ]
                   .filter(Boolean)
-                  .join(" ")}
+                  .join(' ')}
                 key={row.node.id}
                 style={{
                   transform: `translateY(${virtualRow.start}px)`,
@@ -139,8 +133,8 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                 <ButtonGhostMd
                   {...(showDisclosure
                     ? {
-                        "aria-expanded": isExpanded,
-                        "aria-label": isExpanded
+                        'aria-expanded': isExpanded,
+                        'aria-label': isExpanded
                           ? copy.fileTree.collapseDirectory(row.node.title)
                           : copy.fileTree.expandDirectory(row.node.title),
                       }
@@ -167,7 +161,7 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                 </ButtonGhostMd>
                 {renderNodeIcon(row.node)}
                 <ButtonGhostMd
-                  aria-current={row.isSelected ? "page" : false}
+                  aria-current={row.isSelected ? 'page' : false}
                   className={styles.label}
                   onClick={() => {
                     startTransition(() => {
@@ -177,9 +171,7 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                 >
                   {row.node.title}
                 </ButtonGhostMd>
-                {row.node.status === "coming_soon" ? (
-                  <span className={styles.statusDot} />
-                ) : null}
+                {row.node.status === 'coming_soon' ? <span className={styles.statusDot} /> : null}
               </div>
             );
           })}

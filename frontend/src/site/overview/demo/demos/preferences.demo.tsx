@@ -1,6 +1,6 @@
-import { Inline, Stack } from "@/shared/ui/layout";
-import { ButtonSecondaryMd, SegmentedControl, Tag } from "@/shared/ui/primitives";
-import { usePreferences } from "@/shared/store/preferences";
+import { Inline, Stack } from '@/shared/ui/layout';
+import { ButtonSecondaryMd, SegmentedControl, Tag } from '@/shared/ui/primitives';
+import { usePreferences } from '@/shared/store/preferences';
 
 export function PreferenceControlsDemo() {
   const { density, setDensity, theme, toggleTheme } = usePreferences();
@@ -15,9 +15,9 @@ export function PreferenceControlsDemo() {
         label="Density"
         onChange={setDensity}
         options={[
-          { value: "comfortable", label: "Comfortable" },
-          { value: "medium", label: "Medium" },
-          { value: "compact", label: "Compact" },
+          { value: 'comfortable', label: 'Comfortable' },
+          { value: 'medium', label: 'Medium' },
+          { value: 'compact', label: 'Compact' },
         ]}
         value={density}
       />

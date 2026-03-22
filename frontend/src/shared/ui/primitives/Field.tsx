@@ -1,9 +1,9 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
-import { isSome, none, type Option } from "@/shared/lib/monads/option";
-import { Stack } from "@/shared/ui/layout";
+import { isSome, none, type Option } from '@/shared/lib/monads/option';
+import { Stack } from '@/shared/ui/layout';
 
-import { Label } from "./Label";
+import { Label } from './Label';
 
 type FieldProps = {
   label: string;
@@ -11,11 +11,7 @@ type FieldProps = {
   children: ReactNode;
 };
 
-export function Field({
-  label,
-  description = none(),
-  children,
-}: FieldProps) {
+export function Field({ label, description = none(), children }: FieldProps) {
   return (
     <Stack className="sf-field" gap="xs">
       <Label

@@ -1,4 +1,4 @@
-import { Grid, Surface } from "@/shared/ui/layout";
+import { Grid, Surface } from '@/shared/ui/layout';
 
 export function TokensDemo() {
   return (

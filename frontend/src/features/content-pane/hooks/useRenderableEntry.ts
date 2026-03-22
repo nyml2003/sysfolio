@@ -1,19 +1,18 @@
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from 'react';
 
-import type { RenderableEntryPayload, RepositoryError } from "@/entities/content";
-import { useContentRepository } from "@/shared/data/repository";
-import { detachPromise } from "@/shared/lib/async/detach-promise";
-import { idleState, loadingState, type ResourceState } from "@/shared/lib/resource/resource-state";
-import { usePreferences } from "@/shared/store/preferences";
+import type { RenderableEntryPayload, RepositoryError } from '@/entities/content';
+import { useContentRepository } from '@/shared/data/repository';
+import { detachPromise } from '@/shared/lib/async/detach-promise';
+import { idleState, loadingState, type ResourceState } from '@/shared/lib/resource/resource-state';
+import { usePreferences } from '@/shared/store/preferences';
 
 export function useRenderableEntry(
-  path: string,
+  path: string
 ): ResourceState<RenderableEntryPayload, RepositoryError> {
   const repository = useContentRepository();
   const { locale } = usePreferences();
-  const [resource, setResource] = useState<ResourceState<RenderableEntryPayload, RepositoryError>>(
-    idleState(),
-  );
+  const [resource, setResource] =
+    useState<ResourceState<RenderableEntryPayload, RepositoryError>>(idleState());
 
   useEffect(() => {
     const abortController = new AbortController();

@@ -1,5 +1,5 @@
-import { ROOT_PATH } from "./root-path";
-import { normalizePath } from "./normalize-path";
+import { ROOT_PATH } from './root-path';
+import { normalizePath } from './normalize-path';
 
 export function splitPathSegments(path: string): string[] {
   const normalizedPath = normalizePath(path);
@@ -8,6 +8,6 @@ export function splitPathSegments(path: string): string[] {
     ? []
     : normalizedPath
         .slice(1)
-        .split("/")
+        .split('/')
         .filter((segment) => segment.length > 0);
 }

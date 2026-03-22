@@ -1,4 +1,4 @@
-import type { ContentNode, NodeId } from "@/entities/content";
+import type { ContentNode, NodeId } from '@/entities/content';
 
 export type TreeIndex = {
   rootId: NodeId;

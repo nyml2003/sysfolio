@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
-import { isSome, type Option } from "@/shared/lib/monads/option";
+import { isSome, type Option } from '@/shared/lib/monads/option';
 
-import { hasIntersectionObserverSupport } from "./has-intersection-observer-support";
+import { hasIntersectionObserverSupport } from './has-intersection-observer-support';
 
 type UseIntersectionObserverOptions = {
   root: Option<Element>;
@@ -57,7 +57,7 @@ export function useIntersectionObserver({
         root: root.value,
         rootMargin,
         threshold,
-      },
+      }
     );
 
     for (const target of observedTargets) {

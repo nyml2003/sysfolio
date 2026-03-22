@@ -1,9 +1,9 @@
-import type { ComponentPropsWithoutRef, ReactNode } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
-import type { Option } from "@/shared/lib/monads/option";
+import type { Option } from '@/shared/lib/monads/option';
 
-export type ButtonTone = "primary" | "secondary" | "ghost" | "success" | "warning" | "destructive";
-export type ButtonSize = "sm" | "md";
+export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'success' | 'warning' | 'destructive';
+export type ButtonSize = 'sm' | 'md';
 
 /** 前后缀插槽：`none()` 表示无；有内容用 `some(…)`。 */
 export type ButtonAffixSlot = Option<NonNullable<ReactNode>>;
@@ -12,7 +12,7 @@ export type ButtonAffixSlot = Option<NonNullable<ReactNode>>;
 export type ButtonOwnProps = {
   tone: ButtonTone;
   size: ButtonSize;
-  type: "button" | "submit" | "reset";
+  type: 'button' | 'submit' | 'reset';
   loading: boolean;
   /** 块级宽度（表单、空态等）。 */
   fullWidth: boolean;
@@ -23,4 +23,5 @@ export type ButtonOwnProps = {
   children: NonNullable<ReactNode>;
 };
 
-export type ButtonProps = Omit<ComponentPropsWithoutRef<"button">, "type" | "children"> & ButtonOwnProps;
+export type ButtonProps = Omit<ComponentPropsWithoutRef<'button'>, 'type' | 'children'> &
+  ButtonOwnProps;

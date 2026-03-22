@@ -1,25 +1,25 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from 'react';
 
 import type {
   ContextInfo,
   DirectoryContent,
   HomeContent,
   RenderableEntryPayload,
-} from "@/entities/content";
-import { useArticleDom } from "@/features/article/context/article-dom.context";
+} from '@/entities/content';
+import { useArticleDom } from '@/features/article/context/article-dom.context';
 import {
   getOverviewDocumentMeta,
   overviewHomeCollections,
-} from "@/shared/data/mock/content.fixtures";
-import { formatDate } from "@/shared/lib/date/format-date";
-import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
-import { fromNullable, isSome, none, unwrapOr } from "@/shared/lib/monads/option";
-import { usePreferences } from "@/shared/store/preferences";
-import { useOverviewCopy } from "@/site/overview/overview-copy";
-import { Grid, Inline, Stack, Surface } from "@/shared/ui/layout";
-import { ButtonGhostMd, ButtonSecondaryMd, Tag } from "@/shared/ui/primitives";
+} from '@/shared/data/mock/content.fixtures';
+import { formatDate } from '@/shared/lib/date/format-date';
+import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
+import { fromNullable, isSome, none, unwrapOr } from '@/shared/lib/monads/option';
+import { usePreferences } from '@/shared/store/preferences';
+import { useOverviewCopy } from '@/site/overview/overview-copy';
+import { Grid, Inline, Stack, Surface } from '@/shared/ui/layout';
+import { ButtonGhostMd, ButtonSecondaryMd, Tag } from '@/shared/ui/primitives';
 
-import { OverviewDemoDeck } from "../demo/OverviewDemos";
+import { OverviewDemoDeck } from '../demo/OverviewDemos';
 
 type OverviewHomePageProps = {
   content: HomeContent;
@@ -38,39 +38,39 @@ type OverviewArticlePageProps = {
   scrollToTop: () => void;
 };
 
-function ArticleHeading({
-  id,
-  level,
-  title,
-}: {
-  id: string;
-  level: 2 | 3 | 4;
-  title: string;
-}) {
+function ArticleHeading({ id, level, title }: { id: string; level: 2 | 3 | 4; title: string }) {
   const { registerHeading } = useArticleDom();
   const registerHeadingElement = useCallback(
     (node: HTMLHeadingElement | null) => {
       registerHeading(id, fromNullable(node));
     },
-    [id, registerHeading],
+    [id, registerHeading]
   );
 
   if (level === 3) {
-    return <h3 id={id} ref={registerHeadingElement}>{title}</h3>;
+    return (
+      <h3 id={id} ref={registerHeadingElement}>
+        {title}
+      </h3>
+    );
   }
 
   if (level === 4) {
-    return <h4 id={id} ref={registerHeadingElement}>{title}</h4>;
+    return (
+      <h4 id={id} ref={registerHeadingElement}>
+        {title}
+      </h4>
+    );
   }
 
-  return <h2 id={id} ref={registerHeadingElement}>{title}</h2>;
+  return (
+    <h2 id={id} ref={registerHeadingElement}>
+      {title}
+    </h2>
+  );
 }
 
-export function OverviewHomePage({
-  content,
-  context,
-  onNavigate,
-}: OverviewHomePageProps) {
+export function OverviewHomePage({ content, context, onNavigate }: OverviewHomePageProps) {
   const copy = useOverviewCopy();
 
   return (
@@ -109,7 +109,7 @@ export function OverviewHomePage({
               >
                 <Stack gap="xs">
                   <strong>{entry.title}</strong>
-                  <div className="overview-copy">{unwrapOr(entry.description, "")}</div>
+                  <div className="overview-copy">{unwrapOr(entry.description, '')}</div>
                 </Stack>
               </ButtonGhostMd>
             ))}
@@ -120,10 +120,7 @@ export function OverviewHomePage({
   );
 }
 
-export function OverviewDirectoryPage({
-  payload,
-  onNavigate,
-}: OverviewDirectoryPageProps) {
+export function OverviewDirectoryPage({ payload, onNavigate }: OverviewDirectoryPageProps) {
   const content = payload.content as DirectoryContent;
   const copy = useOverviewCopy();
   const ui = useUiCopy();
@@ -132,7 +129,7 @@ export function OverviewDirectoryPage({
     <Stack className="overview-page" gap="lg">
       <Stack gap="sm">
         <div className="overview-eyebrow">
-          {payload.node.pathSegments.join(" / ") || copy.directory.rootLabel}
+          {payload.node.pathSegments.join(' / ') || copy.directory.rootLabel}
         </div>
         <h1 className="overview-title">{content.title}</h1>
         <p className="overview-summary">
@@ -176,23 +173,23 @@ export function OverviewArticlePage({
   const copy = useOverviewCopy();
   const ui = useUiCopy();
   const { registerArticleBody, registerBottomSentinel, registerHeadingOrder } = useArticleDom();
-  const document = payload.content.kind === "article" ? payload.content : null;
+  const document = payload.content.kind === 'article' ? payload.content : null;
   const meta = document === null ? none() : getOverviewDocumentMeta(document.id);
   const headingIds = useMemo(
     () => (document === null ? [] : document.sections.map((section) => section.id)),
-    [document],
+    [document]
   );
   const registerArticleBodyElement = useCallback(
     (node: HTMLDivElement | null) => {
       registerArticleBody(fromNullable(node));
     },
-    [registerArticleBody],
+    [registerArticleBody]
   );
   const registerBottomSentinelElement = useCallback(
     (node: HTMLDivElement | null) => {
       registerBottomSentinel(fromNullable(node));
     },
-    [registerBottomSentinel],
+    [registerBottomSentinel]
   );
 
   useEffect(() => {
@@ -221,9 +218,7 @@ export function OverviewArticlePage({
             ) : null}
             {isSome(meta) ? <Tag>{copy.meta.statusLabel(meta.value.status)}</Tag> : null}
             {isSome(payload.node.updatedAt) ? (
-              <Tag>
-                {ui.article.updatedAt(formatDate(payload.node.updatedAt.value, locale))}
-              </Tag>
+              <Tag>{ui.article.updatedAt(formatDate(payload.node.updatedAt.value, locale))}</Tag>
             ) : null}
           </Inline>
           <p className="overview-summary">{document.summary}</p>
@@ -246,7 +241,11 @@ export function OverviewArticlePage({
               ))}
             </section>
           ))}
-          <div aria-hidden="true" className="overview-article__sentinel" ref={registerBottomSentinelElement} />
+          <div
+            aria-hidden="true"
+            className="overview-article__sentinel"
+            ref={registerBottomSentinelElement}
+          />
         </div>
       </Stack>
     </article>

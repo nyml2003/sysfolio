@@ -1,5 +1,5 @@
-import type { Option } from "./option.types";
+import type { Option } from './option.types';
 
 export function some<T>(value: T): Option<T> {
-  return { tag: "some", value };
+  return { tag: 'some', value };
 }

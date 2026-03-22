@@ -1,14 +1,14 @@
-import type { ContextInfo, RenderableEntryPayload, RepositoryError } from "@/entities/content";
-import { ArticleView } from "@/features/article/components/ArticleView";
-import { HomeView } from "@/features/home/components/HomeView";
-import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
-import { isSome, none, unwrapOr } from "@/shared/lib/monads/option";
-import { ROOT_PATH } from "@/shared/lib/path/content-path";
-import type { ResourceState } from "@/shared/lib/resource/resource-state";
-import { ArticleIcon, FolderIcon, GameIcon, MediaIcon } from "@/shared/ui/primitives/Icon";
-import { ButtonGhostMd, ButtonSecondaryMd } from "@/shared/ui/primitives";
+import type { ContextInfo, RenderableEntryPayload, RepositoryError } from '@/entities/content';
+import { ArticleView } from '@/features/article/components/ArticleView';
+import { HomeView } from '@/features/home/components/HomeView';
+import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
+import { isSome, none, unwrapOr } from '@/shared/lib/monads/option';
+import { ROOT_PATH } from '@/shared/lib/path/content-path';
+import type { ResourceState } from '@/shared/lib/resource/resource-state';
+import { ArticleIcon, FolderIcon, GameIcon, MediaIcon } from '@/shared/ui/primitives/Icon';
+import { ButtonGhostMd, ButtonSecondaryMd } from '@/shared/ui/primitives';
 
-import styles from "./ContentPane.module.css";
+import styles from './ContentPane.module.css';
 
 type ContentPaneProps = {
   resource: ResourceState<RenderableEntryPayload, RepositoryError>;
@@ -18,15 +18,15 @@ type ContentPaneProps = {
 };
 
 function renderDirectoryIcon(kind: string) {
-  if (kind === "folder") {
+  if (kind === 'folder') {
     return <FolderIcon size={16} />;
   }
 
-  if (kind === "game") {
+  if (kind === 'game') {
     return <GameIcon size={16} />;
   }
 
-  if (kind === "media") {
+  if (kind === 'media') {
     return <MediaIcon size={16} />;
   }
 
@@ -36,9 +36,9 @@ function renderDirectoryIcon(kind: string) {
 function renderDirectoryView(
   payload: RenderableEntryPayload,
   onNavigate: (path: string) => void,
-  copy: ReturnType<typeof useUiCopy>,
+  copy: ReturnType<typeof useUiCopy>
 ) {
-  if (payload.content.kind !== "directory") {
+  if (payload.content.kind !== 'directory') {
     return null;
   }
 
@@ -46,13 +46,11 @@ function renderDirectoryView(
     <section className={styles.directoryRoot}>
       <header className={styles.directoryHeader}>
         <div className={styles.directoryEyebrow}>
-          {payload.node.pathSegments.join(" / ") || copy.common.rootLabel}
+          {payload.node.pathSegments.join(' / ') || copy.common.rootLabel}
         </div>
         <h1 className={styles.directoryTitle}>{payload.content.title}</h1>
-        {unwrapOr(payload.content.description, "") === "" ? null : (
-          <div className={styles.directorySummary}>
-            {unwrapOr(payload.content.description, "")}
-          </div>
+        {unwrapOr(payload.content.description, '') === '' ? null : (
+          <div className={styles.directorySummary}>{unwrapOr(payload.content.description, '')}</div>
         )}
       </header>
       <div className={styles.directoryMeta}>
@@ -64,10 +62,10 @@ function renderDirectoryView(
           <ButtonGhostMd
             className={[
               styles.directoryEntry,
-              entry.status === "coming_soon" ? styles.directoryEntryComingSoon : "",
+              entry.status === 'coming_soon' ? styles.directoryEntryComingSoon : '',
             ]
               .filter(Boolean)
-              .join(" ")}
+              .join(' ')}
             key={entry.id}
             onClick={() => {
               onNavigate(entry.path);
@@ -82,9 +80,9 @@ function renderDirectoryView(
                   <span>{copy.common.minuteCount(entry.readingMinutes.value)}</span>
                 ) : null}
               </div>
-              {unwrapOr(entry.description, "") === "" ? null : (
+              {unwrapOr(entry.description, '') === '' ? null : (
                 <div className={styles.directoryEntrySummary}>
-                  {unwrapOr(entry.description, "")}
+                  {unwrapOr(entry.description, '')}
                 </div>
               )}
             </div>
@@ -98,14 +96,13 @@ function renderDirectoryView(
 function renderUnsupportedState(
   context: ContextInfo,
   onNavigate: (path: string) => void,
-  copy: ReturnType<typeof useUiCopy>,
+  copy: ReturnType<typeof useUiCopy>
 ) {
-  const fallbackPath =
-    isSome(context.parent)
-      ? context.parent.value.path
-      : context.breadcrumbs.length > 0
-        ? context.breadcrumbs[0].path
-        : ROOT_PATH;
+  const fallbackPath = isSome(context.parent)
+    ? context.parent.value.path
+    : context.breadcrumbs.length > 0
+      ? context.breadcrumbs[0].path
+      : ROOT_PATH;
 
   return (
     <section className={styles.root}>
@@ -147,21 +144,18 @@ export function ContentPane({
 }: ContentPaneProps) {
   const copy = useUiCopy();
 
-  if (resource.tag === "loading" || resource.tag === "idle") {
-    return renderStatusState(
-      copy.contentPane.loadingTitle,
-      copy.contentPane.loadingBody,
-    );
+  if (resource.tag === 'loading' || resource.tag === 'idle') {
+    return renderStatusState(copy.contentPane.loadingTitle, copy.contentPane.loadingBody);
   }
 
-  if (resource.tag === "error") {
+  if (resource.tag === 'error') {
     return renderStatusState(copy.contentPane.notFoundTitle, resource.error.message);
   }
 
-  if (resource.tag === "empty") {
+  if (resource.tag === 'empty') {
     return renderStatusState(
       copy.contentPane.emptyTitle,
-      unwrapOr(resource.reason, copy.contentPane.defaultEmptyReason),
+      unwrapOr(resource.reason, copy.contentPane.defaultEmptyReason)
     );
   }
 
@@ -173,17 +167,15 @@ export function ContentPane({
     stats: none(),
   });
 
-  if (resource.value.content.kind === "home") {
-    return (
-      <HomeView content={resource.value.content} context={context} onNavigate={onNavigate} />
-    );
+  if (resource.value.content.kind === 'home') {
+    return <HomeView content={resource.value.content} context={context} onNavigate={onNavigate} />;
   }
 
-  if (resource.value.content.kind === "directory") {
+  if (resource.value.content.kind === 'directory') {
     return renderDirectoryView(resource.value, onNavigate, copy);
   }
 
-  if (resource.value.content.kind === "article") {
+  if (resource.value.content.kind === 'article') {
     return (
       <ArticleView
         document={resource.value.content}

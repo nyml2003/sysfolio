@@ -1,21 +1,25 @@
-import { startTransition, useCallback, useState } from "react";
+import { startTransition, useCallback, useState } from 'react';
 
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { useVirtualizer } from '@tanstack/react-virtual';
 
-import type { BreadcrumbSegment, RenderableEntryPayload, RepositoryError } from "@/entities/content";
-import { useFileTree } from "@/features/file-tree/hooks/useFileTree";
-import { getOverviewDocumentMeta } from "@/shared/data/mock/content.fixtures";
-import { getThemeToggleAriaLabel } from "@/shared/lib/i18n/ui-copy";
-import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
-import { fromNullable, isSome, none, type Option, unwrapOr } from "@/shared/lib/monads/option";
-import { ROOT_PATH, pathFromSegments } from "@/shared/lib/path/content-path";
-import type { ResourceState } from "@/shared/lib/resource/resource-state";
-import { usePreferences } from "@/shared/store/preferences";
-import { useStyleContext } from "@/shared/ui/foundation";
-import { useOverviewCopy } from "@/site/overview/overview-copy";
-import { Grid, Inline, Stack, Surface } from "@/shared/ui/layout";
-import { ButtonGhostMd, ButtonGhostSm, SegmentedControl, Tag } from "@/shared/ui/primitives";
-import { iconStyle } from "@/shared/ui/primitives/Icon.style";
+import type {
+  BreadcrumbSegment,
+  RenderableEntryPayload,
+  RepositoryError,
+} from '@/entities/content';
+import { useFileTree } from '@/features/file-tree/hooks/useFileTree';
+import { getOverviewDocumentMeta } from '@/shared/data/mock/content.fixtures';
+import { getThemeToggleAriaLabel } from '@/shared/lib/i18n/ui-copy';
+import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
+import { fromNullable, isSome, none, type Option, unwrapOr } from '@/shared/lib/monads/option';
+import { ROOT_PATH, pathFromSegments } from '@/shared/lib/path/content-path';
+import type { ResourceState } from '@/shared/lib/resource/resource-state';
+import { usePreferences } from '@/shared/store/preferences';
+import { useStyleContext } from '@/shared/ui/foundation';
+import { useOverviewCopy } from '@/site/overview/overview-copy';
+import { Grid, Inline, Stack, Surface } from '@/shared/ui/layout';
+import { ButtonGhostMd, ButtonGhostSm, SegmentedControl, Tag } from '@/shared/ui/primitives';
+import { iconStyle } from '@/shared/ui/primitives/Icon.style';
 import {
   ArticleIcon,
   ChevronDownIcon,
@@ -23,23 +27,23 @@ import {
   FolderIcon,
   MoonIcon,
   SunIcon,
-} from "@/shared/ui/primitives/Icon";
+} from '@/shared/ui/primitives/Icon';
 
 function getNodePath(pathSegments: string[], kind: string): string {
-  return kind === "home" ? ROOT_PATH : pathFromSegments(pathSegments);
+  return kind === 'home' ? ROOT_PATH : pathFromSegments(pathSegments);
 }
 
 function renderNodeIcon(kind: string) {
-  if (kind === "folder") {
-    return <FolderIcon size={16} style={iconStyle("currentColor")} />;
+  if (kind === 'folder') {
+    return <FolderIcon size={16} style={iconStyle('currentColor')} />;
   }
 
-  return <ArticleIcon size={16} style={iconStyle("currentColor")} />;
+  return <ArticleIcon size={16} style={iconStyle('currentColor')} />;
 }
 
 function toStableElementOption(
   currentElement: Option<HTMLDivElement>,
-  nextElement: HTMLDivElement | null,
+  nextElement: HTMLDivElement | null
 ): Option<HTMLDivElement> {
   const nextOption = fromNullable(nextElement);
 
@@ -71,8 +75,8 @@ export function OverviewPathBar({
   const { locale, setDensity, toggleLocale, toggleTheme } = usePreferences();
   const copy = useOverviewCopy();
   const ui = useUiCopy();
-  const isCompact = layoutMode === "compact";
-  const showContextToggle = layoutMode !== "spacious";
+  const isCompact = layoutMode === 'compact';
+  const showContextToggle = layoutMode !== 'spacious';
 
   return (
     <header className="overview-topbar">
@@ -87,7 +91,7 @@ export function OverviewPathBar({
             return (
               <Inline className="overview-breadcrumbs__group" gap="xs" key={segment.id}>
                 <ButtonGhostMd
-                  aria-current={isCurrent ? "page" : false}
+                  aria-current={isCurrent ? 'page' : false}
                   className="overview-breadcrumbs__button"
                   disabled={isCurrent}
                   onClick={() => {
@@ -110,17 +114,14 @@ export function OverviewPathBar({
             label={copy.topBar.densityLabel}
             onChange={setDensity}
             options={[
-              { value: "comfortable", label: "C" },
-              { value: "medium", label: "M" },
-              { value: "compact", label: "X" },
+              { value: 'comfortable', label: 'C' },
+              { value: 'medium', label: 'M' },
+              { value: 'compact', label: 'X' },
             ]}
             value={density}
           />
-          <ButtonGhostSm
-            aria-label={getThemeToggleAriaLabel(locale, theme)}
-            onClick={toggleTheme}
-          >
-            {theme === "light" ? <MoonIcon size={16} /> : <SunIcon size={16} />}
+          <ButtonGhostSm aria-label={getThemeToggleAriaLabel(locale, theme)} onClick={toggleTheme}>
+            {theme === 'light' ? <MoonIcon size={16} /> : <SunIcon size={16} />}
           </ButtonGhostSm>
           <ButtonGhostSm aria-label={ui.localeToggle.ariaLabel} onClick={toggleLocale}>
             {ui.localeToggle.buttonLabel}
@@ -139,10 +140,7 @@ type OverviewFileTreeProps = {
   onNavigate: (path: string) => void;
 };
 
-export function OverviewFileTree({
-  currentPath,
-  onNavigate,
-}: OverviewFileTreeProps) {
+export function OverviewFileTree({ currentPath, onNavigate }: OverviewFileTreeProps) {
   const copy = useOverviewCopy();
   const [scrollElement, setScrollElement] = useState<Option<HTMLDivElement>>(none());
   const { rows, rootState, expandedIds, toggleNode } = useFileTree(currentPath);
@@ -159,24 +157,29 @@ export function OverviewFileTree({
   return (
     <Stack className="overview-rail" gap="sm">
       <div className="overview-rail__title">{copy.rail.fileTreeTitle}</div>
-      {rootState.tag === "error" ? <Surface tone="danger">{rootState.error.message}</Surface> : null}
+      {rootState.tag === 'error' ? (
+        <Surface tone="danger">{rootState.error.message}</Surface>
+      ) : null}
       <div className="overview-tree" ref={registerScrollElement}>
-        <div className="overview-tree__viewport" style={{ height: `${virtualizer.getTotalSize()}px` }}>
+        <div
+          className="overview-tree__viewport"
+          style={{ height: `${virtualizer.getTotalSize()}px` }}
+        >
           {virtualizer.getVirtualItems().map((virtualRow) => {
             const row = rows[virtualRow.index];
             const nodePath = getNodePath(row.node.pathSegments, row.node.kind);
-            const isFolder = row.node.kind === "folder";
+            const isFolder = row.node.kind === 'folder';
             const isExpanded = row.isExpanded || expandedIds.includes(row.node.id);
             const showDisclosure = isFolder && row.node.hasChildren;
 
             return (
               <div
                 className={[
-                  "overview-tree__row",
-                  row.isSelected ? "overview-tree__row--selected" : "",
+                  'overview-tree__row',
+                  row.isSelected ? 'overview-tree__row--selected' : '',
                 ]
                   .filter(Boolean)
-                  .join(" ")}
+                  .join(' ')}
                 key={row.node.id}
                 style={{
                   paddingInlineStart: `calc(var(--sf-space-3) + ${row.depth} * var(--sf-space-4))`,
@@ -184,7 +187,7 @@ export function OverviewFileTree({
                 }}
               >
                 <ButtonGhostMd
-                  {...(showDisclosure ? { "aria-expanded": isExpanded } : {})}
+                  {...(showDisclosure ? { 'aria-expanded': isExpanded } : {})}
                   className="overview-tree__trigger"
                   disabled={!showDisclosure}
                   onClick={() => {
@@ -194,7 +197,11 @@ export function OverviewFileTree({
                   }}
                 >
                   {showDisclosure ? (
-                    isExpanded ? <ChevronDownIcon size={14} /> : <ChevronRightIcon size={14} />
+                    isExpanded ? (
+                      <ChevronDownIcon size={14} />
+                    ) : (
+                      <ChevronRightIcon size={14} />
+                    )
                   ) : (
                     false
                   )}
@@ -235,7 +242,7 @@ export function OverviewContextPanel({
   const style = useStyleContext();
   const copy = useOverviewCopy();
 
-  if (resource.tag !== "ready") {
+  if (resource.tag !== 'ready') {
     return (
       <Stack className="overview-rail" gap="sm">
         <div className="overview-rail__title">{copy.context.panelTitle}</div>
@@ -252,7 +259,7 @@ export function OverviewContextPanel({
     stats: none(),
   });
   const articleMeta =
-    resource.value.content.kind === "article"
+    resource.value.content.kind === 'article'
       ? getOverviewDocumentMeta(resource.value.content.id)
       : none();
 
@@ -270,18 +277,18 @@ export function OverviewContextPanel({
           </Grid>
         </Stack>
       </Surface>
-      {resource.value.content.kind === "article" ? (
+      {resource.value.content.kind === 'article' ? (
         <Surface>
           <Stack gap="sm">
             <div className="overview-section-title">{copy.context.onThisPageTitle}</div>
             {resource.value.content.toc.map((item) => (
               <ButtonGhostMd
                 className={[
-                  "overview-context-link",
-                  item.id === activeHeadingId ? "overview-context-link--active" : "",
+                  'overview-context-link',
+                  item.id === activeHeadingId ? 'overview-context-link--active' : '',
                 ]
                   .filter(Boolean)
-                  .join(" ")}
+                  .join(' ')}
                 key={item.id}
                 onClick={() => {
                   onScrollToHeading(item.id);
@@ -305,7 +312,9 @@ export function OverviewContextPanel({
             {articleMeta.value.gaps.length > 0 ? (
               <Stack gap="xs">
                 {articleMeta.value.gaps.map((gap) => (
-                  <div className="overview-copy" key={gap.id}>{gap.title}</div>
+                  <div className="overview-copy" key={gap.id}>
+                    {gap.title}
+                  </div>
                 ))}
               </Stack>
             ) : (

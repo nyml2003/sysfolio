@@ -1,10 +1,10 @@
-import { Stack } from "@/shared/ui/layout";
+import { Stack } from '@/shared/ui/layout';
 
-import type { OverviewDemoId } from "../overview-copy";
-import { useOverviewCopy } from "../overview-copy";
+import type { OverviewDemoId } from '../overview-copy';
+import { useOverviewCopy } from '../overview-copy';
 
-import { DemoFrame } from "./overview-demo-frame";
-import { overviewDemoRenderers } from "./overview-demo-registry";
+import { DemoFrame } from './overview-demo-frame';
+import { overviewDemoRenderers } from './overview-demo-registry';
 
 type OverviewDemoDeckProps = {
   demoIds: string[];

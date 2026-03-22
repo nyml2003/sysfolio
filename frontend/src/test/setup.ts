@@ -1,12 +1,12 @@
-import { cleanup } from "@testing-library/react";
-import { afterEach, vi } from "vitest";
+import { cleanup } from '@testing-library/react';
+import { afterEach, vi } from 'vitest';
 
 afterEach(() => {
   cleanup();
   window.localStorage.clear();
 });
 
-if (typeof window.ResizeObserver === "undefined") {
+if (typeof window.ResizeObserver === 'undefined') {
   class ResizeObserverMock implements ResizeObserver {
     observe() {}
 
@@ -18,11 +18,11 @@ if (typeof window.ResizeObserver === "undefined") {
   window.ResizeObserver = ResizeObserverMock;
 }
 
-if (typeof window.IntersectionObserver === "undefined") {
+if (typeof window.IntersectionObserver === 'undefined') {
   class IntersectionObserverMock implements IntersectionObserver {
     readonly root = null;
 
-    readonly rootMargin = "0px";
+    readonly rootMargin = '0px';
 
     readonly thresholds = [];
 
@@ -40,7 +40,7 @@ if (typeof window.IntersectionObserver === "undefined") {
   window.IntersectionObserver = IntersectionObserverMock;
 }
 
-if (typeof window.requestAnimationFrame === "undefined") {
+if (typeof window.requestAnimationFrame === 'undefined') {
   window.requestAnimationFrame = (callback: FrameRequestCallback) => {
     return window.setTimeout(() => {
       callback(performance.now());
@@ -48,12 +48,12 @@ if (typeof window.requestAnimationFrame === "undefined") {
   };
 }
 
-if (typeof window.cancelAnimationFrame === "undefined") {
+if (typeof window.cancelAnimationFrame === 'undefined') {
   window.cancelAnimationFrame = (handle: number) => {
     window.clearTimeout(handle);
   };
 }
 
-if (typeof HTMLElement.prototype.scrollTo === "undefined") {
+if (typeof HTMLElement.prototype.scrollTo === 'undefined') {
   HTMLElement.prototype.scrollTo = vi.fn();
 }

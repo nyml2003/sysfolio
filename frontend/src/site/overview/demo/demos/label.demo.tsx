@@ -1,16 +1,16 @@
-import { none, some } from "@/shared/lib/monads/option";
-import { Inline, Stack } from "@/shared/ui/layout";
-import type { LabelOwnProps } from "@/shared/ui/primitives";
-import { Heading, IconButtonGhostSm, Label } from "@/shared/ui/primitives";
-import { MoonIcon } from "@/shared/ui/primitives/Icon";
+import { none, some } from '@/shared/lib/monads/option';
+import { Inline, Stack } from '@/shared/ui/layout';
+import type { LabelOwnProps } from '@/shared/ui/primitives';
+import { Heading, IconButtonGhostSm, Label } from '@/shared/ui/primitives';
+import { MoonIcon } from '@/shared/ui/primitives/Icon';
 
-import { useOverviewCopy } from "../../overview-copy";
-import { overviewDemoSectionHeadingBase } from "../demo-section-heading";
-import { DemoBulletList } from "../overview-demo-frame";
+import { useOverviewCopy } from '../../overview-copy';
+import { overviewDemoSectionHeadingBase } from '../demo-section-heading';
+import { DemoBulletList } from '../overview-demo-frame';
 
 const labelBase: Pick<
   LabelOwnProps,
-  "htmlFor" | "requiredMark" | "optionalMark" | "infoAffordance"
+  'htmlFor' | 'requiredMark' | 'optionalMark' | 'infoAffordance'
 > = {
   htmlFor: none(),
   requiredMark: none(),
@@ -24,14 +24,24 @@ export function LabelDemo() {
   return (
     <Stack gap="xl">
       <Stack className="overview-demo__subsection" gap="sm">
-        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+        <Heading
+          {...overviewDemoSectionHeadingBase}
+          level={2}
+          tone="default"
+          variant="caption-heading"
+        >
           {copy.demos.labelIntroHeading}
         </Heading>
         <DemoBulletList items={copy.demos.labelIntroBullets} />
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+        <Heading
+          {...overviewDemoSectionHeadingBase}
+          level={2}
+          tone="default"
+          variant="caption-heading"
+        >
           {copy.demos.labelVariantHeading}
         </Heading>
         <DemoBulletList items={copy.demos.labelVariantBullets} />
@@ -49,7 +59,12 @@ export function LabelDemo() {
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+        <Heading
+          {...overviewDemoSectionHeadingBase}
+          level={2}
+          tone="default"
+          variant="caption-heading"
+        >
           {copy.demos.labelStateHeading}
         </Heading>
         <DemoBulletList items={copy.demos.labelStateBullets} />
@@ -75,7 +90,12 @@ export function LabelDemo() {
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+        <Heading
+          {...overviewDemoSectionHeadingBase}
+          level={2}
+          tone="default"
+          variant="caption-heading"
+        >
           {copy.demos.labelAffordanceHeading}
         </Heading>
         <DemoBulletList items={copy.demos.labelAffordanceBullets} />
@@ -88,7 +108,7 @@ export function LabelDemo() {
               type="button"
             >
               <MoonIcon size={14} />
-            </IconButtonGhostSm>,
+            </IconButtonGhostSm>
           )}
           state="default"
           variant="default"

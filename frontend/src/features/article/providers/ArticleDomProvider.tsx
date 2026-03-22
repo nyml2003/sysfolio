@@ -1,22 +1,12 @@
-import {
-  useCallback,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 
-import {
-  isSome,
-  none,
-  some,
-  type Option,
-} from "@/shared/lib/monads/option";
+import { isSome, none, some, type Option } from '@/shared/lib/monads/option';
 
 import {
   ArticleDomContext,
   type ArticleDomContextValue,
   type RegisteredArticleHeading,
-} from "../context/article-dom.context";
+} from '../context/article-dom.context';
 
 type ArticleDomProviderProps = {
   children: ReactNode;
@@ -24,7 +14,7 @@ type ArticleDomProviderProps = {
 
 function areSameHeadingOrder(
   currentHeadingOrder: ReadonlyArray<string>,
-  nextHeadingOrder: ReadonlyArray<string>,
+  nextHeadingOrder: ReadonlyArray<string>
 ): boolean {
   return (
     currentHeadingOrder.length === nextHeadingOrder.length &&
@@ -38,24 +28,24 @@ function createAllowedHeadingIds(headingOrder: ReadonlyArray<string>): Record<st
       ...currentIds,
       [headingId]: true,
     }),
-    {},
+    {}
   );
 }
 
 function filterHeadingElementsByAllowedIds(
   headingElementsById: Record<string, HTMLElement>,
-  allowedHeadingIds: Record<string, true>,
+  allowedHeadingIds: Record<string, true>
 ): Record<string, HTMLElement> {
   return Object.fromEntries(
     Object.entries(headingElementsById).filter(
-      ([headingId]) => allowedHeadingIds[headingId] === true,
-    ),
+      ([headingId]) => allowedHeadingIds[headingId] === true
+    )
   ) as Record<string, HTMLElement>;
 }
 
 function toStableNodeOption(
   currentNode: Option<HTMLElement>,
-  nextNode: Option<HTMLElement>,
+  nextNode: Option<HTMLElement>
 ): Option<HTMLElement> {
   if (!isSome(nextNode)) {
     return isSome(currentNode) ? none() : currentNode;
@@ -91,7 +81,7 @@ export function ArticleDomProvider({ children }: ArticleDomProviderProps) {
     setHeadingOrder((currentHeadingOrder) =>
       areSameHeadingOrder(currentHeadingOrder, nextHeadingOrder)
         ? currentHeadingOrder
-        : [...nextHeadingOrder],
+        : [...nextHeadingOrder]
     );
 
     const allowedHeadingIds = createAllowedHeadingIds(nextHeadingOrder);
@@ -99,7 +89,7 @@ export function ArticleDomProvider({ children }: ArticleDomProviderProps) {
     setHeadingElementsById((currentHeadingElementsById) => {
       const nextHeadingElementsById = filterHeadingElementsByAllowedIds(
         currentHeadingElementsById,
-        allowedHeadingIds,
+        allowedHeadingIds
       );
 
       return Object.keys(nextHeadingElementsById).length ===
@@ -110,7 +100,7 @@ export function ArticleDomProvider({ children }: ArticleDomProviderProps) {
   }, []);
 
   const registerHeading = useCallback((headingId: string, node: Option<HTMLElement>) => {
-    if (headingId === "") {
+    if (headingId === '') {
       return;
     }
 
@@ -147,7 +137,7 @@ export function ArticleDomProvider({ children }: ArticleDomProviderProps) {
 
         return element === undefined ? [] : [{ id: headingId, element }];
       }),
-    [headingElementsById, headingOrder],
+    [headingElementsById, headingOrder]
   );
 
   const value = useMemo<ArticleDomContextValue>(
@@ -172,7 +162,7 @@ export function ArticleDomProvider({ children }: ArticleDomProviderProps) {
       registerHeadingOrder,
       registerScrollContainer,
       scrollContainer,
-    ],
+    ]
   );
 
   const contextValue = useMemo(() => some(value), [value]);

@@ -1,6 +1,6 @@
-import { none, some } from "@/shared/lib/monads/option";
-import { Inline, Stack } from "@/shared/ui/layout";
-import type { ButtonOwnProps, IconButtonOwnProps } from "@/shared/ui/primitives";
+import { none, some } from '@/shared/lib/monads/option';
+import { Inline, Stack } from '@/shared/ui/layout';
+import type { ButtonOwnProps, IconButtonOwnProps } from '@/shared/ui/primitives';
 import {
   Button,
   ButtonGroup,
@@ -10,19 +10,19 @@ import {
   IconButtonGhostMd,
   IconButtonGhostSm,
   Tag,
-} from "@/shared/ui/primitives";
-import { MoonIcon } from "@/shared/ui/primitives/Icon";
+} from '@/shared/ui/primitives';
+import { MoonIcon } from '@/shared/ui/primitives/Icon';
 
-import { useOverviewCopy } from "../../overview-copy";
-import { overviewDemoSectionHeadingBase } from "../demo-section-heading";
-import { DemoBulletList } from "../overview-demo-frame";
+import { useOverviewCopy } from '../../overview-copy';
+import { overviewDemoSectionHeadingBase } from '../demo-section-heading';
+import { DemoBulletList } from '../overview-demo-frame';
 
 const btnBase: Pick<
   ButtonOwnProps,
-  "size" | "type" | "loading" | "fullWidth" | "truncateLabel" | "leadingIcon" | "trailingIcon"
+  'size' | 'type' | 'loading' | 'fullWidth' | 'truncateLabel' | 'leadingIcon' | 'trailingIcon'
 > = {
-  size: "md",
-  type: "button",
+  size: 'md',
+  type: 'button',
   loading: false,
   fullWidth: false,
   truncateLabel: false,
@@ -33,9 +33,9 @@ const btnBase: Pick<
 export function ButtonDemo() {
   const copy = useOverviewCopy();
 
-  const iconBase: Pick<IconButtonOwnProps, "size" | "type" | "loading" | "srLabel"> = {
-    size: "md",
-    type: "button",
+  const iconBase: Pick<IconButtonOwnProps, 'size' | 'type' | 'loading' | 'srLabel'> = {
+    size: 'md',
+    type: 'button',
     loading: false,
     srLabel: copy.demos.buttonIconAriaLabel,
   };
@@ -43,14 +43,24 @@ export function ButtonDemo() {
   return (
     <Stack gap="xl">
       <Stack className="overview-demo__subsection" gap="sm">
-        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+        <Heading
+          {...overviewDemoSectionHeadingBase}
+          level={2}
+          tone="default"
+          variant="caption-heading"
+        >
           {copy.demos.buttonIntroHeading}
         </Heading>
         <DemoBulletList items={copy.demos.buttonIntroBullets} />
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+        <Heading
+          {...overviewDemoSectionHeadingBase}
+          level={2}
+          tone="default"
+          variant="caption-heading"
+        >
           {copy.demos.buttonToneHeading}
         </Heading>
         <DemoBulletList items={copy.demos.buttonToneBullets} />
@@ -79,7 +89,12 @@ export function ButtonDemo() {
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+        <Heading
+          {...overviewDemoSectionHeadingBase}
+          level={2}
+          tone="default"
+          variant="caption-heading"
+        >
           {copy.demos.buttonSizeHeading}
         </Heading>
         <DemoBulletList items={copy.demos.buttonSizeBullets} />
@@ -94,17 +109,17 @@ export function ButtonDemo() {
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+        <Heading
+          {...overviewDemoSectionHeadingBase}
+          level={2}
+          tone="default"
+          variant="caption-heading"
+        >
           {copy.demos.buttonA11yHeading}
         </Heading>
         <DemoBulletList items={copy.demos.buttonA11yBullets} />
         <Inline align="center" gap="sm">
-          <Button
-            {...btnBase}
-            aria-label={copy.demos.buttonIconAriaLabel}
-            size="sm"
-            tone="ghost"
-          >
+          <Button {...btnBase} aria-label={copy.demos.buttonIconAriaLabel} size="sm" tone="ghost">
             <MoonIcon size={16} />
           </Button>
           <Tag tone="accent">aria-label</Tag>
@@ -112,14 +127,24 @@ export function ButtonDemo() {
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+        <Heading
+          {...overviewDemoSectionHeadingBase}
+          level={2}
+          tone="default"
+          variant="caption-heading"
+        >
           {copy.demos.buttonDenseHeading}
         </Heading>
         <DemoBulletList items={copy.demos.buttonDenseBullets} />
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+        <Heading
+          {...overviewDemoSectionHeadingBase}
+          level={2}
+          tone="default"
+          variant="caption-heading"
+        >
           {copy.demos.buttonLoadingHeading}
         </Heading>
         <DemoBulletList items={copy.demos.buttonLoadingBullets} />
@@ -134,20 +159,25 @@ export function ButtonDemo() {
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+        <Heading
+          {...overviewDemoSectionHeadingBase}
+          level={2}
+          tone="default"
+          variant="caption-heading"
+        >
           {copy.demos.buttonLayoutHeading}
         </Heading>
         <DemoBulletList items={copy.demos.buttonLayoutBullets} />
-        <Stack gap="md" style={{ inlineSize: "min(100%, 22rem)" }}>
+        <Stack gap="md" style={{ inlineSize: 'min(100%, 22rem)' }}>
           <Button {...btnBase} fullWidth tone="primary">
             {copy.demos.buttonFullWidthLabel}
           </Button>
-          <div style={{ inlineSize: "11rem", maxInlineSize: "100%" }}>
+          <div style={{ inlineSize: '11rem', maxInlineSize: '100%' }}>
             <Button {...btnBase} truncateLabel tone="secondary">
               {copy.demos.buttonTruncateLongLabel}
             </Button>
           </div>
-          <div style={{ inlineSize: "12rem", maxInlineSize: "100%" }}>
+          <div style={{ inlineSize: '12rem', maxInlineSize: '100%' }}>
             <Button
               {...btnBase}
               leadingIcon={some(<MoonIcon size={16} />)}
@@ -161,7 +191,12 @@ export function ButtonDemo() {
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+        <Heading
+          {...overviewDemoSectionHeadingBase}
+          level={2}
+          tone="default"
+          variant="caption-heading"
+        >
           {copy.demos.buttonIconButtonHeading}
         </Heading>
         <DemoBulletList items={copy.demos.buttonIconButtonBullets} />
@@ -191,7 +226,12 @@ export function ButtonDemo() {
       </Stack>
 
       <Stack className="overview-demo__subsection" gap="sm">
-        <Heading {...overviewDemoSectionHeadingBase} level={2} tone="default" variant="caption-heading">
+        <Heading
+          {...overviewDemoSectionHeadingBase}
+          level={2}
+          tone="default"
+          variant="caption-heading"
+        >
           {copy.demos.buttonGroupHeading}
         </Heading>
         <DemoBulletList items={copy.demos.buttonGroupBullets} />

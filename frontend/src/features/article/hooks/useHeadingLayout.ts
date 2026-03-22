@@ -1,21 +1,21 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
 
 import {
   getElementClientHeight,
   getElementScrollHeight,
   getElementScrollTop,
   getElementScrollTopWithinContainer,
-} from "@/shared/lib/dom/scroll-element";
-import { fromNullable, isSome, none, some, type Option } from "@/shared/lib/monads/option";
+} from '@/shared/lib/dom/scroll-element';
+import { fromNullable, isSome, none, some, type Option } from '@/shared/lib/monads/option';
 
-import { useResizeObserver } from "@/shared/lib/layout/useResizeObserver";
+import { useResizeObserver } from '@/shared/lib/layout/useResizeObserver';
 
 import {
   ARTICLE_SCROLL_POSITION_EPSILON,
   TOC_ACTIVATION_LINE_RATIO,
   TOC_SCROLLABLE_EPSILON,
-} from "../constant";
-import { useArticleDom } from "../context/article-dom.context";
+} from '../constant';
+import { useArticleDom } from '../context/article-dom.context';
 
 type HeadingMetric = {
   id: string;
@@ -41,10 +41,7 @@ type UseHeadingLayoutResult = {
   refreshLayout: () => void;
 };
 
-function areSameElementOption(
-  left: Option<HTMLElement>,
-  right: Option<HTMLElement>,
-): boolean {
+function areSameElementOption(left: Option<HTMLElement>, right: Option<HTMLElement>): boolean {
   if (!isSome(left) || !isSome(right)) {
     return !isSome(left) && !isSome(right);
   }
@@ -54,7 +51,7 @@ function areSameElementOption(
 
 function areHeadingMetricsEqual(
   previousMetrics: HeadingMetric[],
-  nextMetrics: HeadingMetric[],
+  nextMetrics: HeadingMetric[]
 ): boolean {
   return (
     previousMetrics.length === nextMetrics.length &&
@@ -76,7 +73,7 @@ function areHeadingMetricsEqual(
 
 function resolveHeadingIdForActivationLine(
   headingMetrics: HeadingMetric[],
-  activationLine: number,
+  activationLine: number
 ): Option<string> {
   const currentHeading = headingMetrics
     .filter((metric) => metric.offsetTop <= activationLine)
@@ -85,9 +82,7 @@ function resolveHeadingIdForActivationLine(
   return currentHeading === undefined ? none() : some(currentHeading.id);
 }
 
-export function useHeadingLayout({
-  enabled,
-}: UseHeadingLayoutOptions): UseHeadingLayoutResult {
+export function useHeadingLayout({ enabled }: UseHeadingLayoutOptions): UseHeadingLayoutResult {
   const { articleBody, bottomSentinel, headings, scrollContainer } = useArticleDom();
   const [layoutVersion, setLayoutVersion] = useState(0);
   const headingMetricsRef = useRef<HeadingMetric[]>([]);
@@ -121,13 +116,10 @@ export function useHeadingLayout({
     const nextTargetScrollTopById: Record<string, number> = {};
 
     for (const heading of headings) {
-      const offsetTop = getElementScrollTopWithinContainer(
-        scrollContainerElement,
-        heading.element,
-      );
+      const offsetTop = getElementScrollTopWithinContainer(scrollContainerElement, heading.element);
       const targetScrollTop = Math.max(
         0,
-        offsetTop - getElementClientHeight(scrollContainerElement) * TOC_ACTIVATION_LINE_RATIO,
+        offsetTop - getElementClientHeight(scrollContainerElement) * TOC_ACTIVATION_LINE_RATIO
       );
 
       nextMetrics.push({
@@ -158,13 +150,7 @@ export function useHeadingLayout({
     refreshLayout();
     // Effect Events are intentionally non-reactive here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    articleBody,
-    bottomSentinel,
-    enabled,
-    headings,
-    scrollContainer,
-  ]);
+  }, [articleBody, bottomSentinel, enabled, headings, scrollContainer]);
 
   useResizeObserver({
     disabled: !enabled,
@@ -203,7 +189,8 @@ export function useHeadingLayout({
     }
 
     return (
-      getElementScrollHeight(scrollContainer.value) - getElementClientHeight(scrollContainer.value) >
+      getElementScrollHeight(scrollContainer.value) -
+        getElementClientHeight(scrollContainer.value) >
       TOC_SCROLLABLE_EPSILON
     );
   });
@@ -225,10 +212,7 @@ export function useHeadingLayout({
       getElementScrollTop(scrollContainer.value) +
       getElementClientHeight(scrollContainer.value) * TOC_ACTIVATION_LINE_RATIO;
 
-    return resolveHeadingIdForActivationLine(
-      headingMetrics,
-      activationLine,
-    );
+    return resolveHeadingIdForActivationLine(headingMetrics, activationLine);
   });
 
   const getBottomSentinel = useEffectEvent(() => {

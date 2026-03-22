@@ -1,7 +1,5 @@
-import type { MotionMode } from "@/shared/lib/style/style.types";
+import type { MotionMode } from '@/shared/lib/style/style.types';
 
-export function resolveMotionMode(
-  mediaQueryMatchesReducedMotion: boolean,
-): MotionMode {
-  return mediaQueryMatchesReducedMotion ? "reduced" : "full";
+export function resolveMotionMode(mediaQueryMatchesReducedMotion: boolean): MotionMode {
+  return mediaQueryMatchesReducedMotion ? 'reduced' : 'full';
 }

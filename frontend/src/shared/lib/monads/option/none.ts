@@ -1,5 +1,5 @@
-import type { Option } from "./option.types";
+import type { Option } from './option.types';
 
 export function none(): Option<never> {
-  return { tag: "none" };
+  return { tag: 'none' };
 }

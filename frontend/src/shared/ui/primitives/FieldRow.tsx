@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
-import { Inline } from "@/shared/ui/layout";
+import { Inline } from '@/shared/ui/layout';
 
 export function FieldRow({ children }: { children: ReactNode }) {
   return (

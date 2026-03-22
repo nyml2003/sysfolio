@@ -1,11 +1,11 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from 'react';
 
-import type { Option } from "@/shared/lib/monads/option";
+import type { Option } from '@/shared/lib/monads/option';
 
-export type LabelVariant = "default" | "strong" | "subtle";
+export type LabelVariant = 'default' | 'strong' | 'subtle';
 
 /** catalog：default / disabled / required / optional */
-export type LabelState = "default" | "disabled" | "required" | "optional";
+export type LabelState = 'default' | 'disabled' | 'required' | 'optional';
 
 export type LabelOwnProps = {
   variant: LabelVariant;
@@ -21,4 +21,4 @@ export type LabelOwnProps = {
   children: NonNullable<ReactNode>;
 };
 
-export type LabelProps = LabelOwnProps & Omit<HTMLAttributes<HTMLElement>, "children">;
+export type LabelProps = LabelOwnProps & Omit<HTMLAttributes<HTMLElement>, 'children'>;

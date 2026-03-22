@@ -1,8 +1,8 @@
-import type { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
+import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
 
-import { clsx } from "clsx";
+import { clsx } from 'clsx';
 
-type SurfaceTone = "default" | "muted" | "accent" | "danger";
+type SurfaceTone = 'default' | 'muted' | 'accent' | 'danger';
 
 type SurfaceProps<T extends ElementType> = {
   as?: T;
@@ -12,23 +12,23 @@ type SurfaceProps<T extends ElementType> = {
   className?: string;
 };
 
-export function Surface<T extends ElementType = "section">({
+export function Surface<T extends ElementType = 'section'>({
   as,
   children,
-  tone = "default",
+  tone = 'default',
   padded = true,
   className,
   ...rest
 }: SurfaceProps<T> & Omit<ComponentPropsWithoutRef<T>, keyof SurfaceProps<T>>) {
-  const Component = as ?? "section";
+  const Component = as ?? 'section';
 
   return (
     <Component
       className={clsx(
-        "sf-surface",
+        'sf-surface',
         `sf-surface--${tone}`,
-        padded && "sf-surface--padded",
-        className,
+        padded && 'sf-surface--padded',
+        className
       )}
       {...rest}
     >
@@ -36,4 +36,3 @@ export function Surface<T extends ElementType = "section">({
     </Component>
   );
 }
-

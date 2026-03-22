@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-import { isSome } from "@/shared/lib/monads/option";
+import { isSome } from '@/shared/lib/monads/option';
 
-import { getDocumentElementOption } from "./get-document-element-option";
+import { getDocumentElementOption } from './get-document-element-option';
 
 function setDocumentElementLanguage(language: string) {
   const documentElement = getDocumentElementOption();

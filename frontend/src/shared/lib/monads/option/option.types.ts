@@ -1,7 +1,7 @@
-export type None = { tag: "none" };
+export type None = { tag: 'none' };
 
 export type Some<T> = {
-  tag: "some";
+  tag: 'some';
   value: T;
 };
 

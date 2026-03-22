@@ -1,9 +1,9 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
-import { Inline, Stack, Surface } from "@/shared/ui/layout";
-import { Tag } from "@/shared/ui/primitives";
+import { Inline, Stack, Surface } from '@/shared/ui/layout';
+import { Tag } from '@/shared/ui/primitives';
 
-import { useOverviewCopy } from "../overview-copy";
+import { useOverviewCopy } from '../overview-copy';
 
 export function DemoBulletList({ items }: { items: readonly string[] }) {
   return (

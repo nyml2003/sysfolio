@@ -1,7 +1,7 @@
-import type { ContentNode, NodeId } from "@/entities/content";
-import { isSome } from "@/shared/lib/monads/option";
+import type { ContentNode } from '@/entities/content';
+import { isSome } from '@/shared/lib/monads/option';
 
-import type { TreeIndex } from "./tree-index.types";
+import type { TreeIndex } from './tree-index.types';
 
 export function mergeNodes(index: TreeIndex, nodes: ContentNode[]): TreeIndex {
   const nextNodesById = { ...index.nodesById };

@@ -1,23 +1,23 @@
-import { useEffect, useRef, useState } from "react";
-import { animate, useMotionValue, useMotionValueEvent } from "motion/react";
+import { useEffect, useRef, useState } from 'react';
+import { animate, useMotionValue, useMotionValueEvent } from 'motion/react';
 
-import { getWindowOption } from "@/shared/lib/dom/get-window-option";
+import { getWindowOption } from '@/shared/lib/dom/get-window-option';
 import {
   getElementClientHeight,
   getElementScrollHeight,
   getElementScrollTop,
   setElementScrollTop,
-} from "@/shared/lib/dom/scroll-element";
-import { useEventListener } from "@/shared/lib/dom/useEventListener";
-import { isSome, none, some, unwrapOr, type Option } from "@/shared/lib/monads/option";
+} from '@/shared/lib/dom/scroll-element';
+import { useEventListener } from '@/shared/lib/dom/useEventListener';
+import { isSome, none, some, unwrapOr, type Option } from '@/shared/lib/monads/option';
 
 import {
   ARTICLE_SCROLL_KEYBOARD_KEYS,
   ARTICLE_SMOOTH_SCROLL_COMPLETION_EPSILON,
   ARTICLE_SMOOTH_SCROLL_DURATION_SECONDS,
   ARTICLE_SMOOTH_SCROLL_EASE,
-} from "../constant";
-import { useArticleDom } from "../context/article-dom.context";
+} from '../constant';
+import { useArticleDom } from '../context/article-dom.context';
 
 type UseSmoothScrollOptions = {
   durationSeconds: Option<number>;
@@ -31,19 +31,22 @@ type UseSmoothScrollResult = {
 };
 
 function hasKeyboardKey(event: Event): event is Event & { key: string } {
-  return "key" in event && typeof event.key === "string";
+  return 'key' in event && typeof event.key === 'string';
 }
 
 function isScrollKeyboardKey(key: string): boolean {
   return ARTICLE_SCROLL_KEYBOARD_KEYS.includes(
-    key as (typeof ARTICLE_SCROLL_KEYBOARD_KEYS)[number],
+    key as (typeof ARTICLE_SCROLL_KEYBOARD_KEYS)[number]
   );
 }
 
 function clampScrollTop(scrollContainer: HTMLElement, scrollTop: number): number {
   return Math.max(
     0,
-    Math.min(scrollTop, getElementScrollHeight(scrollContainer) - getElementClientHeight(scrollContainer)),
+    Math.min(
+      scrollTop,
+      getElementScrollHeight(scrollContainer) - getElementClientHeight(scrollContainer)
+    )
   );
 }
 
@@ -94,11 +97,11 @@ export function useSmoothScroll({
       animate(scrollTopValue, nextScrollTop, {
         duration: unwrapOr(durationSeconds, ARTICLE_SMOOTH_SCROLL_DURATION_SECONDS),
         ease: ARTICLE_SMOOTH_SCROLL_EASE,
-      }),
+      })
     );
   };
 
-  useMotionValueEvent(scrollTopValue, "change", (latest) => {
+  useMotionValueEvent(scrollTopValue, 'change', (latest) => {
     if (!isSome(scrollContainer) || !isProgrammaticScrollingRef.current) {
       return;
     }
@@ -106,12 +109,12 @@ export function useSmoothScroll({
     setElementScrollTop(scrollContainer.value, clampScrollTop(scrollContainer.value, latest));
   });
 
-  useMotionValueEvent(scrollTopValue, "animationComplete", () => {
+  useMotionValueEvent(scrollTopValue, 'animationComplete', () => {
     animationRef.current = none();
     setIsProgrammaticScrolling(false);
   });
 
-  useMotionValueEvent(scrollTopValue, "animationCancel", () => {
+  useMotionValueEvent(scrollTopValue, 'animationCancel', () => {
     animationRef.current = none();
     setIsProgrammaticScrolling(false);
   });
@@ -138,7 +141,7 @@ export function useSmoothScroll({
 
   useEventListener({
     target: scrollContainer,
-    type: "wheel",
+    type: 'wheel',
     listener: notifyUserInteraction,
     options: { passive: true },
     disabled: !isSome(scrollContainer),
@@ -146,7 +149,7 @@ export function useSmoothScroll({
 
   useEventListener({
     target: scrollContainer,
-    type: "touchstart",
+    type: 'touchstart',
     listener: notifyUserInteraction,
     options: { passive: true },
     disabled: !isSome(scrollContainer),
@@ -154,7 +157,7 @@ export function useSmoothScroll({
 
   useEventListener({
     target: getWindowOption(),
-    type: "keydown",
+    type: 'keydown',
     listener: handleKeyboardInteraction,
     options: undefined,
     disabled: false,

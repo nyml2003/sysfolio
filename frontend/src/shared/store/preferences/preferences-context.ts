@@ -1,9 +1,9 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
-import { none, type Option } from "@/shared/lib/monads/option";
-import type { AppLocale } from "@/shared/lib/i18n/locale.types";
-import type { DensityPreference } from "@/shared/lib/style/style.types";
-import type { ThemePreference } from "@/shared/lib/theme/theme.types";
+import { none, type Option } from '@/shared/lib/monads/option';
+import type { AppLocale } from '@/shared/lib/i18n/locale.types';
+import type { DensityPreference } from '@/shared/lib/style/style.types';
+import type { ThemePreference } from '@/shared/lib/theme/theme.types';
 
 export type PreferencesContextValue = {
   theme: ThemePreference;

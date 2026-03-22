@@ -1,11 +1,11 @@
-import type { BreadcrumbSegment } from "@/entities/content";
+import type { BreadcrumbSegment } from '@/entities/content';
 
-import { LocaleToggle } from "@/features/locale/components/LocaleToggle";
-import { ThemeToggle } from "@/features/theme/components/ThemeToggle";
-import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
-import { ButtonGhostMd } from "@/shared/ui/primitives";
+import { LocaleToggle } from '@/features/locale/components/LocaleToggle';
+import { ThemeToggle } from '@/features/theme/components/ThemeToggle';
+import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
+import { ButtonGhostMd } from '@/shared/ui/primitives';
 
-import styles from "./PathBar.module.css";
+import styles from './PathBar.module.css';
 
 type PathBarProps = {
   breadcrumbs: BreadcrumbSegment[];
@@ -26,11 +26,7 @@ export function PathBar({ breadcrumbs, isLoading, onNavigate }: PathBarProps) {
 
   return (
     <header className={styles.root}>
-      <nav
-        aria-busy={isLoading}
-        aria-label={copy.pathBar.navLabel}
-        className={styles.segments}
-      >
+      <nav aria-busy={isLoading} aria-label={copy.pathBar.navLabel} className={styles.segments}>
         {breadcrumbs.map((segment, index) => {
           const isCurrent = index === breadcrumbs.length - 1;
 
@@ -41,18 +37,18 @@ export function PathBar({ breadcrumbs, isLoading, onNavigate }: PathBarProps) {
                   aria-hidden="true"
                   className={[
                     styles.segmentSkeleton,
-                    isCurrent ? styles.segmentSkeletonCurrent : "",
+                    isCurrent ? styles.segmentSkeletonCurrent : '',
                   ]
                     .filter(Boolean)
-                    .join(" ")}
+                    .join(' ')}
                   style={{ width: getSkeletonWidth(segment.title, isCurrent) }}
                 />
               ) : (
                 <ButtonGhostMd
-                  aria-current={isCurrent ? "page" : false}
-                  className={[styles.segment, isCurrent ? styles.current : ""]
+                  aria-current={isCurrent ? 'page' : false}
+                  className={[styles.segment, isCurrent ? styles.current : '']
                     .filter(Boolean)
-                    .join(" ")}
+                    .join(' ')}
                   disabled={isCurrent}
                   onClick={() => {
                     if (!isCurrent) {

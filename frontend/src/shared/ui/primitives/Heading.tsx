@@ -1,31 +1,22 @@
-import { createElement, forwardRef } from "react";
+import { createElement, forwardRef } from 'react';
 
-import { clsx } from "clsx";
+import { clsx } from 'clsx';
 
-import { isSome } from "@/shared/lib/monads/option";
+import { isSome } from '@/shared/lib/monads/option';
 
-import type { HeadingLevel, HeadingProps } from "./heading.types";
+import type { HeadingLevel, HeadingProps } from './heading.types';
 
-const headingTagByLevel: Record<HeadingLevel, "h1" | "h2" | "h3" | "h4" | "h5" | "h6"> = {
-  1: "h1",
-  2: "h2",
-  3: "h3",
-  4: "h4",
-  5: "h5",
-  6: "h6",
+const headingTagByLevel: Record<HeadingLevel, 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'> = {
+  1: 'h1',
+  2: 'h2',
+  3: 'h3',
+  4: 'h4',
+  5: 'h5',
+  6: 'h6',
 };
 
 export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Heading(props, ref) {
-  const {
-    level,
-    variant,
-    tone,
-    leadingIcon,
-    trailingMeta,
-    children,
-    className,
-    ...rest
-  } = props;
+  const { level, variant, tone, leadingIcon, trailingMeta, children, className, ...rest } = props;
 
   const tag = headingTagByLevel[level];
   const hasAffix = isSome(leadingIcon) || isSome(trailingMeta);
@@ -56,15 +47,15 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
       ref,
       ...rest,
       className: clsx(
-        "sf-heading",
+        'sf-heading',
         `sf-heading--${variant}`,
         `sf-heading--${tone}`,
-        hasAffix && "sf-heading--has-affix",
-        className,
+        hasAffix && 'sf-heading--has-affix',
+        className
       ),
     },
-    inner,
+    inner
   );
 });
 
-Heading.displayName = "Heading";
+Heading.displayName = 'Heading';

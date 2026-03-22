@@ -1,6 +1,6 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext } from 'react';
 
-import { isSome, none, type Option } from "@/shared/lib/monads/option";
+import { isSome, none, type Option } from '@/shared/lib/monads/option';
 
 export type RegisteredArticleHeading = {
   id: string;
@@ -25,7 +25,7 @@ export function useArticleDom(): ArticleDomContextValue {
   const context = useContext(ArticleDomContext);
 
   if (!isSome(context)) {
-    throw new Error("useArticleDom must be used inside ArticleDomProvider.");
+    throw new Error('useArticleDom must be used inside ArticleDomProvider.');
   }
 
   return context.value;

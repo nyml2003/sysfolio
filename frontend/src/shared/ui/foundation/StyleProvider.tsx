@@ -1,13 +1,6 @@
-import {
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useEffectEvent, useMemo, useState, type ReactNode } from 'react';
 
-import { clsx } from "clsx";
+import { clsx } from 'clsx';
 
 import {
   fromNullable,
@@ -16,26 +9,26 @@ import {
   some,
   unwrapOr,
   type Option,
-} from "@/shared/lib/monads/option";
+} from '@/shared/lib/monads/option';
 import {
   DEFAULT_MOTION_MODE,
   type DensityPreference,
   type LayoutMode,
   type MotionMode,
   type ResolvedStyleContextValue,
-} from "@/shared/lib/style/style.types";
-import type { ThemePreference } from "@/shared/lib/theme/theme.types";
-import { useResizeObserver } from "@/shared/lib/layout/useResizeObserver";
-import { usePreferences } from "@/shared/store/preferences";
+} from '@/shared/lib/style/style.types';
+import type { ThemePreference } from '@/shared/lib/theme/theme.types';
+import { useResizeObserver } from '@/shared/lib/layout/useResizeObserver';
+import { usePreferences } from '@/shared/store/preferences';
 
 import {
   INITIAL_LAYOUT_MODE,
   STYLE_LAYOUT_MODE_CLASS_NAMES,
   STYLE_SCOPE_CLASS_NAME,
-} from "./style.constants";
-import { StyleContext } from "./style-context";
-import { resolveLayoutModeFromWidth } from "./resolve-layout-mode-from-width";
-import { resolveMotionMode } from "./resolve-motion-mode";
+} from './style.constants';
+import { StyleContext } from './style-context';
+import { resolveLayoutModeFromWidth } from './resolve-layout-mode-from-width';
+import { resolveMotionMode } from './resolve-motion-mode';
 
 type StyleProviderProps = {
   children: ReactNode;
@@ -48,7 +41,7 @@ type StyleProviderProps = {
 
 function toStableScopeOption(
   currentNode: Option<HTMLDivElement>,
-  nextNode: HTMLDivElement | null,
+  nextNode: HTMLDivElement | null
 ): Option<HTMLDivElement> {
   const nextOption = fromNullable(nextNode);
 
@@ -73,10 +66,8 @@ export function StyleProvider({
 }: StyleProviderProps) {
   const preferences = usePreferences();
   const [scopeElement, setScopeElement] = useState<Option<HTMLDivElement>>(none());
-  const [resolvedLayoutMode, setResolvedLayoutMode] =
-    useState<LayoutMode>(INITIAL_LAYOUT_MODE);
-  const [resolvedMotionMode, setResolvedMotionMode] =
-    useState<MotionMode>(DEFAULT_MOTION_MODE);
+  const [resolvedLayoutMode, setResolvedLayoutMode] = useState<LayoutMode>(INITIAL_LAYOUT_MODE);
+  const [resolvedMotionMode, setResolvedMotionMode] = useState<MotionMode>(DEFAULT_MOTION_MODE);
   const registerScopeElement = useCallback((node: HTMLDivElement | null) => {
     setScopeElement((currentNode) => toStableScopeOption(currentNode, node));
   }, []);
@@ -86,18 +77,16 @@ export function StyleProvider({
   const syncResolvedLayoutMode = useEffectEvent(() => {
     if (isSome(layoutMode)) {
       setResolvedLayoutMode((currentMode) =>
-        currentMode === layoutMode.value ? currentMode : layoutMode.value,
+        currentMode === layoutMode.value ? currentMode : layoutMode.value
       );
       return;
     }
 
-    const measuredWidth = isSome(scopeElement)
-      ? scopeElement.value.clientWidth
-      : window.innerWidth;
+    const measuredWidth = isSome(scopeElement) ? scopeElement.value.clientWidth : window.innerWidth;
     const nextLayoutMode = resolveLayoutModeFromWidth(measuredWidth);
 
     setResolvedLayoutMode((currentMode) =>
-      currentMode === nextLayoutMode ? currentMode : nextLayoutMode,
+      currentMode === nextLayoutMode ? currentMode : nextLayoutMode
     );
   });
 
@@ -106,7 +95,7 @@ export function StyleProvider({
     onResize: () => {
       syncResolvedLayoutMode();
     },
-    dependencyToken: isSome(scopeElement) ? scopeElement.value : "scope-missing",
+    dependencyToken: isSome(scopeElement) ? scopeElement.value : 'scope-missing',
     disabled: isSome(layoutMode),
   });
 
@@ -117,32 +106,32 @@ export function StyleProvider({
   useEffect(() => {
     if (isSome(motion)) {
       setResolvedMotionMode((currentMode) =>
-        currentMode === motion.value ? currentMode : motion.value,
+        currentMode === motion.value ? currentMode : motion.value
       );
       return undefined;
     }
 
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
       setResolvedMotionMode(DEFAULT_MOTION_MODE);
       return undefined;
     }
 
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const applyMotionMode = () => {
       const nextMotionMode = resolveMotionMode(mediaQuery.matches);
 
       setResolvedMotionMode((currentMode) =>
-        currentMode === nextMotionMode ? currentMode : nextMotionMode,
+        currentMode === nextMotionMode ? currentMode : nextMotionMode
       );
     };
 
     applyMotionMode();
 
-    if (typeof mediaQuery.addEventListener === "function") {
-      mediaQuery.addEventListener("change", applyMotionMode);
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', applyMotionMode);
 
       return () => {
-        mediaQuery.removeEventListener("change", applyMotionMode);
+        mediaQuery.removeEventListener('change', applyMotionMode);
       };
     }
 
@@ -160,7 +149,7 @@ export function StyleProvider({
       layoutMode: resolvedLayoutMode,
       motion: resolvedMotionMode,
     }),
-    [resolvedDensity, resolvedLayoutMode, resolvedMotionMode, resolvedTheme],
+    [resolvedDensity, resolvedLayoutMode, resolvedMotionMode, resolvedTheme]
   );
   const contextValue = useMemo(() => some(value), [value]);
 
@@ -169,11 +158,11 @@ export function StyleProvider({
       <div
         className={clsx(
           STYLE_SCOPE_CLASS_NAME,
-          unwrapOr(className, ""),
+          unwrapOr(className, ''),
           `sf-theme-${resolvedTheme}`,
           `sf-density-${resolvedDensity}`,
           STYLE_LAYOUT_MODE_CLASS_NAMES[resolvedLayoutMode],
-          `sf-motion-${resolvedMotionMode}`,
+          `sf-motion-${resolvedMotionMode}`
         )}
         ref={registerScopeElement}
       >

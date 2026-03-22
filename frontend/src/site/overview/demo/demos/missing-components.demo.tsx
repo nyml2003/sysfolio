@@ -1,5 +1,5 @@
-import { overviewDocumentMetaById } from "@/shared/data/mock/content.fixtures";
-import { Grid, Surface } from "@/shared/ui/layout";
+import { overviewDocumentMetaById } from '@/shared/data/mock/content.fixtures';
+import { Grid, Surface } from '@/shared/ui/layout';
 
 export function MissingComponentsDemo() {
   const summaries = Object.values(overviewDocumentMetaById).reduce(
@@ -7,7 +7,7 @@ export function MissingComponentsDemo() {
       ...current,
       [meta.status]: (current[meta.status] ?? 0) + 1,
     }),
-    {} as Record<string, number>,
+    {} as Record<string, number>
   );
 
   return (

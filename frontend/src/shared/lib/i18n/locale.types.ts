@@ -1,8 +1,8 @@
-export const APP_LOCALES = ["zh-CN", "en-US"] as const;
+export const APP_LOCALES = ['zh-CN', 'en-US'] as const;
 
 export type AppLocale = (typeof APP_LOCALES)[number];
 
-export const DEFAULT_LOCALE: AppLocale = "en-US";
+export const DEFAULT_LOCALE: AppLocale = 'en-US';
 
 export function isAppLocale(value: string): value is AppLocale {
   return APP_LOCALES.includes(value as AppLocale);

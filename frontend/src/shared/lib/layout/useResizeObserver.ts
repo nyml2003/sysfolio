@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
-import { isSome, type Option } from "@/shared/lib/monads/option";
+import { isSome, type Option } from '@/shared/lib/monads/option';
 
 type UseResizeObserverOptions = {
   getTargets: () => ReadonlyArray<Option<Element>>;
@@ -59,12 +59,12 @@ export function useResizeObserver({
 
     const observedTargets = collectObservedTargets(getTargetsRef.current());
 
-    if (typeof ResizeObserver === "undefined") {
+    if (typeof ResizeObserver === 'undefined') {
       scheduleResize();
-      window.addEventListener("resize", scheduleResize);
+      window.addEventListener('resize', scheduleResize);
 
       return () => {
-        window.removeEventListener("resize", scheduleResize);
+        window.removeEventListener('resize', scheduleResize);
         cancelResizeFrame(frameState);
       };
     }

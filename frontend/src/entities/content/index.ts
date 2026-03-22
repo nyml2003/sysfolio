@@ -23,4 +23,4 @@ export type {
   TocItem,
   TreeRootPayload,
   UnsupportedContent,
-} from "./content.types";
+} from './content.types';

@@ -1,9 +1,9 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 
-import { none, some } from "@/shared/lib/monads/option";
+import { none, some } from '@/shared/lib/monads/option';
 
-import { Label } from "./Label";
+import { Label } from './Label';
 
 const base = {
   requiredMark: none(),
@@ -11,42 +11,48 @@ const base = {
   infoAffordance: none(),
 };
 
-describe("Label", () => {
-  it("renders label element when htmlFor is set", () => {
+describe('Label', () => {
+  it('renders label element when htmlFor is set', () => {
     const { container } = render(
-      <Label {...base} htmlFor={some("field-id")} state="default" variant="default">
+      <Label {...base} htmlFor={some('field-id')} state="default" variant="default">
         Name
-      </Label>,
+      </Label>
     );
-    const el = container.querySelector("label[for=field-id]");
+    const el = container.querySelector('label[for=field-id]');
     expect(el).toBeTruthy();
-    expect(el?.textContent).toContain("Name");
+    expect(el?.textContent).toContain('Name');
   });
 
-  it("renders span when no htmlFor", () => {
+  it('renders span when no htmlFor', () => {
     const { container } = render(
       <Label {...base} htmlFor={none()} state="default" variant="default">
         Standalone
-      </Label>,
+      </Label>
     );
-    expect(container.querySelector("span.sf-label")).toBeTruthy();
+    expect(container.querySelector('span.sf-label')).toBeTruthy();
   });
 
-  it("shows default required asterisk", () => {
+  it('shows default required asterisk', () => {
     render(
       <Label {...base} htmlFor={none()} state="required" variant="default">
         Email
-      </Label>,
+      </Label>
     );
-    expect(screen.getByText("*")).toBeTruthy();
+    expect(screen.getByText('*')).toBeTruthy();
   });
 
-  it("shows optional mark when provided", () => {
+  it('shows optional mark when provided', () => {
     render(
-      <Label {...base} htmlFor={none()} optionalMark={some("(opt)")} state="optional" variant="default">
+      <Label
+        {...base}
+        htmlFor={none()}
+        optionalMark={some('(opt)')}
+        state="optional"
+        variant="default"
+      >
         Note
-      </Label>,
+      </Label>
     );
-    expect(screen.getByText("(opt)")).toBeTruthy();
+    expect(screen.getByText('(opt)')).toBeTruthy();
   });
 });

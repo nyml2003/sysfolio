@@ -1,10 +1,10 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
-import { isSome, none, type Option } from "@/shared/lib/monads/option";
-import { ButtonSecondaryMd } from "@/shared/ui/primitives";
-import { Stack, Surface } from "@/shared/ui/layout";
+import { isSome, none, type Option } from '@/shared/lib/monads/option';
+import { ButtonSecondaryMd } from '@/shared/ui/primitives';
+import { Stack, Surface } from '@/shared/ui/layout';
 
-type ViewStateLayoutState = "ready" | "loading" | "empty" | "error";
+type ViewStateLayoutState = 'ready' | 'loading' | 'empty' | 'error';
 
 type ViewStateLayoutProps = {
   state: ViewStateLayoutState;
@@ -23,12 +23,12 @@ export function ViewStateLayout({
   onAction = none(),
   children,
 }: ViewStateLayoutProps) {
-  if (state === "ready") {
+  if (state === 'ready') {
     return <>{children}</>;
   }
 
   return (
-    <Surface className="sf-view-state" tone={state === "error" ? "danger" : "muted"}>
+    <Surface className="sf-view-state" tone={state === 'error' ? 'danger' : 'muted'}>
       <Stack gap="sm">
         {isSome(title) ? <h2 className="sf-view-state__title">{title.value}</h2> : null}
         {isSome(body) ? <p className="sf-view-state__body">{body.value}</p> : null}

@@ -1,9 +1,6 @@
-import {
-  getElementClientHeight,
-  getElementScrollTop,
-} from "@/shared/lib/dom/scroll-element";
+import { getElementClientHeight, getElementScrollTop } from '@/shared/lib/dom/scroll-element';
 
-import { TOC_ACTIVATION_LINE_RATIO } from "../../constant";
+import { TOC_ACTIVATION_LINE_RATIO } from '../../constant';
 
 export function getTocActivationLine(scrollContainer: HTMLElement): number {
   return (

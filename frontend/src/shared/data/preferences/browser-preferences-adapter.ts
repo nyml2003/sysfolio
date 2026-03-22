@@ -1,29 +1,24 @@
-import type { OnboardingState, ReadingProgress, RepositoryError } from "@/entities/content";
-import { isNone, isSome, none, some } from "@/shared/lib/monads/option";
-import type { Option } from "@/shared/lib/monads/option";
-import { err, isErr, ok } from "@/shared/lib/monads/result";
-import type { Result } from "@/shared/lib/monads/result";
-import { DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@/shared/lib/i18n/locale.types";
-import {
-  DEFAULT_DENSITY,
-  type DensityPreference,
-} from "@/shared/lib/style/style.types";
-import { DEFAULT_THEME } from "@/shared/lib/theme/theme.types";
-import type { ThemePreference } from "@/shared/lib/theme/theme.types";
+import type { OnboardingState, ReadingProgress, RepositoryError } from '@/entities/content';
+import { isNone, isSome, none, some } from '@/shared/lib/monads/option';
+import type { Option } from '@/shared/lib/monads/option';
+import { err, isErr, ok } from '@/shared/lib/monads/result';
+import type { Result } from '@/shared/lib/monads/result';
+import { DEFAULT_LOCALE, isAppLocale, type AppLocale } from '@/shared/lib/i18n/locale.types';
+import { DEFAULT_DENSITY, type DensityPreference } from '@/shared/lib/style/style.types';
+import { DEFAULT_THEME } from '@/shared/lib/theme/theme.types';
+import type { ThemePreference } from '@/shared/lib/theme/theme.types';
 
-const THEME_KEY = "sysfolio.theme";
-const DENSITY_KEY = "sysfolio.density";
-const LOCALE_KEY = "sysfolio.locale";
-const ONBOARDING_KEY = "sysfolio.onboarding";
-const READING_PROGRESS_KEY = "sysfolio.reading-progress";
+const THEME_KEY = 'sysfolio.theme';
+const DENSITY_KEY = 'sysfolio.density';
+const LOCALE_KEY = 'sysfolio.locale';
+const ONBOARDING_KEY = 'sysfolio.onboarding';
+const READING_PROGRESS_KEY = 'sysfolio.reading-progress';
 
 type PreferencesAdapter = {
   getThemePreference(): Result<RepositoryError, ThemePreference>;
   setThemePreference(theme: ThemePreference): Result<RepositoryError, ThemePreference>;
   getDensityPreference(): Result<RepositoryError, DensityPreference>;
-  setDensityPreference(
-    density: DensityPreference,
-  ): Result<RepositoryError, DensityPreference>;
+  setDensityPreference(density: DensityPreference): Result<RepositoryError, DensityPreference>;
   getLocalePreference(): Result<RepositoryError, AppLocale>;
   setLocalePreference(locale: AppLocale): Result<RepositoryError, AppLocale>;
   getOnboardingState(): Result<RepositoryError, OnboardingState>;
@@ -31,16 +26,16 @@ type PreferencesAdapter = {
   getSavedReadingProgress(path: string): Result<RepositoryError, Option<ReadingProgress>>;
   saveReadingProgress(
     path: string,
-    progress: ReadingProgress,
+    progress: ReadingProgress
   ): Result<RepositoryError, ReadingProgress>;
 };
 
 function storageError(message: string): RepositoryError {
-  return { code: "storage_error", message };
+  return { code: 'storage_error', message };
 }
 
 function hasWindowStorage(): boolean {
-  return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+  return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
 }
 
 function readStorage(key: string): Result<RepositoryError, Option<string>> {
@@ -71,11 +66,11 @@ function writeStorage(key: string, value: string): Result<RepositoryError, strin
 }
 
 function parseTheme(raw: string): ThemePreference {
-  return raw === "dark" ? "dark" : DEFAULT_THEME;
+  return raw === 'dark' ? 'dark' : DEFAULT_THEME;
 }
 
 function parseDensity(raw: string): DensityPreference {
-  if (raw === "medium" || raw === "compact") {
+  if (raw === 'medium' || raw === 'compact') {
     return raw;
   }
 
@@ -87,16 +82,16 @@ function parseLocale(raw: string): AppLocale {
 }
 
 function isReadingProgress(raw: unknown): raw is ReadingProgress {
-  if (typeof raw !== "object" || raw === null) {
+  if (typeof raw !== 'object' || raw === null) {
     return false;
   }
 
   const candidate = raw as Record<string, unknown>;
 
   return (
-    typeof candidate.scrollTop === "number" &&
+    typeof candidate.scrollTop === 'number' &&
     Number.isFinite(candidate.scrollTop) &&
-    typeof candidate.updatedAt === "string"
+    typeof candidate.updatedAt === 'string'
   );
 }
 
@@ -104,7 +99,7 @@ function parseProgressMap(raw: string): Result<RepositoryError, Record<string, R
   try {
     const parsed = JSON.parse(raw) as unknown;
 
-    if (typeof parsed !== "object" || parsed === null) {
+    if (typeof parsed !== 'object' || parsed === null) {
       return ok({});
     }
 
@@ -181,17 +176,13 @@ export function createBrowserPreferencesAdapter(): PreferencesAdapter {
       }
 
       return ok({
-        dismissed:
-          isSome(storedStateResult.value) &&
-          storedStateResult.value.value === "dismissed",
+        dismissed: isSome(storedStateResult.value) && storedStateResult.value.value === 'dismissed',
       });
     },
     dismissOnboarding() {
-      const writeResult = writeStorage(ONBOARDING_KEY, "dismissed");
+      const writeResult = writeStorage(ONBOARDING_KEY, 'dismissed');
 
-      return isErr(writeResult)
-        ? writeResult
-        : ok({ dismissed: true });
+      return isErr(writeResult) ? writeResult : ok({ dismissed: true });
     },
     getSavedReadingProgress(path) {
       const storedProgressResult = readStorage(READING_PROGRESS_KEY);
@@ -221,10 +212,9 @@ export function createBrowserPreferencesAdapter(): PreferencesAdapter {
         return storedProgressResult;
       }
 
-      const progressMapResult =
-        isSome(storedProgressResult.value)
-          ? parseProgressMap(storedProgressResult.value.value)
-          : ok<Record<string, ReadingProgress>>({});
+      const progressMapResult = isSome(storedProgressResult.value)
+        ? parseProgressMap(storedProgressResult.value.value)
+        : ok<Record<string, ReadingProgress>>({});
 
       if (isErr(progressMapResult)) {
         return progressMapResult;
@@ -235,10 +225,7 @@ export function createBrowserPreferencesAdapter(): PreferencesAdapter {
         [path]: progress,
       };
 
-      const writeResult = writeStorage(
-        READING_PROGRESS_KEY,
-        JSON.stringify(nextProgressMap),
-      );
+      const writeResult = writeStorage(READING_PROGRESS_KEY, JSON.stringify(nextProgressMap));
 
       return isErr(writeResult) ? writeResult : ok(progress);
     },

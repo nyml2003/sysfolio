@@ -1,8 +1,8 @@
-import { clsx } from "clsx";
+import { clsx } from 'clsx';
 
-import { isSome } from "@/shared/lib/monads/option";
+import { isSome } from '@/shared/lib/monads/option';
 
-import type { LabelProps } from "./label.types";
+import type { LabelProps } from './label.types';
 
 export function Label({
   variant,
@@ -15,19 +15,21 @@ export function Label({
   className,
   ...rest
 }: LabelProps) {
-  const disabled = state === "disabled";
-  const showRequired = state === "required";
-  const showOptional = state === "optional";
+  const disabled = state === 'disabled';
+  const showRequired = state === 'required';
+  const showOptional = state === 'optional';
 
-  const requiredContent = showRequired
-    ? isSome(requiredMark)
-      ? requiredMark.value
-      : (
-          <span aria-hidden className="sf-label__required">
-            *
-          </span>
-        )
-    : false;
+  const requiredContent = showRequired ? (
+    isSome(requiredMark) ? (
+      requiredMark.value
+    ) : (
+      <span aria-hidden className="sf-label__required">
+        *
+      </span>
+    )
+  ) : (
+    false
+  );
 
   const optionalContent = showOptional && isSome(optionalMark) ? optionalMark.value : false;
 
@@ -45,18 +47,18 @@ export function Label({
   );
 
   const rootClassName = clsx(
-    "sf-label",
+    'sf-label',
     `sf-label--${variant}`,
-    disabled && "sf-label--disabled",
-    showRequired && "sf-label--is-required",
-    showOptional && "sf-label--is-optional",
-    className,
+    disabled && 'sf-label--disabled',
+    showRequired && 'sf-label--is-required',
+    showOptional && 'sf-label--is-optional',
+    className
   );
 
   const common = {
     ...rest,
     className: rootClassName,
-    ...(disabled ? { "aria-disabled": true as const } : {}),
+    ...(disabled ? { 'aria-disabled': true as const } : {}),
   };
 
   if (isSome(htmlFor)) {

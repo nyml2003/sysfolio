@@ -1,12 +1,12 @@
-import { none } from "@/shared/lib/monads/option";
+import { none } from '@/shared/lib/monads/option';
 
-import { createButtonPreset } from "./button-factory";
+import { createButtonPreset } from './button-factory';
 
 /** 工具栏 / 树行 / 弱操作：ghost + md */
 export const ButtonGhostMd = createButtonPreset({
-  tone: "ghost",
-  size: "md",
-  type: "button",
+  tone: 'ghost',
+  size: 'md',
+  type: 'button',
   loading: false,
   fullWidth: false,
   truncateLabel: false,
@@ -16,9 +16,9 @@ export const ButtonGhostMd = createButtonPreset({
 
 /** 顶栏等密区域：ghost + sm */
 export const ButtonGhostSm = createButtonPreset({
-  tone: "ghost",
-  size: "sm",
-  type: "button",
+  tone: 'ghost',
+  size: 'sm',
+  type: 'button',
   loading: false,
   fullWidth: false,
   truncateLabel: false,
@@ -28,9 +28,9 @@ export const ButtonGhostSm = createButtonPreset({
 
 /** 常规块内操作：secondary + md */
 export const ButtonSecondaryMd = createButtonPreset({
-  tone: "secondary",
-  size: "md",
-  type: "button",
+  tone: 'secondary',
+  size: 'md',
+  type: 'button',
   loading: false,
   fullWidth: false,
   truncateLabel: false,
@@ -40,9 +40,9 @@ export const ButtonSecondaryMd = createButtonPreset({
 
 /** 密区域次操作：secondary + sm */
 export const ButtonSecondarySm = createButtonPreset({
-  tone: "secondary",
-  size: "sm",
-  type: "button",
+  tone: 'secondary',
+  size: 'sm',
+  type: 'button',
   loading: false,
   fullWidth: false,
   truncateLabel: false,
@@ -52,9 +52,9 @@ export const ButtonSecondarySm = createButtonPreset({
 
 /** 单屏主 CTA：primary + md */
 export const ButtonPrimaryMd = createButtonPreset({
-  tone: "primary",
-  size: "md",
-  type: "button",
+  tone: 'primary',
+  size: 'md',
+  type: 'button',
   loading: false,
   fullWidth: false,
   truncateLabel: false,

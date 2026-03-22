@@ -2,9 +2,9 @@ import {
   getElementClientHeight,
   getElementScrollHeight,
   getElementScrollTop,
-} from "@/shared/lib/dom/scroll-element";
+} from '@/shared/lib/dom/scroll-element';
 
-import { TOC_BOTTOM_EPSILON } from "../../constant";
+import { TOC_BOTTOM_EPSILON } from '../../constant';
 
 export function isAtScrollBottom(scrollContainer: HTMLElement): boolean {
   return (

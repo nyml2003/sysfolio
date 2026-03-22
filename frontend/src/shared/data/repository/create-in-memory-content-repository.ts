@@ -13,17 +13,17 @@ import type {
   RepositoryError,
   TreeRootPayload,
   UnsupportedContent,
-} from "@/entities/content";
-import { DEFAULT_LOCALE, type AppLocale } from "@/shared/lib/i18n/locale.types";
-import type { DensityPreference } from "@/shared/lib/style/style.types";
-import { ROOT_PATH, normalizePath, pathFromSegments } from "@/shared/lib/path/content-path";
+} from '@/entities/content';
+import { DEFAULT_LOCALE, type AppLocale } from '@/shared/lib/i18n/locale.types';
+import type { DensityPreference } from '@/shared/lib/style/style.types';
+import { ROOT_PATH, normalizePath, pathFromSegments } from '@/shared/lib/path/content-path';
 import {
   emptyState,
   errorState,
   readyState,
   type ResourceState,
-} from "@/shared/lib/resource/resource-state";
-import { type ThemePreference } from "@/shared/lib/theme/theme.types";
+} from '@/shared/lib/resource/resource-state';
+import { type ThemePreference } from '@/shared/lib/theme/theme.types';
 import {
   fromNullable,
   isNone,
@@ -32,15 +32,12 @@ import {
   some,
   unwrapOr,
   type Option,
-} from "@/shared/lib/monads/option";
-import { isErr } from "@/shared/lib/monads/result";
-import {
-  createMockContentFixtures,
-  ROOT_NODE_ID,
-} from "@/shared/data/mock/content.fixtures";
-import { createBrowserPreferencesAdapter } from "@/shared/data/preferences/browser-preferences-adapter";
+} from '@/shared/lib/monads/option';
+import { isErr } from '@/shared/lib/monads/result';
+import { createMockContentFixtures, ROOT_NODE_ID } from '@/shared/data/mock/content.fixtures';
+import { createBrowserPreferencesAdapter } from '@/shared/data/preferences/browser-preferences-adapter';
 
-import type { ContentRepository } from "./repository.types";
+import type { ContentRepository } from './repository.types';
 
 type RepositoryOptions = {
   latencyMs: number;
@@ -59,7 +56,7 @@ type LocalizedRepositoryData = ReturnType<typeof buildLocalizedRepositoryData>;
 const browserPreferencesAdapter = createBrowserPreferencesAdapter();
 
 function notFound(message: string): RepositoryError {
-  return { code: "not_found", message };
+  return { code: 'not_found', message };
 }
 
 function sleep(ms: number): Promise<void> {
@@ -68,16 +65,12 @@ function sleep(ms: number): Promise<void> {
   });
 }
 
-function compareByTreeOrder(
-  left: ContentNode,
-  right: ContentNode,
-  locale: AppLocale,
-): number {
-  if (left.kind === "folder" && right.kind !== "folder") {
+function compareByTreeOrder(left: ContentNode, right: ContentNode, locale: AppLocale): number {
+  if (left.kind === 'folder' && right.kind !== 'folder') {
     return -1;
   }
 
-  if (left.kind !== "folder" && right.kind === "folder") {
+  if (left.kind !== 'folder' && right.kind === 'folder') {
     return 1;
   }
 
@@ -90,14 +83,14 @@ function sortNodes(nodes: ContentNode[], locale: AppLocale): ContentNode[] {
 
 function sortSummaries(
   entries: DirectoryChildSummary[],
-  locale: AppLocale,
+  locale: AppLocale
 ): DirectoryChildSummary[] {
   return [...entries].sort((left, right) => {
-    if (left.kind === "folder" && right.kind !== "folder") {
+    if (left.kind === 'folder' && right.kind !== 'folder') {
       return -1;
     }
 
-    if (left.kind !== "folder" && right.kind === "folder") {
+    if (left.kind !== 'folder' && right.kind === 'folder') {
       return 1;
     }
 
@@ -106,44 +99,44 @@ function sortSummaries(
 }
 
 function getNodePath(node: ContentNode): string {
-  return node.kind === "home" ? ROOT_PATH : pathFromSegments(node.pathSegments);
+  return node.kind === 'home' ? ROOT_PATH : pathFromSegments(node.pathSegments);
 }
 
 function getArticleSummary(
   articleDocuments: Record<string, ArticleDocument>,
-  documentId: string,
+  documentId: string
 ): string {
   const document = articleDocuments[documentId];
 
-  return document === undefined ? "" : document.summary;
+  return document === undefined ? '' : document.summary;
 }
 
 function getNodeDescription(
   dataset: LocalizedRepositoryData,
   node: ContentNode,
-  locale: AppLocale,
-): DirectoryChildSummary["description"] {
-  if (node.kind === "folder") {
+  locale: AppLocale
+): DirectoryChildSummary['description'] {
+  if (node.kind === 'folder') {
     return dataset.directoryDescriptions[node.id] ?? none();
   }
 
-  if (node.kind === "article" && isSome(node.documentId)) {
+  if (node.kind === 'article' && isSome(node.documentId)) {
     return some(getArticleSummary(dataset.articleDocuments, node.documentId.value));
   }
 
-  if (node.kind === "game") {
+  if (node.kind === 'game') {
     return some(
-      locale === "en-US"
-        ? "Interactive file types are reserved here. A playable experience will plug into this entry in a later iteration."
-        : "交互文件类型预留中，后续版本会在这里接入可玩的内容。",
+      locale === 'en-US'
+        ? 'Interactive file types are reserved here. A playable experience will plug into this entry in a later iteration.'
+        : '交互文件类型预留中，后续版本会在这里接入可玩的内容。'
     );
   }
 
-  if (node.kind === "media") {
+  if (node.kind === 'media') {
     return some(
-      locale === "en-US"
-        ? "Media entries are already part of the tree, but this version only keeps the entry point and the empty state."
-        : "媒体类型已经进入树结构，但这一期只先保留入口和空态。",
+      locale === 'en-US'
+        ? 'Media entries are already part of the tree, but this version only keeps the entry point and the empty state.'
+        : '媒体类型已经进入树结构，但这一期只先保留入口和空态。'
     );
   }
 
@@ -153,7 +146,7 @@ function getNodeDescription(
 function toSummary(
   dataset: LocalizedRepositoryData,
   node: ContentNode,
-  locale: AppLocale,
+  locale: AppLocale
 ): DirectoryChildSummary {
   return {
     id: node.id,
@@ -171,19 +164,19 @@ function toSummary(
 function toUnsupportedContent(
   locale: AppLocale,
   node: ContentNode,
-  parentPath: string,
+  parentPath: string
 ): UnsupportedContent {
   return {
-    kind: "unsupported",
+    kind: 'unsupported',
     title: node.title,
     description:
-      node.kind === "game"
-        ? locale === "en-US"
-          ? "This entry already exists in the filesystem structure, but the current version still focuses on textual reading."
-          : "这个入口已经进入文件系统结构，但当前版本仍以文本阅读为主。"
-        : locale === "en-US"
-          ? "This entry is already reserved in the tree. Media playback will be connected in a later version."
-          : "这个入口已经在树里占位，媒体承载会在后续版本接进来。",
+      node.kind === 'game'
+        ? locale === 'en-US'
+          ? 'This entry already exists in the filesystem structure, but the current version still focuses on textual reading.'
+          : '这个入口已经进入文件系统结构，但当前版本仍以文本阅读为主。'
+        : locale === 'en-US'
+          ? 'This entry is already reserved in the tree. Media playback will be connected in a later version.'
+          : '这个入口已经在树里占位，媒体承载会在后续版本接进来。',
     ctaPath: parentPath,
   };
 }
@@ -208,13 +201,11 @@ function buildLocalizedRepositoryData(locale: AppLocale) {
   }
 
   const orderedRecentArticleNodes = sortNodes(
-    fixtures.contentNodes.filter(
-      (node) => node.kind === "article" && isSome(node.updatedAt),
-    ),
-    locale,
+    fixtures.contentNodes.filter((node) => node.kind === 'article' && isSome(node.updatedAt)),
+    locale
   ).sort((left, right) => {
-    const leftDate = unwrapOr(left.updatedAt, "");
-    const rightDate = unwrapOr(right.updatedAt, "");
+    const leftDate = unwrapOr(left.updatedAt, '');
+    const rightDate = unwrapOr(right.updatedAt, '');
 
     return rightDate.localeCompare(leftDate);
   });
@@ -229,7 +220,7 @@ function buildLocalizedRepositoryData(locale: AppLocale) {
 }
 
 export function createInMemoryContentRepository(
-  rawOptions: RepositoryOptionsInput = { latencyMs: none() },
+  rawOptions: RepositoryOptionsInput = { latencyMs: none() }
 ): ContentRepository {
   const options = {
     latencyMs: unwrapOr(rawOptions.latencyMs, defaultRepositoryOptions.latencyMs),
@@ -259,17 +250,14 @@ export function createInMemoryContentRepository(
     return nextDataset;
   }
 
-  function getNodeById(
-    dataset: LocalizedRepositoryData,
-    nodeId: string,
-  ): Option<ContentNode> {
+  function getNodeById(dataset: LocalizedRepositoryData, nodeId: string): Option<ContentNode> {
     return fromNullable(dataset.nodeById[nodeId]);
   }
 
   function getChildren(
     dataset: LocalizedRepositoryData,
     parentId: string,
-    locale: AppLocale,
+    locale: AppLocale
   ): ContentNode[] {
     const childIds = dataset.childrenByParentId[parentId] ?? [];
 
@@ -279,24 +267,22 @@ export function createInMemoryContentRepository(
 
         return isSome(child) ? [child.value] : [];
       }),
-      locale,
+      locale
     );
   }
 
   function buildDirectoryContent(
     dataset: LocalizedRepositoryData,
     node: ContentNode,
-    locale: AppLocale,
+    locale: AppLocale
   ): DirectoryContent {
     return {
-      kind: "directory",
+      kind: 'directory',
       title: node.title,
       description: dataset.directoryDescriptions[node.id] ?? none(),
       children: sortSummaries(
-        getChildren(dataset, node.id, locale).map((child) =>
-          toSummary(dataset, child, locale),
-        ),
-        locale,
+        getChildren(dataset, node.id, locale).map((child) => toSummary(dataset, child, locale)),
+        locale
       ),
     };
   }
@@ -304,23 +290,23 @@ export function createInMemoryContentRepository(
   function buildDirectoryStats(
     dataset: LocalizedRepositoryData,
     nodeId: string,
-    locale: AppLocale,
+    locale: AppLocale
   ): DirectoryStats {
     const children = getChildren(dataset, nodeId, locale);
 
     return {
       childCount: children.length,
-      folderCount: children.filter((child) => child.kind === "folder").length,
-      articleCount: children.filter((child) => child.kind === "article").length,
-      availableCount: children.filter((child) => child.status === "available").length,
+      folderCount: children.filter((child) => child.kind === 'folder').length,
+      articleCount: children.filter((child) => child.kind === 'article').length,
+      availableCount: children.filter((child) => child.status === 'available').length,
     };
   }
 
   function buildBreadcrumbs(
     dataset: LocalizedRepositoryData,
-    node: ContentNode,
-  ): ContextInfo["breadcrumbs"] {
-    const breadcrumbs: ContextInfo["breadcrumbs"] = [
+    node: ContentNode
+  ): ContextInfo['breadcrumbs'] {
+    const breadcrumbs: ContextInfo['breadcrumbs'] = [
       {
         id: ROOT_NODE_ID,
         title: dataset.rootNodeTitle,
@@ -356,21 +342,20 @@ export function createInMemoryContentRepository(
   function buildContextInfo(
     dataset: LocalizedRepositoryData,
     node: ContentNode,
-    locale: AppLocale,
+    locale: AppLocale
   ): ContextInfo {
     const parentNode: Option<ContentNode> =
       isSome(node.parentId) && node.parentId.value !== ROOT_NODE_ID
         ? getNodeById(dataset, node.parentId.value)
         : none();
-    const siblingSummaries =
-      !isSome(parentNode)
-        ? []
-        : getChildren(dataset, parentNode.value.id, locale)
-            .filter((child) => child.id !== node.id)
-            .map((child) => toSummary(dataset, child, locale))
-            .slice(0, 4);
+    const siblingSummaries = !isSome(parentNode)
+      ? []
+      : getChildren(dataset, parentNode.value.id, locale)
+          .filter((child) => child.id !== node.id)
+          .map((child) => toSummary(dataset, child, locale))
+          .slice(0, 4);
     const recentEntries =
-      node.kind === "folder"
+      node.kind === 'folder'
         ? buildDirectoryContent(dataset, node, locale).children.slice(0, 4)
         : dataset.orderedRecentArticleNodes
             .map((entry) => toSummary(dataset, entry, locale))
@@ -381,31 +366,28 @@ export function createInMemoryContentRepository(
       parent: isSome(parentNode) ? some(toSummary(dataset, parentNode.value, locale)) : none(),
       siblings: siblingSummaries,
       recentEntries,
-      stats:
-        node.kind === "folder"
-          ? some(buildDirectoryStats(dataset, node.id, locale))
-          : none(),
+      stats: node.kind === 'folder' ? some(buildDirectoryStats(dataset, node.id, locale)) : none(),
     };
   }
 
   function getRenderableContent(
     dataset: LocalizedRepositoryData,
     node: ContentNode,
-    locale: AppLocale,
+    locale: AppLocale
   ): Option<RenderableContent> {
-    if (node.kind === "home" && isSome(node.documentId)) {
+    if (node.kind === 'home' && isSome(node.documentId)) {
       return fromNullable(dataset.homeContents[node.documentId.value]);
     }
 
-    if (node.kind === "folder") {
+    if (node.kind === 'folder') {
       return some(buildDirectoryContent(dataset, node, locale));
     }
 
-    if (node.kind === "article" && isSome(node.documentId)) {
+    if (node.kind === 'article' && isSome(node.documentId)) {
       return fromNullable(dataset.articleDocuments[node.documentId.value]);
     }
 
-    if (node.kind === "game" || node.kind === "media") {
+    if (node.kind === 'game' || node.kind === 'media') {
       const parentPath =
         isSome(node.parentId) && node.parentId.value !== ROOT_NODE_ID
           ? (() => {
@@ -422,7 +404,7 @@ export function createInMemoryContentRepository(
   }
 
   async function getRenderableEntry(
-    path: string,
+    path: string
   ): Promise<ResourceState<RenderableEntryPayload, RepositoryError>> {
     const locale = getResolvedLocale();
     const dataset = getDataset(locale);
@@ -433,11 +415,11 @@ export function createInMemoryContentRepository(
       return withLatency(
         errorState(
           notFound(
-            locale === "en-US"
+            locale === 'en-US'
               ? `Path ${normalizedPath} was not found.`
-              : `路径 ${normalizedPath} 未找到。`,
-          ),
-        ),
+              : `路径 ${normalizedPath} 未找到。`
+          )
+        )
       );
     }
 
@@ -447,11 +429,11 @@ export function createInMemoryContentRepository(
       return withLatency(
         emptyState(
           some(
-            locale === "en-US"
+            locale === 'en-US'
               ? `No renderable content for ${normalizedPath}.`
-              : `${normalizedPath} 当前没有可渲染内容。`,
-          ),
-        ),
+              : `${normalizedPath} 当前没有可渲染内容。`
+          )
+        )
       );
     }
 
@@ -460,7 +442,7 @@ export function createInMemoryContentRepository(
         node,
         content: content.value,
         context: some(buildContextInfo(dataset, node, locale)),
-      }),
+      })
     );
   }
 
@@ -473,14 +455,14 @@ export function createInMemoryContentRepository(
       const dataset = getDataset(locale);
       const rootChildren = getChildren(dataset, ROOT_NODE_ID, locale);
       const secondLevel = rootChildren.flatMap((node) =>
-        node.kind === "folder" ? getChildren(dataset, node.id, locale) : [],
+        node.kind === 'folder' ? getChildren(dataset, node.id, locale) : []
       );
 
       return withLatency(
         readyState<TreeRootPayload, RepositoryError>({
           rootId: ROOT_NODE_ID,
           nodes: [dataset.nodeById[ROOT_NODE_ID], ...rootChildren, ...secondLevel],
-        }),
+        })
       );
     },
     async loadChildren(nodeId, page) {
@@ -493,11 +475,9 @@ export function createInMemoryContentRepository(
         return withLatency(
           errorState(
             notFound(
-              locale === "en-US"
-                ? `Node ${nodeId} was not found.`
-                : `节点 ${nodeId} 未找到。`,
-            ),
-          ),
+              locale === 'en-US' ? `Node ${nodeId} was not found.` : `节点 ${nodeId} 未找到。`
+            )
+          )
         );
       }
 
@@ -507,7 +487,7 @@ export function createInMemoryContentRepository(
             parentId: nodeId,
             nodes: [],
             nextPage: none(),
-          }),
+          })
         );
       }
 
@@ -516,7 +496,7 @@ export function createInMemoryContentRepository(
           parentId: nodeId,
           nodes: getChildren(dataset, nodeId, locale),
           nextPage: none(),
-        }),
+        })
       );
     },
     async getNodeByPath(path) {
@@ -529,11 +509,11 @@ export function createInMemoryContentRepository(
         ? withLatency(
             errorState(
               notFound(
-                locale === "en-US"
+                locale === 'en-US'
                   ? `Path ${normalizedPath} was not found.`
-                  : `路径 ${normalizedPath} 未找到。`,
-              ),
-            ),
+                  : `路径 ${normalizedPath} 未找到。`
+              )
+            )
           )
         : withLatency(readyState(node));
     },
@@ -546,11 +526,11 @@ export function createInMemoryContentRepository(
         ? withLatency(
             errorState(
               notFound(
-                locale === "en-US"
+                locale === 'en-US'
                   ? `Home document ${documentId} was not found.`
-                  : `首页文档 ${documentId} 未找到。`,
-              ),
-            ),
+                  : `首页文档 ${documentId} 未找到。`
+              )
+            )
           )
         : withLatency(readyState<HomeContent, RepositoryError>(content));
     },
@@ -559,22 +539,20 @@ export function createInMemoryContentRepository(
       const dataset = getDataset(locale);
       const node = getNodeById(dataset, nodeId);
 
-      if (isNone(node) || node.value.kind !== "folder") {
+      if (isNone(node) || node.value.kind !== 'folder') {
         return withLatency(
           errorState(
             notFound(
-              locale === "en-US"
-                ? `Directory ${nodeId} was not found.`
-                : `目录 ${nodeId} 未找到。`,
-            ),
-          ),
+              locale === 'en-US' ? `Directory ${nodeId} was not found.` : `目录 ${nodeId} 未找到。`
+            )
+          )
         );
       }
 
       return withLatency(
         readyState<DirectoryContent, RepositoryError>(
-          buildDirectoryContent(dataset, node.value, locale),
-        ),
+          buildDirectoryContent(dataset, node.value, locale)
+        )
       );
     },
     async getArticleDocumentById(documentId) {
@@ -586,11 +564,11 @@ export function createInMemoryContentRepository(
         ? withLatency(
             errorState(
               notFound(
-                locale === "en-US"
+                locale === 'en-US'
                   ? `Article ${documentId} was not found.`
-                  : `文章 ${documentId} 未找到。`,
-              ),
-            ),
+                  : `文章 ${documentId} 未找到。`
+              )
+            )
           )
         : withLatency(readyState<ArticleDocument, RepositoryError>(document));
     },
@@ -604,16 +582,14 @@ export function createInMemoryContentRepository(
         ? withLatency(
             errorState(
               notFound(
-                locale === "en-US"
+                locale === 'en-US'
                   ? `Path ${normalizedPath} was not found.`
-                  : `路径 ${normalizedPath} 未找到。`,
-              ),
-            ),
+                  : `路径 ${normalizedPath} 未找到。`
+              )
+            )
           )
         : withLatency(
-            readyState<ContextInfo, RepositoryError>(
-              buildContextInfo(dataset, node, locale),
-            ),
+            readyState<ContextInfo, RepositoryError>(buildContextInfo(dataset, node, locale))
           );
     },
     async getThemePreference() {
@@ -682,10 +658,7 @@ export function createInMemoryContentRepository(
     },
     async saveReadingProgress(path, position) {
       const normalizedPath = normalizePath(path);
-      const result = browserPreferencesAdapter.saveReadingProgress(
-        normalizedPath,
-        position,
-      );
+      const result = browserPreferencesAdapter.saveReadingProgress(normalizedPath, position);
 
       return isErr(result)
         ? withLatency(errorState(result.error))

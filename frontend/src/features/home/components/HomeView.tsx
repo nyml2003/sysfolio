@@ -1,9 +1,9 @@
-import type { ContextInfo, HomeContent } from "@/entities/content";
-import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
-import { isSome, unwrapOr } from "@/shared/lib/monads/option";
-import { ArticleIcon, FolderIcon } from "@/shared/ui/primitives/Icon";
-import { ButtonGhostMd } from "@/shared/ui/primitives";
-import styles from "./HomeView.module.css";
+import type { ContextInfo, HomeContent } from '@/entities/content';
+import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
+import { isSome, unwrapOr } from '@/shared/lib/monads/option';
+import { ArticleIcon, FolderIcon } from '@/shared/ui/primitives/Icon';
+import { ButtonGhostMd } from '@/shared/ui/primitives';
+import styles from './HomeView.module.css';
 
 type HomeViewProps = {
   content: HomeContent;
@@ -12,7 +12,7 @@ type HomeViewProps = {
 };
 
 function renderEntryIcon(kind: string) {
-  return kind === "folder" ? <FolderIcon size={16} /> : <ArticleIcon size={16} />;
+  return kind === 'folder' ? <FolderIcon size={16} /> : <ArticleIcon size={16} />;
 }
 
 export function HomeView({ content, context, onNavigate }: HomeViewProps) {
@@ -31,9 +31,12 @@ export function HomeView({ content, context, onNavigate }: HomeViewProps) {
         <div className={styles.list}>
           {context.recentEntries.map((entry) => (
             <ButtonGhostMd
-              className={[styles.entry, entry.status === "coming_soon" ? styles.entryComingSoon : ""]
+              className={[
+                styles.entry,
+                entry.status === 'coming_soon' ? styles.entryComingSoon : '',
+              ]
                 .filter(Boolean)
-                .join(" ")}
+                .join(' ')}
               key={entry.id}
               onClick={() => {
                 onNavigate(entry.path);
@@ -48,10 +51,8 @@ export function HomeView({ content, context, onNavigate }: HomeViewProps) {
                     <span>{copy.common.minuteCount(entry.readingMinutes.value)}</span>
                   ) : null}
                 </div>
-                {unwrapOr(entry.description, "") === "" ? null : (
-                  <div className={styles.entrySummary}>
-                    {unwrapOr(entry.description, "")}
-                  </div>
+                {unwrapOr(entry.description, '') === '' ? null : (
+                  <div className={styles.entrySummary}>{unwrapOr(entry.description, '')}</div>
                 )}
               </div>
             </ButtonGhostMd>

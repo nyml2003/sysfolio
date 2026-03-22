@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { SVGProps } from 'react';
 
 type IconProps = SVGProps<SVGSVGElement> & {
   size: number;
@@ -23,7 +23,7 @@ function IconBase({ children, size, ...props }: IconProps) {
   );
 }
 
-export function ChevronRightIcon(props: Omit<IconProps, "children">) {
+export function ChevronRightIcon(props: Omit<IconProps, 'children'>) {
   return (
     <IconBase {...props}>
       <path d="M9 6l6 6-6 6" />
@@ -31,7 +31,7 @@ export function ChevronRightIcon(props: Omit<IconProps, "children">) {
   );
 }
 
-export function ChevronDownIcon(props: Omit<IconProps, "children">) {
+export function ChevronDownIcon(props: Omit<IconProps, 'children'>) {
   return (
     <IconBase {...props}>
       <path d="M6 9l6 6 6-6" />
@@ -39,7 +39,7 @@ export function ChevronDownIcon(props: Omit<IconProps, "children">) {
   );
 }
 
-export function HomeIcon(props: Omit<IconProps, "children">) {
+export function HomeIcon(props: Omit<IconProps, 'children'>) {
   return (
     <IconBase {...props}>
       <path d="M4 11.5L12 5l8 6.5" />
@@ -48,7 +48,7 @@ export function HomeIcon(props: Omit<IconProps, "children">) {
   );
 }
 
-export function FolderIcon(props: Omit<IconProps, "children">) {
+export function FolderIcon(props: Omit<IconProps, 'children'>) {
   return (
     <IconBase {...props}>
       <path d="M3 8.5h6l2 2H21v8.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8.5z" />
@@ -57,7 +57,7 @@ export function FolderIcon(props: Omit<IconProps, "children">) {
   );
 }
 
-export function ArticleIcon(props: Omit<IconProps, "children">) {
+export function ArticleIcon(props: Omit<IconProps, 'children'>) {
   return (
     <IconBase {...props}>
       <path d="M7 4.5h8l3 3V19a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2z" />
@@ -68,7 +68,7 @@ export function ArticleIcon(props: Omit<IconProps, "children">) {
   );
 }
 
-export function GameIcon(props: Omit<IconProps, "children">) {
+export function GameIcon(props: Omit<IconProps, 'children'>) {
   return (
     <IconBase {...props}>
       <path d="M7 9.5l-2 7a2 2 0 0 0 3.2 2l2.3-1.7a2 2 0 0 1 2.5 0l2.3 1.7A2 2 0 0 0 18.5 16.5l-2-7A3 3 0 0 0 13.6 7H10.4A3 3 0 0 0 7 9.5z" />
@@ -80,7 +80,7 @@ export function GameIcon(props: Omit<IconProps, "children">) {
   );
 }
 
-export function MediaIcon(props: Omit<IconProps, "children">) {
+export function MediaIcon(props: Omit<IconProps, 'children'>) {
   return (
     <IconBase {...props}>
       <rect height="14" rx="2" width="18" x="3" y="5" />
@@ -89,7 +89,7 @@ export function MediaIcon(props: Omit<IconProps, "children">) {
   );
 }
 
-export function MoonIcon(props: Omit<IconProps, "children">) {
+export function MoonIcon(props: Omit<IconProps, 'children'>) {
   return (
     <IconBase {...props}>
       <path d="M19 14.5a7.5 7.5 0 1 1-9.5-9.5A8.5 8.5 0 0 0 19 14.5z" />
@@ -97,7 +97,7 @@ export function MoonIcon(props: Omit<IconProps, "children">) {
   );
 }
 
-export function SunIcon(props: Omit<IconProps, "children">) {
+export function SunIcon(props: Omit<IconProps, 'children'>) {
   return (
     <IconBase {...props}>
       <circle cx="12" cy="12" r="4" />

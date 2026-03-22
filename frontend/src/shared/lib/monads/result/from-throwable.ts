@@ -1,6 +1,6 @@
-import type { Result } from "./result.types";
-import { err } from "./err";
-import { ok } from "./ok";
+import type { Result } from './result.types';
+import { err } from './err';
+import { ok } from './ok';
 
 export function fromThrowable<T>(fn: () => T): Result<unknown, T> {
   try {

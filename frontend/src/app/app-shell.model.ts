@@ -1,11 +1,11 @@
-import type { BreadcrumbSegment } from "@/entities/content";
-import { ROOT_PATH, splitPathSegments } from "@/shared/lib/path/content-path";
+import type { BreadcrumbSegment } from '@/entities/content';
+import { ROOT_PATH, splitPathSegments } from '@/shared/lib/path/content-path';
 
 import {
   APP_SHELL_HOME_BREADCRUMB_ID,
   APP_SHELL_ROOT_BREADCRUMB_ID,
   APP_SHELL_ROOT_BREADCRUMB_TITLE,
-} from "./constant";
+} from './constant';
 
 export function buildFallbackBreadcrumbs(path: string, homeTitle: string): BreadcrumbSegment[] {
   const segments = splitPathSegments(path);
@@ -26,9 +26,9 @@ export function buildFallbackBreadcrumbs(path: string, homeTitle: string): Bread
         breadcrumbs: [
           ...state.breadcrumbs,
           {
-            id: currentSegments.join("/"),
+            id: currentSegments.join('/'),
             title: segment,
-            path: `/${currentSegments.join("/")}`,
+            path: `/${currentSegments.join('/')}`,
           },
         ],
       };
@@ -36,7 +36,7 @@ export function buildFallbackBreadcrumbs(path: string, homeTitle: string): Bread
     {
       breadcrumbs: [rootBreadcrumb],
       currentSegments: [],
-    },
+    }
   );
 
   return resolvedBreadcrumbs.breadcrumbs.length === 1

@@ -1,5 +1,5 @@
-import { Grid, Inline, Stack, Surface } from "@/shared/ui/layout";
-import { Tag } from "@/shared/ui/primitives";
+import { Grid, Inline, Stack, Surface } from '@/shared/ui/layout';
+import { Tag } from '@/shared/ui/primitives';
 
 export function LayoutPrimitivesDemo() {
   return (

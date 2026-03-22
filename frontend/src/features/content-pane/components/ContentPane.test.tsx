@@ -1,26 +1,26 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 
-import { ArticleDomProvider } from "@/features/article/providers/ArticleDomProvider";
-import { createInMemoryContentRepository } from "@/shared/data/repository";
-import { some } from "@/shared/lib/monads/option";
-import { emptyState, errorState, loadingState } from "@/shared/lib/resource/resource-state";
+import { ArticleDomProvider } from '@/features/article/providers/ArticleDomProvider';
+import { createInMemoryContentRepository } from '@/shared/data/repository';
+import { some } from '@/shared/lib/monads/option';
+import { emptyState, errorState, loadingState } from '@/shared/lib/resource/resource-state';
 import {
   PreferencesContext,
   type PreferencesContextValue,
-} from "@/shared/store/preferences/preferences-context";
+} from '@/shared/store/preferences/preferences-context';
 
-import { ContentPane } from "./ContentPane";
+import { ContentPane } from './ContentPane';
 
 const preferencesValue: PreferencesContextValue = {
-  theme: "light",
+  theme: 'light',
   toggleTheme() {},
-  density: "comfortable",
+  density: 'comfortable',
   setDensity() {},
-  locale: "en-US",
+  locale: 'en-US',
   toggleLocale() {},
   onboardingVisible: false,
   dismissOnboarding() {},
@@ -30,7 +30,7 @@ function renderWithProviders(node: ReactNode) {
   return render(
     <PreferencesContext.Provider value={some(preferencesValue)}>
       <ArticleDomProvider>{node}</ArticleDomProvider>
-    </PreferencesContext.Provider>,
+    </PreferencesContext.Provider>
   );
 }
 
@@ -40,8 +40,8 @@ function createRepository() {
   });
 }
 
-describe("ContentPane", () => {
-  it("renders loading, empty, and error resource states", () => {
+describe('ContentPane', () => {
+  it('renders loading, empty, and error resource states', () => {
     const noop = () => {};
     const { rerender } = renderWithProviders(
       <ContentPane
@@ -49,72 +49,70 @@ describe("ContentPane", () => {
         resource={loadingState()}
         restoreNoticeVisible={false}
         scrollToTop={noop}
-      />,
+      />
     );
 
-    expect(screen.getByText("Loading content")).toBeTruthy();
+    expect(screen.getByText('Loading content')).toBeTruthy();
 
     rerender(
       <PreferencesContext.Provider value={some(preferencesValue)}>
         <ArticleDomProvider>
           <ContentPane
             onNavigate={noop}
-            resource={emptyState(some("Nothing here yet."))}
+            resource={emptyState(some('Nothing here yet.'))}
             restoreNoticeVisible={false}
             scrollToTop={noop}
           />
         </ArticleDomProvider>
-      </PreferencesContext.Provider>,
+      </PreferencesContext.Provider>
     );
 
-    expect(screen.getByText("Nothing here yet.")).toBeTruthy();
+    expect(screen.getByText('Nothing here yet.')).toBeTruthy();
 
     rerender(
       <PreferencesContext.Provider value={some(preferencesValue)}>
         <ArticleDomProvider>
           <ContentPane
             onNavigate={noop}
-            resource={errorState({ code: "not_found", message: "Missing path." })}
+            resource={errorState({ code: 'not_found', message: 'Missing path.' })}
             restoreNoticeVisible={false}
             scrollToTop={noop}
           />
         </ArticleDomProvider>
-      </PreferencesContext.Provider>,
+      </PreferencesContext.Provider>
     );
 
-    expect(screen.getByText("Missing path.")).toBeTruthy();
+    expect(screen.getByText('Missing path.')).toBeTruthy();
   });
 
-  it("dispatches ready resources to home, directory, and article renderers", async () => {
+  it('dispatches ready resources to home, directory, and article renderers', async () => {
     const repository = createRepository();
     const onNavigate = vi.fn();
     const user = userEvent.setup();
-    const homeResource = await repository.getRenderableEntryByPath("/");
-    const directoryResource = await repository.getRenderableEntryByPath("/foundation");
-    const articleResource = await repository.getRenderableEntryByPath(
-      "/foundation/style-provider",
-    );
+    const homeResource = await repository.getRenderableEntryByPath('/');
+    const directoryResource = await repository.getRenderableEntryByPath('/foundation');
+    const articleResource = await repository.getRenderableEntryByPath('/foundation/style-provider');
 
     if (
-      homeResource.tag !== "ready" ||
-      directoryResource.tag !== "ready" ||
-      articleResource.tag !== "ready"
+      homeResource.tag !== 'ready' ||
+      directoryResource.tag !== 'ready' ||
+      articleResource.tag !== 'ready'
     ) {
-      throw new Error("Expected ready resources for renderer dispatch tests.");
+      throw new Error('Expected ready resources for renderer dispatch tests.');
     }
 
     if (
-      homeResource.value.content.kind !== "home" ||
-      directoryResource.value.content.kind !== "directory" ||
-      articleResource.value.content.kind !== "article"
+      homeResource.value.content.kind !== 'home' ||
+      directoryResource.value.content.kind !== 'directory' ||
+      articleResource.value.content.kind !== 'article'
     ) {
-      throw new Error("Expected home, directory, and article renderable content.");
+      throw new Error('Expected home, directory, and article renderable content.');
     }
 
     const firstDirectoryEntry = directoryResource.value.content.children[0];
 
     if (firstDirectoryEntry === undefined) {
-      throw new Error("Expected at least one directory entry in the foundation fixture.");
+      throw new Error('Expected at least one directory entry in the foundation fixture.');
     }
 
     const { rerender } = renderWithProviders(
@@ -123,14 +121,14 @@ describe("ContentPane", () => {
         resource={homeResource}
         restoreNoticeVisible={false}
         scrollToTop={() => {}}
-      />,
+      />
     );
 
     expect(
-      screen.getByRole("heading", {
+      screen.getByRole('heading', {
         level: 1,
         name: homeResource.value.content.title,
-      }),
+      })
     ).toBeTruthy();
 
     rerender(
@@ -143,20 +141,20 @@ describe("ContentPane", () => {
             scrollToTop={() => {}}
           />
         </ArticleDomProvider>
-      </PreferencesContext.Provider>,
+      </PreferencesContext.Provider>
     );
 
     expect(
-      screen.getByRole("heading", {
+      screen.getByRole('heading', {
         level: 1,
         name: directoryResource.value.content.title,
-      }),
+      })
     ).toBeTruthy();
 
     await user.click(
-      screen.getByRole("button", {
-        name: new RegExp(firstDirectoryEntry.title, "i"),
-      }),
+      screen.getByRole('button', {
+        name: new RegExp(firstDirectoryEntry.title, 'i'),
+      })
     );
 
     expect(onNavigate).toHaveBeenCalledWith(firstDirectoryEntry.path);
@@ -171,14 +169,14 @@ describe("ContentPane", () => {
             scrollToTop={() => {}}
           />
         </ArticleDomProvider>
-      </PreferencesContext.Provider>,
+      </PreferencesContext.Provider>
     );
 
     expect(
-      screen.getByRole("heading", {
+      screen.getByRole('heading', {
         level: 1,
         name: articleResource.value.content.title,
-      }),
+      })
     ).toBeTruthy();
   });
 });

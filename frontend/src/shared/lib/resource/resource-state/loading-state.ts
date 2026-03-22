@@ -1,5 +1,5 @@
-import type { ResourceState } from "./resource-state.types";
+import type { ResourceState } from './resource-state.types';
 
 export function loadingState<T, E>(): ResourceState<T, E> {
-  return { tag: "loading" };
+  return { tag: 'loading' };
 }

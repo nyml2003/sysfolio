@@ -1,19 +1,13 @@
-import type { Option } from "@/shared/lib/monads/option";
-import type { ResourceState } from "@/shared/lib/resource/resource-state";
+import type { Option } from '@/shared/lib/monads/option';
+import type { ResourceState } from '@/shared/lib/resource/resource-state';
 
 export type NodeId = string;
 export type DocumentId = string;
 export type Timestamp = string;
 
-export type ContentKind =
-  | "folder"
-  | "home"
-  | "article"
-  | "game"
-  | "media"
-  | "unknown";
+export type ContentKind = 'folder' | 'home' | 'article' | 'game' | 'media' | 'unknown';
 
-export type ContentStatus = "available" | "coming_soon" | "external";
+export type ContentStatus = 'available' | 'coming_soon' | 'external';
 
 export type ContentNode = {
   id: NodeId;
@@ -51,12 +45,12 @@ export type DirectoryChildSummary = {
 };
 
 export type HomeContent = {
-  kind: "home";
+  kind: 'home';
   title: string;
 };
 
 export type DirectoryContent = {
-  kind: "directory";
+  kind: 'directory';
   title: string;
   description: Option<string>;
   children: DirectoryChildSummary[];
@@ -76,7 +70,7 @@ export type ArticleSection = {
 };
 
 export type ArticleDocument = {
-  kind: "article";
+  kind: 'article';
   id: DocumentId;
   title: string;
   summary: string;
@@ -86,7 +80,7 @@ export type ArticleDocument = {
 };
 
 export type UnsupportedContent = {
-  kind: "unsupported";
+  kind: 'unsupported';
   title: string;
   description: string;
   ctaPath: string;
@@ -131,7 +125,7 @@ export type ChildrenPagePayload = {
 };
 
 export type RepositoryError = {
-  code: "invalid_path" | "not_found" | "storage_error" | "unknown";
+  code: 'invalid_path' | 'not_found' | 'storage_error' | 'unknown';
   message: string;
 };
 
@@ -144,7 +138,4 @@ export type ReadingProgress = {
   updatedAt: Timestamp;
 };
 
-export type RenderableEntryResource = ResourceState<
-  RenderableEntryPayload,
-  RepositoryError
->;
+export type RenderableEntryResource = ResourceState<RenderableEntryPayload, RepositoryError>;

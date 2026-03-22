@@ -624,6 +624,294 @@
     margin-inline-start: 0.1rem;
   }
 
+  /* Text — primitive-component-catalog：variants × tone */
+  .sf-text {
+    margin: 0;
+    font-family: var(--sf-font-ui);
+    font-style: normal;
+  }
+
+  .sf-text--ui {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.25;
+  }
+
+  .sf-text--body {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .sf-text--strong {
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .sf-text--subtle {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.35;
+  }
+
+  .sf-text--caption {
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: 0.01em;
+  }
+
+  .sf-text--mono {
+    font-family: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.35;
+  }
+
+  .sf-text--tone-default {
+    color: var(--sf-color-text);
+  }
+
+  .sf-text--tone-muted {
+    color: var(--sf-color-text-muted);
+  }
+
+  .sf-text--tone-success {
+    color: var(--sf-color-success-strong);
+  }
+
+  .sf-text--tone-warning {
+    color: var(--sf-color-warning-strong);
+  }
+
+  .sf-text--tone-destructive {
+    color: var(--sf-color-danger-strong);
+  }
+
+  .sf-text--tone-disabled {
+    opacity: 0.55;
+    color: var(--sf-color-text-muted);
+  }
+
+  /* Link — primitive-component-catalog：导航型文本；hover / focus-visible / visited 由 CSS 覆盖 */
+  .sf-link {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sf-space-2);
+    max-inline-size: 100%;
+    font-family: var(--sf-font-ui);
+    font-size: inherit;
+    font-weight: 500;
+    line-height: inherit;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 0.14em;
+    cursor: pointer;
+    transition:
+      color var(--sf-duration-fast) var(--sf-ease-standard),
+      text-decoration-color var(--sf-duration-fast) var(--sf-ease-standard),
+      opacity var(--sf-duration-fast) var(--sf-ease-standard);
+  }
+
+  .sf-link:focus-visible {
+    outline: 2px solid var(--sf-color-accent);
+    outline-offset: 2px;
+    border-radius: 0.125rem;
+  }
+
+  .sf-link--has-affix {
+    min-inline-size: 0;
+  }
+
+  .sf-link__label {
+    min-inline-size: 0;
+  }
+
+  .sf-link__leading,
+  .sf-link__trailing {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .sf-link__external-mark {
+    font-size: 0.85em;
+    line-height: 1;
+    font-weight: 400;
+  }
+
+  .sf-link--default {
+    color: var(--sf-color-accent-strong);
+  }
+
+  .sf-link--default:hover {
+    text-decoration-color: currentcolor;
+  }
+
+  .sf-link--default:visited:not(.sf-link--current) {
+    color: var(--sf-color-accent-strong);
+    opacity: 0.88;
+  }
+
+  .sf-link--subtle {
+    font-weight: 400;
+    color: var(--sf-color-text-muted);
+  }
+
+  .sf-link--subtle:hover {
+    color: var(--sf-color-text);
+    text-decoration-color: var(--sf-color-text-faint);
+  }
+
+  .sf-link--subtle:visited:not(.sf-link--current) {
+    color: var(--sf-color-text-muted);
+    opacity: 0.92;
+  }
+
+  .sf-link--external {
+    color: var(--sf-color-accent-strong);
+  }
+
+  .sf-link--external:hover {
+    text-decoration-color: currentcolor;
+  }
+
+  .sf-link--external:visited:not(.sf-link--current) {
+    color: var(--sf-color-accent-strong);
+    opacity: 0.88;
+  }
+
+  .sf-link--current {
+    font-weight: 600;
+    color: var(--sf-color-text);
+    text-decoration-color: var(--sf-color-accent);
+  }
+
+  .sf-link--current:hover {
+    color: var(--sf-color-text);
+    text-decoration-color: var(--sf-color-accent-strong);
+  }
+
+  /* CodeBlockSurface — primitive-component-catalog：块级代码表面；focus-within 由容器聚焦子元素触发 */
+  .sf-code-block-surface {
+    box-sizing: border-box;
+    display: block;
+    max-inline-size: 100%;
+    border: 1px solid var(--sf-color-border);
+    border-radius: var(--sf-radius-md);
+    background: var(--sf-color-surface-raised);
+    color: var(--sf-color-text);
+    text-align: start;
+  }
+
+  .sf-code-block-surface:focus-within {
+    outline: 2px solid var(--sf-color-accent);
+    outline-offset: 1px;
+  }
+
+  .sf-code-block-surface__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sf-space-2) var(--sf-space-4);
+    padding: var(--sf-space-2) var(--sf-space-3);
+    border-bottom: 1px solid var(--sf-color-border);
+    background: var(--sf-color-surface-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--sf-color-text-muted);
+  }
+
+  .sf-code-block-surface__header-start,
+  .sf-code-block-surface__header-end {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sf-space-2);
+    min-inline-size: 0;
+  }
+
+  .sf-code-block-surface__language {
+    font-family: var(--sf-font-ui);
+  }
+
+  .sf-code-block-surface__meta {
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--sf-color-text-subtle);
+  }
+
+  .sf-code-block-surface__header-slot {
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--sf-color-text);
+  }
+
+  .sf-code-block-surface__actions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sf-space-2);
+  }
+
+  .sf-code-block-surface__body {
+    margin: 0;
+    padding: var(--sf-space-4);
+    min-inline-size: 0;
+  }
+
+  .sf-code-block-surface__body--scrollable {
+    overflow-x: auto;
+  }
+
+  .sf-code-block-surface__body--wrapped {
+    overflow-x: hidden;
+  }
+
+  .sf-code-block-surface__body .sf-code-block-surface__pre {
+    margin: 0;
+    font-family: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+  }
+
+  .sf-code-block-surface__body--scrollable .sf-code-block-surface__pre {
+    white-space: pre;
+  }
+
+  .sf-code-block-surface__body--wrapped .sf-code-block-surface__pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .sf-code-block-surface__code {
+    font-family: inherit;
+  }
+
+  .sf-code-block-surface__footer {
+    padding: var(--sf-space-2) var(--sf-space-3);
+    border-top: 1px solid var(--sf-color-border);
+    font-size: 0.75rem;
+    color: var(--sf-color-text-muted);
+  }
+
+  .sf-code-block-surface--command {
+    background: var(--sf-color-surface-muted);
+    border-color: var(--sf-color-border-strong);
+  }
+
+  .sf-code-block-surface--diff-neutral {
+    background: var(--sf-color-surface-muted);
+    border-style: dashed;
+  }
+
   .sf-tag {
     display: inline-flex;
     align-items: center;

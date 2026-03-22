@@ -1,5 +1,5 @@
-import { Grid, Stack } from "@/shared/ui/layout";
-import { Notice, ProgressBar } from "@/shared/ui/primitives";
+import { Grid, Stack } from '@/shared/ui/layout';
+import { Notice, ProgressBar } from '@/shared/ui/primitives';
 
 export function ViewStateLayoutDemo() {
   return (

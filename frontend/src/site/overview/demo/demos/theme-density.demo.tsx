@@ -1,5 +1,5 @@
-import { Grid, Stack, Surface } from "@/shared/ui/layout";
-import { Tag } from "@/shared/ui/primitives";
+import { Grid, Stack, Surface } from '@/shared/ui/layout';
+import { Tag } from '@/shared/ui/primitives';
 
 export function ThemeDensityDemo() {
   return (
@@ -7,7 +7,9 @@ export function ThemeDensityDemo() {
       <Surface>
         <Stack gap="sm">
           <Tag>Comfortable rhythm</Tag>
-          <p className="overview-demo__copy">Long-form reading and overview pages use the relaxed scale.</p>
+          <p className="overview-demo__copy">
+            Long-form reading and overview pages use the relaxed scale.
+          </p>
         </Stack>
       </Surface>
       <Surface>

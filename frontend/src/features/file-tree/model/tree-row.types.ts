@@ -1,4 +1,4 @@
-import type { ContentNode } from "@/entities/content";
+import type { ContentNode } from '@/entities/content';
 
 export type TreeRow = {
   node: ContentNode;

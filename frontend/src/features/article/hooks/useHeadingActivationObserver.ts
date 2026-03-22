@@ -1,24 +1,24 @@
-import { useEffect, useEffectEvent, useRef } from "react";
+import { useEffect, useEffectEvent, useRef } from 'react';
 
-import { getWindowOption } from "@/shared/lib/dom/get-window-option";
+import { getWindowOption } from '@/shared/lib/dom/get-window-option';
 import {
   getElementClientHeight,
   getElementScrollHeight,
   getElementScrollTop,
   getElementScrollTopWithinContainer,
-} from "@/shared/lib/dom/scroll-element";
-import { useEventListener } from "@/shared/lib/dom/useEventListener";
-import { hasIntersectionObserverSupport } from "@/shared/lib/dom/has-intersection-observer-support";
-import { useIntersectionObserver } from "@/shared/lib/dom/useIntersectionObserver";
-import { isSome, none, some, type Option } from "@/shared/lib/monads/option";
+} from '@/shared/lib/dom/scroll-element';
+import { useEventListener } from '@/shared/lib/dom/useEventListener';
+import { hasIntersectionObserverSupport } from '@/shared/lib/dom/has-intersection-observer-support';
+import { useIntersectionObserver } from '@/shared/lib/dom/useIntersectionObserver';
+import { isSome, none, some, type Option } from '@/shared/lib/monads/option';
 
 import {
   TOC_BOTTOM_EPSILON,
   TOC_BOTTOM_SENTINEL_THRESHOLD,
   TOC_HEADING_OBSERVER_THRESHOLD,
   TOC_OBSERVER_BAND_HEIGHT,
-} from "../constant";
-import { useArticleDom } from "../context/article-dom.context";
+} from '../constant';
+import { useArticleDom } from '../context/article-dom.context';
 
 type UseHeadingActivationObserverOptions = {
   layoutVersion: number;
@@ -38,7 +38,7 @@ function isBottomVisible(scrollContainer: HTMLElement): boolean {
 function resolveActiveHeadingIdForActivationLine(
   observedHeadings: ReadonlyArray<{ id: string; element: HTMLElement }>,
   scrollContainerElement: HTMLElement,
-  activationLineRatio: number,
+  activationLineRatio: number
 ): Option<string> {
   const activationLine =
     getElementScrollTop(scrollContainerElement) +
@@ -47,7 +47,7 @@ function resolveActiveHeadingIdForActivationLine(
     .filter(
       (heading) =>
         getElementScrollTopWithinContainer(scrollContainerElement, heading.element) <=
-        activationLine,
+        activationLine
     )
     .at(-1);
 
@@ -56,7 +56,7 @@ function resolveActiveHeadingIdForActivationLine(
 
 function resolveIntersectingActiveHeadingId(
   observedHeadings: ReadonlyArray<{ id: string; element: HTMLElement }>,
-  intersectingHeadingIds: Record<string, true>,
+  intersectingHeadingIds: Record<string, true>
 ): Option<string> {
   const activeHeading = observedHeadings
     .filter((heading) => intersectingHeadingIds[heading.id] === true)
@@ -78,10 +78,7 @@ export function useHeadingActivationObserver({
   const intersectingHeadingIdsRef = useRef<Record<string, true>>({});
   const intersectionObserverSupported = hasIntersectionObserverSupport();
   const shouldUseFallback =
-    !intersectionObserverSupported &&
-    !disabled &&
-    isSome(scrollContainer) &&
-    headings.length > 0;
+    !intersectionObserverSupported && !disabled && isSome(scrollContainer) && headings.length > 0;
 
   onActiveHeadingChangeRef.current = onActiveHeadingChange;
   onBottomVisibilityChangeRef.current = onBottomVisibilityChange;
@@ -94,7 +91,7 @@ export function useHeadingActivationObserver({
     const activeHeadingId = resolveActiveHeadingIdForActivationLine(
       headings,
       scrollContainer.value,
-      activationLineRatio,
+      activationLineRatio
     );
 
     if (isSome(activeHeadingId)) {
@@ -102,7 +99,7 @@ export function useHeadingActivationObserver({
     }
 
     onBottomVisibilityChangeRef.current(
-      isSome(bottomSentinel) && isBottomVisible(scrollContainer.value),
+      isSome(bottomSentinel) && isBottomVisible(scrollContainer.value)
     );
   });
 
@@ -125,7 +122,7 @@ export function useHeadingActivationObserver({
 
   useEventListener({
     target: shouldUseFallback ? scrollContainer : none(),
-    type: "scroll",
+    type: 'scroll',
     listener: syncFallbackState,
     options: { passive: true },
     disabled: !shouldUseFallback,
@@ -133,7 +130,7 @@ export function useHeadingActivationObserver({
 
   useEventListener({
     target: shouldUseFallback ? getWindowOption() : none(),
-    type: "resize",
+    type: 'resize',
     listener: syncFallbackState,
     options: undefined,
     disabled: !shouldUseFallback,
@@ -160,10 +157,7 @@ export function useHeadingActivationObserver({
         delete intersectingHeadingIds[headingId];
       }
 
-      const activeHeadingId = resolveIntersectingActiveHeadingId(
-        headings,
-        intersectingHeadingIds,
-      );
+      const activeHeadingId = resolveIntersectingActiveHeadingId(headings, intersectingHeadingIds);
 
       if (isSome(activeHeadingId)) {
         onActiveHeadingChangeRef.current(activeHeadingId.value);
@@ -174,14 +168,21 @@ export function useHeadingActivationObserver({
           const bandHeight = TOC_OBSERVER_BAND_HEIGHT;
           const activationTop = getElementClientHeight(scrollContainer.value) * activationLineRatio;
           const rootMarginTop = -activationTop;
-          const rootMarginBottom =
-            -(getElementClientHeight(scrollContainer.value) - activationTop - bandHeight);
+          const rootMarginBottom = -(
+            getElementClientHeight(scrollContainer.value) -
+            activationTop -
+            bandHeight
+          );
 
           return `${rootMarginTop}px 0px ${rootMarginBottom}px 0px`;
         })()
-      : "0px 0px 0px 0px",
+      : '0px 0px 0px 0px',
     threshold: TOC_HEADING_OBSERVER_THRESHOLD,
-    disabled: disabled || !intersectionObserverSupported || !isSome(scrollContainer) || headings.length === 0,
+    disabled:
+      disabled ||
+      !intersectionObserverSupported ||
+      !isSome(scrollContainer) ||
+      headings.length === 0,
     dependencyToken: layoutVersion,
   });
 
@@ -191,13 +192,15 @@ export function useHeadingActivationObserver({
     onIntersect: (entries) => {
       const entry = entries[0];
 
-      onBottomVisibilityChangeRef.current(
-        entry === undefined ? false : entry.isIntersecting,
-      );
+      onBottomVisibilityChangeRef.current(entry === undefined ? false : entry.isIntersecting);
     },
-    rootMargin: "0px",
+    rootMargin: '0px',
     threshold: TOC_BOTTOM_SENTINEL_THRESHOLD,
-    disabled: disabled || !intersectionObserverSupported || !isSome(scrollContainer) || !isSome(bottomSentinel),
+    disabled:
+      disabled ||
+      !intersectionObserverSupported ||
+      !isSome(scrollContainer) ||
+      !isSome(bottomSentinel),
     dependencyToken: layoutVersion,
   });
 }

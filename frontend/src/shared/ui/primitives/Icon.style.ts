@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties } from 'react';
 
 export function iconStyle(color: string): CSSProperties {
   return {

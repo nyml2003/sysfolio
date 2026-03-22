@@ -1,17 +1,17 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
-import { isSome, type Option } from "@/shared/lib/monads/option";
+import { isSome, type Option } from '@/shared/lib/monads/option';
 
 type EventTargetLike = {
   addEventListener: (
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: AddEventListenerOptions | boolean,
+    options?: AddEventListenerOptions | boolean
   ) => void;
   removeEventListener: (
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: EventListenerOptions | boolean,
+    options?: EventListenerOptions | boolean
   ) => void;
 };
 

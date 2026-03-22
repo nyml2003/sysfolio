@@ -1,3 +1,3 @@
-export type ThemePreference = "light" | "dark";
+export type ThemePreference = 'light' | 'dark';
 
-export const DEFAULT_THEME: ThemePreference = "light";
+export const DEFAULT_THEME: ThemePreference = 'light';

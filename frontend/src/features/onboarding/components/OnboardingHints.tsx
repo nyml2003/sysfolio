@@ -1,33 +1,33 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
-import { usePreferences } from "@/shared/store/preferences";
-import { ButtonGhostMd } from "@/shared/ui/primitives";
+import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
+import { usePreferences } from '@/shared/store/preferences';
+import { ButtonGhostMd } from '@/shared/ui/primitives';
 
-import styles from "./OnboardingHints.module.css";
+import styles from './OnboardingHints.module.css';
 
 const tipLayout = [
   {
-    id: "tree",
-    dotStyle: { top: "25%", left: "13%" },
-    popoverStyle: { top: "28%", left: "15%" },
+    id: 'tree',
+    dotStyle: { top: '25%', left: '13%' },
+    popoverStyle: { top: '28%', left: '15%' },
   },
   {
-    id: "content",
-    dotStyle: { top: "23%", left: "50%" },
-    popoverStyle: { top: "26%", left: "52%" },
+    id: 'content',
+    dotStyle: { top: '23%', left: '50%' },
+    popoverStyle: { top: '26%', left: '52%' },
   },
   {
-    id: "path",
-    dotStyle: { top: "6%", left: "53%" },
-    popoverStyle: { top: "8%", left: "55%" },
+    id: 'path',
+    dotStyle: { top: '6%', left: '53%' },
+    popoverStyle: { top: '8%', left: '55%' },
   },
 ] as const;
 
 export function OnboardingHints() {
   const { onboardingVisible, dismissOnboarding } = usePreferences();
   const copy = useUiCopy();
-  const [activeTipId, setActiveTipId] = useState<string>("tree");
+  const [activeTipId, setActiveTipId] = useState<string>('tree');
 
   const tips = [
     { ...tipLayout[0], label: copy.onboarding.treeTip },
@@ -45,7 +45,7 @@ export function OnboardingHints() {
     <div
       className={styles.root}
       onKeyDown={(event) => {
-        if (event.key === "Escape") {
+        if (event.key === 'Escape') {
           dismissOnboarding();
         }
       }}

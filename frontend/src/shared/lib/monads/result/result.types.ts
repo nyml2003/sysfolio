@@ -1,10 +1,10 @@
 export type Err<E> = {
-  tag: "err";
+  tag: 'err';
   error: E;
 };
 
 export type Ok<T> = {
-  tag: "ok";
+  tag: 'ok';
   value: T;
 };
 

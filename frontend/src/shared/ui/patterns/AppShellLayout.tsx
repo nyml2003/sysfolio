@@ -1,15 +1,15 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
-import { clsx } from "clsx";
+import { clsx } from 'clsx';
 
-import { useStyleContext } from "@/shared/ui/foundation";
+import { useStyleContext } from '@/shared/ui/foundation';
 
 type AppShellLayoutProps = {
   topBar: ReactNode;
   navigation: ReactNode;
   content: ReactNode;
   contextPanel: ReactNode;
-  activeOverlay: "none" | "navigation" | "context";
+  activeOverlay: 'none' | 'navigation' | 'context';
   onDismissOverlay: () => void;
 };
 
@@ -22,9 +22,9 @@ export function AppShellLayout({
   onDismissOverlay,
 }: AppShellLayoutProps) {
   const { layoutMode } = useStyleContext();
-  const navigationInline = layoutMode !== "compact";
-  const contextInline = layoutMode === "spacious";
-  const showOverlay = activeOverlay !== "none" && layoutMode !== "spacious";
+  const navigationInline = layoutMode !== 'compact';
+  const contextInline = layoutMode === 'spacious';
+  const showOverlay = activeOverlay !== 'none' && layoutMode !== 'spacious';
 
   return (
     <div className="sf-app-shell">
@@ -48,17 +48,16 @@ export function AppShellLayout({
           />
           <aside
             className={clsx(
-              "sf-app-shell__overlay-panel",
-              activeOverlay === "navigation"
-                ? "sf-app-shell__overlay-panel--navigation"
-                : "sf-app-shell__overlay-panel--context",
+              'sf-app-shell__overlay-panel',
+              activeOverlay === 'navigation'
+                ? 'sf-app-shell__overlay-panel--navigation'
+                : 'sf-app-shell__overlay-panel--context'
             )}
           >
-            {activeOverlay === "navigation" ? navigation : contextPanel}
+            {activeOverlay === 'navigation' ? navigation : contextPanel}
           </aside>
         </div>
       ) : null}
     </div>
   );
 }
-

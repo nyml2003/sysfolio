@@ -1,4 +1,4 @@
-import type { NodeId } from "@/entities/content";
+import type { NodeId } from '@/entities/content';
 
 export function mergeExpandedIds(currentIds: NodeId[], nextIds: NodeId[]): NodeId[] {
   const merged = [...currentIds];

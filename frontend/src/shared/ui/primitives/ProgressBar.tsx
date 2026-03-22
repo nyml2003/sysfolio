@@ -18,4 +18,3 @@ export function ProgressBar({ value }: ProgressBarProps) {
     </div>
   );
 }
-

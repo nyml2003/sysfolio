@@ -1,13 +1,13 @@
-import type { NodeId } from "@/entities/content";
-import { ROOT_PATH, normalizePath, pathFromSegments } from "@/shared/lib/path/content-path";
+import type { NodeId } from '@/entities/content';
+import { ROOT_PATH, normalizePath, pathFromSegments } from '@/shared/lib/path/content-path';
 
-import type { TreeIndex } from "./tree-index.types";
-import type { TreeRow } from "./tree-row.types";
+import type { TreeIndex } from './tree-index.types';
+import type { TreeRow } from './tree-row.types';
 
 export function buildVisibleRows(
   index: TreeIndex,
   expandedIds: NodeId[],
-  selectedPath: string,
+  selectedPath: string
 ): TreeRow[] {
   const normalizedSelectedPath = normalizePath(selectedPath);
   const rows: TreeRow[] = [];
@@ -22,7 +22,7 @@ export function buildVisibleRows(
         continue;
       }
 
-      const nodePath = node.kind === "home" ? ROOT_PATH : pathFromSegments(node.pathSegments);
+      const nodePath = node.kind === 'home' ? ROOT_PATH : pathFromSegments(node.pathSegments);
       const isExpanded = expandedIds.includes(node.id);
 
       rows.push({
@@ -32,7 +32,7 @@ export function buildVisibleRows(
         isSelected: normalizePath(nodePath) === normalizedSelectedPath,
       });
 
-      if (node.kind === "folder" && isExpanded) {
+      if (node.kind === 'folder' && isExpanded) {
         walk(node.id, depth + 1);
       }
     }

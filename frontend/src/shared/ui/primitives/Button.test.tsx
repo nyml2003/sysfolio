@@ -1,22 +1,15 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 
-import { none, some } from "@/shared/lib/monads/option";
+import { none, some } from '@/shared/lib/monads/option';
 
-import { Button } from "./Button";
+import { Button } from './Button';
 
-const tones = [
-  "primary",
-  "secondary",
-  "ghost",
-  "success",
-  "warning",
-  "destructive",
-] as const;
+const tones = ['primary', 'secondary', 'ghost', 'success', 'warning', 'destructive'] as const;
 
 const btn = {
-  size: "md" as const,
-  type: "button" as const,
+  size: 'md' as const,
+  type: 'button' as const,
   loading: false,
   fullWidth: false,
   truncateLabel: false,
@@ -24,68 +17,68 @@ const btn = {
   trailingIcon: none(),
 };
 
-describe("Button", () => {
-  it("applies sf-button and tone/size classes", () => {
+describe('Button', () => {
+  it('applies sf-button and tone/size classes', () => {
     render(
       <Button {...btn} size="sm" tone="primary">
         Go
-      </Button>,
+      </Button>
     );
-    const el = screen.getByRole("button", { name: "Go" });
-    expect(el.className).toContain("sf-button");
-    expect(el.className).toContain("sf-button--primary");
-    expect(el.className).toContain("sf-button--sm");
+    const el = screen.getByRole('button', { name: 'Go' });
+    expect(el.className).toContain('sf-button');
+    expect(el.className).toContain('sf-button--primary');
+    expect(el.className).toContain('sf-button--sm');
   });
 
-  it.each(tones)("tone %s maps to sf-button--%s", (tone) => {
+  it.each(tones)('tone %s maps to sf-button--%s', (tone) => {
     render(
       <Button {...btn} tone={tone}>
         label
-      </Button>,
+      </Button>
     );
-    expect(screen.getByRole("button").className).toContain(`sf-button--${tone}`);
+    expect(screen.getByRole('button').className).toContain(`sf-button--${tone}`);
   });
 
-  it("loading sets aria-busy, disabled, and loading class", () => {
+  it('loading sets aria-busy, disabled, and loading class', () => {
     render(
       <Button {...btn} loading tone="secondary">
         Wait
-      </Button>,
+      </Button>
     );
-    const el = screen.getByRole("button", { name: "Wait" });
-    expect(el.getAttribute("aria-busy")).toBe("true");
+    const el = screen.getByRole('button', { name: 'Wait' });
+    expect(el.getAttribute('aria-busy')).toBe('true');
     expect((el as HTMLButtonElement).disabled).toBe(true);
-    expect(el.className).toContain("sf-button--loading");
-    expect(el.className).toContain("is-loading");
+    expect(el.className).toContain('sf-button--loading');
+    expect(el.className).toContain('is-loading');
   });
 
-  it("applies full-width and truncate classes", () => {
+  it('applies full-width and truncate classes', () => {
     render(
       <Button {...btn} fullWidth truncateLabel tone="secondary">
         Label
-      </Button>,
+      </Button>
     );
-    const el = screen.getByRole("button", { name: "Label" });
-    expect(el.className).toContain("sf-button--full-width");
-    expect(el.className).toContain("sf-button--truncate");
+    const el = screen.getByRole('button', { name: 'Label' });
+    expect(el.className).toContain('sf-button--full-width');
+    expect(el.className).toContain('sf-button--truncate');
   });
 
-  it("adds has-affix when leading icon is present", () => {
+  it('adds has-affix when leading icon is present', () => {
     render(
       <Button {...btn} leadingIcon={some(<span>icon</span>)} tone="secondary">
         Next
-      </Button>,
+      </Button>
     );
-    expect(screen.getByRole("button").className).toContain("sf-button--has-affix");
+    expect(screen.getByRole('button').className).toContain('sf-button--has-affix');
   });
 
-  it("renders leadingIcon in layout", () => {
+  it('renders leadingIcon in layout', () => {
     render(
       <Button {...btn} leadingIcon={some(<span data-testid="lead">icon</span>)} tone="secondary">
         Next
-      </Button>,
+      </Button>
     );
-    expect(screen.getByTestId("lead")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Next" })).toBeTruthy();
+    expect(screen.getByTestId('lead')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Next' })).toBeTruthy();
   });
 });
