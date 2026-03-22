@@ -36,6 +36,15 @@
 | `motion-spec.md` | 动效等级与 reduced motion 规则 |
 | `CHANGELOG.md` | 已完成变更记录 |
 
+## Research Reports
+
+以下文档用于承接阶段性调研结论，帮助补充 active specs，但不作为新的主规范入口：
+
+| 文档 | 作用 |
+| --- | --- |
+| `preference-system-research-report.md` | preference system 的业界实践、能力缺口与后续补充建议 |
+| `ui-ux-system-gap-research-report.md` | preference 之外的系统级 UI UX 缺口调研与优先级判断 |
+
 ## 样式源码
 
 真实源码位于 `styles/`：

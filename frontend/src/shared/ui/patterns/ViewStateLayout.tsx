@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { isSome, none, type Option } from "@/shared/lib/monads/option";
 import { Button } from "@/shared/ui/primitives";
 import { Stack, Surface } from "@/shared/ui/layout";
 
@@ -7,19 +8,19 @@ type ViewStateLayoutState = "ready" | "loading" | "empty" | "error";
 
 type ViewStateLayoutProps = {
   state: ViewStateLayoutState;
-  title?: string;
-  body?: string;
-  actionLabel?: string;
-  onAction?: () => void;
+  title: Option<string>;
+  body: Option<string>;
+  actionLabel: Option<string>;
+  onAction: Option<() => void>;
   children: ReactNode;
 };
 
 export function ViewStateLayout({
   state,
-  title,
-  body,
-  actionLabel,
-  onAction,
+  title = none(),
+  body = none(),
+  actionLabel = none(),
+  onAction = none(),
   children,
 }: ViewStateLayoutProps) {
   if (state === "ready") {
@@ -29,15 +30,14 @@ export function ViewStateLayout({
   return (
     <Surface className="sf-view-state" tone={state === "error" ? "danger" : "muted"}>
       <Stack gap="sm">
-        {title === undefined ? null : <h2 className="sf-view-state__title">{title}</h2>}
-        {body === undefined ? null : <p className="sf-view-state__body">{body}</p>}
-        {actionLabel === undefined || onAction === undefined ? null : (
-          <Button onClick={onAction} tone="secondary">
-            {actionLabel}
+        {isSome(title) ? <h2 className="sf-view-state__title">{title.value}</h2> : null}
+        {isSome(body) ? <p className="sf-view-state__body">{body.value}</p> : null}
+        {isSome(actionLabel) && isSome(onAction) ? (
+          <Button onClick={onAction.value} tone="secondary">
+            {actionLabel.value}
           </Button>
-        )}
+        ) : null}
       </Stack>
     </Surface>
   );
 }
-

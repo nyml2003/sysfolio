@@ -1,7 +1,7 @@
 import {
+  useCallback,
   useEffect,
   useEffectEvent,
-  useCallback,
   useMemo,
   useState,
   type ReactNode,
@@ -9,7 +9,14 @@ import {
 
 import { clsx } from "clsx";
 
-import { fromNullable, isSome, none, some, type Option } from "@/shared/lib/monads/option";
+import {
+  fromNullable,
+  isSome,
+  none,
+  some,
+  unwrapOr,
+  type Option,
+} from "@/shared/lib/monads/option";
 import {
   DEFAULT_MOTION_MODE,
   type DensityPreference,
@@ -31,11 +38,11 @@ import { resolveLayoutModeFromWidth, resolveMotionMode } from "./style.utils";
 
 type StyleProviderProps = {
   children: ReactNode;
-  theme?: ThemePreference;
-  density?: DensityPreference;
-  layoutMode?: LayoutMode;
-  motion?: MotionMode;
-  className?: string;
+  theme: Option<ThemePreference>;
+  density: Option<DensityPreference>;
+  layoutMode: Option<LayoutMode>;
+  motion: Option<MotionMode>;
+  className: Option<string>;
 };
 
 function toStableScopeOption(
@@ -57,11 +64,11 @@ function toStableScopeOption(
 
 export function StyleProvider({
   children,
-  theme,
-  density,
-  layoutMode,
-  motion,
-  className,
+  theme = none(),
+  density = none(),
+  layoutMode = none(),
+  motion = none(),
+  className = none(),
 }: StyleProviderProps) {
   const preferences = usePreferences();
   const [scopeElement, setScopeElement] = useState<Option<HTMLDivElement>>(none());
@@ -72,13 +79,13 @@ export function StyleProvider({
   const registerScopeElement = useCallback((node: HTMLDivElement | null) => {
     setScopeElement((currentNode) => toStableScopeOption(currentNode, node));
   }, []);
-  const resolvedTheme = theme ?? preferences.theme;
-  const resolvedDensity = density ?? preferences.density;
+  const resolvedTheme = unwrapOr(theme, preferences.theme);
+  const resolvedDensity = unwrapOr(density, preferences.density);
 
   const syncResolvedLayoutMode = useEffectEvent(() => {
-    if (layoutMode !== undefined) {
+    if (isSome(layoutMode)) {
       setResolvedLayoutMode((currentMode) =>
-        currentMode === layoutMode ? currentMode : layoutMode,
+        currentMode === layoutMode.value ? currentMode : layoutMode.value,
       );
       return;
     }
@@ -99,7 +106,7 @@ export function StyleProvider({
       syncResolvedLayoutMode();
     },
     dependencyToken: isSome(scopeElement) ? scopeElement.value : "scope-missing",
-    disabled: layoutMode !== undefined,
+    disabled: isSome(layoutMode),
   });
 
   useEffect(() => {
@@ -107,9 +114,9 @@ export function StyleProvider({
   }, [layoutMode, scopeElement, syncResolvedLayoutMode]);
 
   useEffect(() => {
-    if (motion !== undefined) {
+    if (isSome(motion)) {
       setResolvedMotionMode((currentMode) =>
-        currentMode === motion ? currentMode : motion,
+        currentMode === motion.value ? currentMode : motion.value,
       );
       return undefined;
     }
@@ -161,7 +168,7 @@ export function StyleProvider({
       <div
         className={clsx(
           STYLE_SCOPE_CLASS_NAME,
-          className,
+          unwrapOr(className, ""),
           `sf-theme-${resolvedTheme}`,
           `sf-density-${resolvedDensity}`,
           STYLE_LAYOUT_MODE_CLASS_NAMES[resolvedLayoutMode],

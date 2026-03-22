@@ -1,6 +1,8 @@
 export {
   createOverviewLibraryFixtures as createMockContentFixtures,
   getOverviewDocumentMeta,
+  getOverviewDocumentMetaById,
+  getOverviewHomeCollections,
   listOverviewDesignGaps,
   overviewDocumentMetaById,
   overviewHomeCollections,

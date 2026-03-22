@@ -122,13 +122,13 @@ function OverviewContent({
       content={
         <div className="overview-scroll-region" ref={registerScrollContainerElement}>
           <ViewStateLayout
-            body={
+            body={some(
               resource.tag === "error"
                 ? resource.error.message
                 : resource.tag === "loading"
                   ? "The overview station is resolving the current path."
-                  : "This path does not have renderable content yet."
-            }
+                  : "This path does not have renderable content yet.",
+            )}
             state={
               resource.tag === "ready"
                 ? "ready"
@@ -140,13 +140,15 @@ function OverviewContent({
             }
             title={
               resource.tag === "error"
-                ? "Path not found"
+                ? some("Path not found")
                 : resource.tag === "empty"
-                  ? "Nothing to render"
+                  ? some("Nothing to render")
                   : resource.tag === "ready"
-                    ? undefined
-                    : "Loading document"
+                    ? none()
+                    : some("Loading document")
             }
+            actionLabel={none()}
+            onAction={none()}
           >
             {resource.tag === "ready" && resource.value.content.kind === "home" ? (
               <OverviewHomePage

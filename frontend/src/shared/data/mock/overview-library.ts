@@ -7,8 +7,8 @@ import type {
   HomeContent,
   NodeId,
 } from "@/entities/content";
-import type { AppLocale } from "@/shared/lib/i18n/locale.types";
-import { none, some, type Option } from "@/shared/lib/monads/option";
+import { DEFAULT_LOCALE, type AppLocale } from "@/shared/lib/i18n/locale.types";
+import { none, some, unwrapOr, type Option } from "@/shared/lib/monads/option";
 
 export const ROOT_NODE_ID = "root";
 export const ROOT_NODE_TITLE = "system-library";
@@ -44,11 +44,16 @@ export type OverviewDocumentMeta = {
   relatedPaths: string[];
 };
 
+export type OverviewHomeCollectionEntry = {
+  path: string;
+  label: string;
+};
+
 export type OverviewHomeCollection = {
   id: string;
   title: string;
   description: string;
-  paths: string[];
+  entries: OverviewHomeCollectionEntry[];
 };
 
 type NodeConfig = {
@@ -59,11 +64,11 @@ type NodeConfig = {
   parentId: NodeId;
   ancestorIds: NodeId[];
   pathSegments: string[];
-  childrenCount?: number;
-  documentId?: DocumentId;
-  publishedAt?: string;
-  updatedAt?: string;
-  readingMinutes?: number;
+  childrenCount: Option<number>;
+  documentId: Option<DocumentId>;
+  publishedAt: Option<string>;
+  updatedAt: Option<string>;
+  readingMinutes: Option<number>;
 };
 
 type ArticleConfig = {
@@ -74,8 +79,12 @@ type ArticleConfig = {
   sections: ArticleSection[];
 };
 
+function localize(locale: AppLocale, english: string, chinese: string): string {
+  return locale === "en-US" ? english : chinese;
+}
+
 function createNode(config: NodeConfig): ContentNode {
-  const childrenCount = config.childrenCount ?? 0;
+  const childrenCount = unwrapOr(config.childrenCount, 0);
 
   return {
     id: config.id,
@@ -88,10 +97,10 @@ function createNode(config: NodeConfig): ContentNode {
     pathSegments: config.pathSegments,
     childrenCount,
     hasChildren: childrenCount > 0,
-    documentId: config.documentId === undefined ? none() : some(config.documentId),
-    publishedAt: config.publishedAt === undefined ? none() : some(config.publishedAt),
-    updatedAt: config.updatedAt === undefined ? none() : some(config.updatedAt),
-    readingMinutes: config.readingMinutes === undefined ? none() : some(config.readingMinutes),
+    documentId: config.documentId,
+    publishedAt: config.publishedAt,
+    updatedAt: config.updatedAt,
+    readingMinutes: config.readingMinutes,
   };
 }
 
@@ -125,313 +134,600 @@ function createSection(
   };
 }
 
-export const overviewDocumentMetaById: Record<DocumentId, OverviewDocumentMeta> = {
-  "doc-style-provider": {
-    documentId: "doc-style-provider",
-    layer: "foundation",
-    status: "ready",
-    designStatus: "confirmed",
-    demoIds: ["style-provider", "preferences"],
-    tags: ["runtime", "preferences"],
-    gaps: [],
-    relatedPaths: ["/foundation/theme-and-density", "/layout/app-shell"],
-  },
-  "doc-tokens": {
-    documentId: "doc-tokens",
-    layer: "foundation",
-    status: "partial",
-    designStatus: "needs-review",
-    demoIds: ["tokens"],
-    tags: ["tokens", "semantic aliases"],
-    gaps: [
-      {
-        id: "token-danger-tone",
-        title: "Destructive tone aliases",
-        description: "Need reviewed destructive tokens for buttons and notices.",
-        owner: "design",
-      },
-    ],
-    relatedPaths: ["/foundation/theme-and-density"],
-  },
-  "doc-theme-density": {
-    documentId: "doc-theme-density",
-    layer: "foundation",
-    status: "ready",
-    designStatus: "confirmed",
-    demoIds: ["theme-density"],
-    tags: ["theme", "density"],
-    gaps: [],
-    relatedPaths: ["/foundation/style-provider"],
-  },
-  "doc-layout-primitives": {
-    documentId: "doc-layout-primitives",
-    layer: "layout",
-    status: "ready",
-    designStatus: "confirmed",
-    demoIds: ["layout-primitives"],
-    tags: ["stack", "inline", "grid", "surface"],
-    gaps: [],
-    relatedPaths: ["/layout/app-shell"],
-  },
-  "doc-app-shell": {
-    documentId: "doc-app-shell",
-    layer: "layout",
-    status: "partial",
-    designStatus: "needs-review",
-    demoIds: ["app-shell"],
-    tags: ["shell", "responsive", "filesystem"],
-    gaps: [
-      {
-        id: "app-shell-medium-drawer",
-        title: "Medium drawer polish",
-        description: "Need final motion and surface treatment for the medium context drawer.",
-        owner: "design",
-      },
-    ],
-    relatedPaths: ["/patterns/navigation/tree-nav"],
-  },
-  "doc-button": {
-    documentId: "doc-button",
-    layer: "primitive",
-    status: "partial",
-    designStatus: "needs-design",
-    demoIds: ["button"],
-    tags: ["button", "actions"],
-    gaps: [
-      {
-        id: "button-destructive",
-        title: "Destructive button family",
-        description: "Need a complete destructive tone family and loading choreography.",
-        owner: "design",
-      },
-    ],
-    relatedPaths: ["/primitives/data-entry/field-and-input"],
-  },
-  "doc-field-input": {
-    documentId: "doc-field-input",
-    layer: "primitive",
-    status: "partial",
-    designStatus: "needs-review",
-    demoIds: ["field-input"],
-    tags: ["field", "input", "select"],
-    gaps: [
-      {
-        id: "combobox-density",
-        title: "Compact combobox density",
-        description: "Need a reviewed compact list treatment for search-heavy entry flows.",
-        owner: "design",
-      },
-    ],
-    relatedPaths: ["/primitives/actions/button"],
-  },
-  "doc-tree-nav": {
-    documentId: "doc-tree-nav",
-    layer: "pattern",
-    status: "partial",
-    designStatus: "needs-review",
-    demoIds: ["tree-nav"],
-    tags: ["tree", "navigation", "priority"],
-    gaps: [
-      {
-        id: "tree-search-match",
-        title: "Search-match state",
-        description: "Need a visual rule that does not steal ownership from current or selected.",
-        owner: "design",
-      },
-    ],
-    relatedPaths: ["/layout/app-shell"],
-  },
-  "doc-view-state-layout": {
-    documentId: "doc-view-state-layout",
-    layer: "pattern",
-    status: "partial",
-    designStatus: "needs-review",
-    demoIds: ["view-state-layout"],
-    tags: ["loading", "empty", "error"],
-    gaps: [
-      {
-        id: "empty-state-illustration",
-        title: "Illustrated empty-state tone",
-        description: "Need a reviewed empty-state treatment for docs and audit pages.",
-        owner: "design",
-      },
-    ],
-    relatedPaths: ["/primitives/feedback/status-feedback"],
-  },
-  "doc-design-gaps": {
-    documentId: "doc-design-gaps",
-    layer: "audit",
-    status: "partial",
-    designStatus: "needs-review",
-    demoIds: ["design-gaps", "missing-components"],
-    tags: ["audit", "design"],
-    gaps: [],
-    relatedPaths: ["/primitives/actions/button", "/patterns/navigation/tree-nav"],
-  },
-};
-
-export const overviewHomeCollections: OverviewHomeCollection[] = [
-  {
-    id: "runtime",
-    title: "Start With The Runtime",
-    description: "Preferences, tokens, and layout resolution are the base of the library.",
-    paths: ["/foundation/style-provider", "/foundation/token-map", "/foundation/theme-and-density"],
-  },
-  {
-    id: "layout",
-    title: "Then Lock Layout",
-    description: "The shell and layout primitives stop product pages from inventing their own scaffolds.",
-    paths: ["/layout/layout-primitives", "/layout/app-shell"],
-  },
-  {
-    id: "audit",
-    title: "Audit What Still Needs Design",
-    description: "Use the audit page to see which contracts are still incomplete.",
-    paths: ["/audit/design-gaps"],
-  },
-];
-
-export function listOverviewDesignGaps(): OverviewGap[] {
-  return Object.values(overviewDocumentMetaById).flatMap((meta) => meta.gaps);
+function createOverviewDocumentMetaByLocale(
+  locale: AppLocale,
+): Record<DocumentId, OverviewDocumentMeta> {
+  return {
+    "doc-style-provider": {
+      documentId: "doc-style-provider",
+      layer: "foundation",
+      status: "ready",
+      designStatus: "confirmed",
+      demoIds: ["style-provider", "preferences"],
+      tags: ["runtime", "preferences"],
+      gaps: [],
+      relatedPaths: ["/foundation/theme-and-density", "/layout/app-shell"],
+    },
+    "doc-tokens": {
+      documentId: "doc-tokens",
+      layer: "foundation",
+      status: "partial",
+      designStatus: "needs-review",
+      demoIds: ["tokens"],
+      tags: ["tokens", "semantic aliases"],
+      gaps: [
+        {
+          id: "token-danger-tone",
+          title: localize(locale, "Destructive tone aliases", "危险态 tone alias"),
+          description: localize(
+            locale,
+            "Need reviewed destructive tokens for buttons and notices.",
+            "按钮和 notice 还需要经过评审的危险态 tokens。",
+          ),
+          owner: "design",
+        },
+      ],
+      relatedPaths: ["/foundation/theme-and-density"],
+    },
+    "doc-theme-density": {
+      documentId: "doc-theme-density",
+      layer: "foundation",
+      status: "ready",
+      designStatus: "confirmed",
+      demoIds: ["theme-density"],
+      tags: ["theme", "density"],
+      gaps: [],
+      relatedPaths: ["/foundation/style-provider"],
+    },
+    "doc-layout-primitives": {
+      documentId: "doc-layout-primitives",
+      layer: "layout",
+      status: "ready",
+      designStatus: "confirmed",
+      demoIds: ["layout-primitives"],
+      tags: ["stack", "inline", "grid", "surface"],
+      gaps: [],
+      relatedPaths: ["/layout/app-shell"],
+    },
+    "doc-app-shell": {
+      documentId: "doc-app-shell",
+      layer: "layout",
+      status: "partial",
+      designStatus: "needs-review",
+      demoIds: ["app-shell"],
+      tags: ["shell", "responsive", "filesystem"],
+      gaps: [
+        {
+          id: "app-shell-medium-drawer",
+          title: localize(locale, "Medium drawer polish", "中栏抽屉收尾"),
+          description: localize(
+            locale,
+            "Need final motion and surface treatment for the medium context drawer.",
+            "中栏 context drawer 还缺最终的动效和表面处理。",
+          ),
+          owner: "design",
+        },
+      ],
+      relatedPaths: ["/patterns/navigation/tree-nav"],
+    },
+    "doc-button": {
+      documentId: "doc-button",
+      layer: "primitive",
+      status: "partial",
+      designStatus: "needs-design",
+      demoIds: ["button"],
+      tags: ["button", "actions"],
+      gaps: [
+        {
+          id: "button-destructive",
+          title: localize(locale, "Destructive button family", "破坏性按钮族"),
+          description: localize(
+            locale,
+            "Need a complete destructive tone family and loading choreography.",
+            "还需要完整的破坏性按钮 tone 家族和 loading 编排。",
+          ),
+          owner: "design",
+        },
+      ],
+      relatedPaths: ["/primitives/data-entry/field-and-input"],
+    },
+    "doc-field-input": {
+      documentId: "doc-field-input",
+      layer: "primitive",
+      status: "partial",
+      designStatus: "needs-review",
+      demoIds: ["field-input"],
+      tags: ["field", "input", "select"],
+      gaps: [
+        {
+          id: "combobox-density",
+          title: localize(locale, "Compact combobox density", "紧凑 combobox 密度"),
+          description: localize(
+            locale,
+            "Need a reviewed compact list treatment for search-heavy entry flows.",
+            "搜索密集型录入流还缺经过评审的紧凑列表处理。",
+          ),
+          owner: "design",
+        },
+      ],
+      relatedPaths: ["/primitives/actions/button"],
+    },
+    "doc-tree-nav": {
+      documentId: "doc-tree-nav",
+      layer: "pattern",
+      status: "partial",
+      designStatus: "needs-review",
+      demoIds: ["tree-nav"],
+      tags: ["tree", "navigation", "priority"],
+      gaps: [
+        {
+          id: "tree-search-match",
+          title: localize(locale, "Search-match state", "搜索命中态"),
+          description: localize(
+            locale,
+            "Need a visual rule that does not steal ownership from current or selected.",
+            "还需要一条不会抢走 current 或 selected 语义的搜索命中视觉规则。",
+          ),
+          owner: "design",
+        },
+      ],
+      relatedPaths: ["/layout/app-shell"],
+    },
+    "doc-view-state-layout": {
+      documentId: "doc-view-state-layout",
+      layer: "pattern",
+      status: "partial",
+      designStatus: "needs-review",
+      demoIds: ["view-state-layout"],
+      tags: ["loading", "empty", "error"],
+      gaps: [
+        {
+          id: "empty-state-illustration",
+          title: localize(locale, "Illustrated empty-state tone", "带插图的空态语气"),
+          description: localize(
+            locale,
+            "Need a reviewed empty-state treatment for docs and audit pages.",
+            "文档页和审计页还需要经过评审的空态处理。",
+          ),
+          owner: "design",
+        },
+      ],
+      relatedPaths: ["/primitives/feedback/status-feedback"],
+    },
+    "doc-design-gaps": {
+      documentId: "doc-design-gaps",
+      layer: "audit",
+      status: "partial",
+      designStatus: "needs-review",
+      demoIds: ["design-gaps", "missing-components"],
+      tags: ["audit", "design"],
+      gaps: [],
+      relatedPaths: ["/primitives/actions/button", "/patterns/navigation/tree-nav"],
+    },
+  };
 }
 
-function createOverviewArticleDocuments(): Record<DocumentId, ArticleDocument> {
+export function getOverviewDocumentMetaById(
+  locale: AppLocale = DEFAULT_LOCALE,
+): Record<DocumentId, OverviewDocumentMeta> {
+  return createOverviewDocumentMetaByLocale(locale);
+}
+
+export const overviewDocumentMetaById = getOverviewDocumentMetaById(DEFAULT_LOCALE);
+
+export function getOverviewHomeCollections(
+  locale: AppLocale = DEFAULT_LOCALE,
+): OverviewHomeCollection[] {
+  return [
+    {
+      id: "runtime",
+      title: localize(locale, "Start With The Runtime", "先看运行时"),
+      description: localize(
+        locale,
+        "Preferences, tokens, and layout resolution are the base of the library.",
+        "偏好、tokens 和布局解析构成了组件库最底层的运行时。",
+      ),
+      entries: [
+        { path: "/foundation/style-provider", label: "StyleProvider" },
+        { path: "/foundation/token-map", label: "Token Map" },
+        {
+          path: "/foundation/theme-and-density",
+          label: localize(locale, "Theme And Density", "主题与密度"),
+        },
+      ],
+    },
+    {
+      id: "layout",
+      title: localize(locale, "Then Lock Layout", "再把布局定住"),
+      description: localize(
+        locale,
+        "The shell and layout primitives stop product pages from inventing their own scaffolds.",
+        "外壳和布局原语先把页面脚手架收口，业务页面就不会各写各的。",
+      ),
+      entries: [
+        {
+          path: "/layout/layout-primitives",
+          label: localize(locale, "Layout Primitives", "布局原语"),
+        },
+        { path: "/layout/app-shell", label: "App Shell" },
+      ],
+    },
+    {
+      id: "audit",
+      title: localize(locale, "Audit What Still Needs Design", "审计还缺什么设计"),
+      description: localize(
+        locale,
+        "Use the audit page to see which contracts are still incomplete.",
+        "用审计页集中查看哪些契约还没有收敛完成。",
+      ),
+      entries: [
+        {
+          path: "/audit/design-gaps",
+          label: localize(locale, "Design Gaps", "设计缺口"),
+        },
+      ],
+    },
+  ];
+}
+
+export const overviewHomeCollections = getOverviewHomeCollections(DEFAULT_LOCALE);
+
+export function listOverviewDesignGaps(
+  locale: AppLocale = DEFAULT_LOCALE,
+): OverviewGap[] {
+  return Object.values(getOverviewDocumentMetaById(locale)).flatMap((meta) => meta.gaps);
+}
+
+function createOverviewArticleDocuments(
+  locale: AppLocale,
+): Record<DocumentId, ArticleDocument> {
   return {
     "doc-style-provider": createArticle({
       id: "doc-style-provider",
       title: "StyleProvider",
-      summary: "StyleProvider resolves preferences and environment capabilities into one stable UI runtime.",
-      eyebrow: "foundation / runtime",
+      summary: localize(
+        locale,
+        "StyleProvider resolves preferences and environment capabilities into one stable UI runtime.",
+        "StyleProvider 把偏好和环境能力解析成统一、稳定的 UI 运行时。",
+      ),
+      eyebrow: localize(locale, "foundation / runtime", "基础 / 运行时"),
       sections: [
-        createSection("style-provider-why", "Why the provider exists", 2, [
-          "Theme, density, layout mode, and motion should not be recomputed inside product views. StyleProvider resolves them once and shares the result with the whole library scope.",
-        ]),
-        createSection("style-provider-inputs", "What flows into the runtime", 2, [
-          "Theme and density come from user preferences. Layout mode comes from the shell container width unless a host overrides it. Motion follows the system preference unless a host overrides it.",
-        ]),
+        createSection(
+          "style-provider-why",
+          localize(locale, "Why the provider exists", "为什么需要这个 provider"),
+          2,
+          [
+            localize(
+              locale,
+              "Theme, density, layout mode, and motion should not be recomputed inside product views. StyleProvider resolves them once and shares the result with the whole library scope.",
+              "主题、密度、布局模式和动效不应该在业务页面里反复计算。StyleProvider 只解析一次，再把结果分发给整套组件库作用域。",
+            ),
+          ],
+        ),
+        createSection(
+          "style-provider-inputs",
+          localize(locale, "What flows into the runtime", "哪些输入会进入运行时"),
+          2,
+          [
+            localize(
+              locale,
+              "Theme and density come from user preferences. Layout mode comes from the shell container width unless a host overrides it. Motion follows the system preference unless a host overrides it.",
+              "主题和密度来自用户偏好。布局模式默认由外壳容器宽度决定，除非宿主显式覆盖。动效默认跟随系统偏好，除非宿主显式覆盖。",
+            ),
+          ],
+        ),
       ],
     }),
     "doc-tokens": createArticle({
       id: "doc-tokens",
       title: "Token Map",
-      summary: "Tokens define the system vocabulary for surfaces, text, borders, density, and motion before component styling begins.",
-      eyebrow: "foundation / tokens",
+      summary: localize(
+        locale,
+        "Tokens define the system vocabulary for surfaces, text, borders, density, and motion before component styling begins.",
+        "在组件样式落地之前，tokens 先定义表面、文字、边框、密度和动效这些系统词汇。",
+      ),
+      eyebrow: localize(locale, "foundation / tokens", "基础 / tokens"),
       sections: [
-        createSection("tokens-surfaces", "Semantic surfaces first", 2, [
-          "Canvas, raised surfaces, borders, text, and status colors are expressed as semantic roles so components stop hard-coding their own visual relationships.",
-        ]),
-        createSection("tokens-density", "Density and motion are also tokens", 2, [
-          "Spacing, radius, row height, and transition aliases all shift through tokens. Components consume those aliases instead of branching per page.",
-        ]),
+        createSection(
+          "tokens-surfaces",
+          localize(locale, "Semantic surfaces first", "先定义语义表面"),
+          2,
+          [
+            localize(
+              locale,
+              "Canvas, raised surfaces, borders, text, and status colors are expressed as semantic roles so components stop hard-coding their own visual relationships.",
+              "画布、抬升表面、边框、文字和状态色都应该先被表达成语义角色，组件才能停止硬编码彼此的视觉关系。",
+            ),
+          ],
+        ),
+        createSection(
+          "tokens-density",
+          localize(locale, "Density and motion are also tokens", "密度和动效也应该是 token"),
+          2,
+          [
+            localize(
+              locale,
+              "Spacing, radius, row height, and transition aliases all shift through tokens. Components consume those aliases instead of branching per page.",
+              "间距、圆角、行高和过渡别名都应该通过 tokens 切换。组件消费这些别名，而不是在页面里各自分叉。",
+            ),
+          ],
+        ),
       ],
     }),
     "doc-theme-density": createArticle({
       id: "doc-theme-density",
-      title: "Theme And Density",
-      summary: "Theme and density are persisted preferences that reshape the system without changing component structure.",
-      eyebrow: "foundation / preferences",
+      title: localize(locale, "Theme And Density", "主题与密度"),
+      summary: localize(
+        locale,
+        "Theme and density are persisted preferences that reshape the system without changing component structure.",
+        "主题和密度是持久化偏好，它们会改变系统气质，但不会改动组件结构。",
+      ),
+      eyebrow: localize(locale, "foundation / preferences", "基础 / 偏好"),
       sections: [
-        createSection("theme-density-jobs", "Two preferences, two jobs", 2, [
-          "Theme controls light and dark semantics. Density controls rhythm, spacing, control sizing, and the weight of state containers.",
-        ]),
-        createSection("theme-density-rules", "Patterns still stay inside the same scale", 2, [
-          "Patterns may derive tighter spacing in compact contexts, but they cannot invent a second density system.",
-        ]),
+        createSection(
+          "theme-density-jobs",
+          localize(locale, "Two preferences, two jobs", "两个偏好，各管一件事"),
+          2,
+          [
+            localize(
+              locale,
+              "Theme controls light and dark semantics. Density controls rhythm, spacing, control sizing, and the weight of state containers.",
+              "主题负责浅色和深色语义。密度负责节奏、间距、控件尺寸，以及状态容器的重量感。",
+            ),
+          ],
+        ),
+        createSection(
+          "theme-density-rules",
+          localize(locale, "Patterns still stay inside the same scale", "模式层仍然留在同一套刻度里"),
+          2,
+          [
+            localize(
+              locale,
+              "Patterns may derive tighter spacing in compact contexts, but they cannot invent a second density system.",
+              "模式层可以在紧凑场景里拿更紧的间距，但不能再发明第二套密度系统。",
+            ),
+          ],
+        ),
       ],
     }),
     "doc-layout-primitives": createArticle({
       id: "doc-layout-primitives",
-      title: "Layout Primitives",
-      summary: "Stack, Inline, Grid, Surface, and ScrollArea provide the layout vocabulary product pages should compose instead of re-creating.",
-      eyebrow: "layout / primitives",
+      title: localize(locale, "Layout Primitives", "布局原语"),
+      summary: localize(
+        locale,
+        "Stack, Inline, Grid, Surface, and ScrollArea provide the layout vocabulary product pages should compose instead of re-creating.",
+        "Stack、Inline、Grid、Surface 和 ScrollArea 提供了页面应该直接组合的布局词汇，而不是每页重写一遍。",
+      ),
+      eyebrow: localize(locale, "layout / primitives", "布局 / 原语"),
       sections: [
-        createSection("layout-primitives-why", "Why layout belongs in the library", 2, [
-          "If business pages own flex, grid, surface, and spacing rules, each page becomes its own design system. Layout primitives pull that responsibility back into the shared layer.",
-        ]),
-        createSection("layout-primitives-usage", "How product code should consume them", 2, [
-          "Low-level layout comes from composable primitives. High-level shells come from slot-based patterns that keep page scaffolds consistent.",
-        ]),
+        createSection(
+          "layout-primitives-why",
+          localize(locale, "Why layout belongs in the library", "为什么布局应该属于组件库"),
+          2,
+          [
+            localize(
+              locale,
+              "If business pages own flex, grid, surface, and spacing rules, each page becomes its own design system. Layout primitives pull that responsibility back into the shared layer.",
+              "如果业务页自己掌控 flex、grid、surface 和 spacing，每一页都会变成自己的设计系统。布局原语就是把这份责任收回共享层。",
+            ),
+          ],
+        ),
+        createSection(
+          "layout-primitives-usage",
+          localize(locale, "How product code should consume them", "业务代码应该怎么消费它们"),
+          2,
+          [
+            localize(
+              locale,
+              "Low-level layout comes from composable primitives. High-level shells come from slot-based patterns that keep page scaffolds consistent.",
+              "低层布局由可组合原语提供。高层页面外壳由 slot 化模式提供，这样页面脚手架才能保持一致。",
+            ),
+          ],
+        ),
       ],
     }),
     "doc-app-shell": createArticle({
       id: "doc-app-shell",
       title: "App Shell",
-      summary: "The shell is a layout pattern that owns the filesystem rails, reading region, and responsive drawer behavior.",
-      eyebrow: "layout / shell",
+      summary: localize(
+        locale,
+        "The shell is a layout pattern that owns the filesystem rails, reading region, and responsive drawer behavior.",
+        "App Shell 是一个布局模式，负责文件系统双栏、阅读区，以及响应式抽屉行为。",
+      ),
+      eyebrow: localize(locale, "layout / shell", "布局 / 外壳"),
       sections: [
-        createSection("app-shell-structure", "A shell, not a page hack", 2, [
-          "The shell owns the top bar, left navigation rail, reading region, and right context rail. It belongs to the layout layer, not to an individual product page.",
-        ]),
-        createSection("app-shell-layout-mode", "Layout mode changes structure", 2, [
-          "Spacious mode keeps both rails visible. Medium mode keeps navigation visible and pushes context into a drawer. Compact mode turns both rails into temporary overlays.",
-        ]),
+        createSection(
+          "app-shell-structure",
+          localize(locale, "A shell, not a page hack", "它是外壳，不是页面补丁"),
+          2,
+          [
+            localize(
+              locale,
+              "The shell owns the top bar, left navigation rail, reading region, and right context rail. It belongs to the layout layer, not to an individual product page.",
+              "外壳统一拥有顶栏、左侧导航栏、阅读区和右侧上下文栏。它属于布局层，而不应该挂在某个单独的业务页面上。",
+            ),
+          ],
+        ),
+        createSection(
+          "app-shell-layout-mode",
+          localize(locale, "Layout mode changes structure", "布局模式会改变结构"),
+          2,
+          [
+            localize(
+              locale,
+              "Spacious mode keeps both rails visible. Medium mode keeps navigation visible and pushes context into a drawer. Compact mode turns both rails into temporary overlays.",
+              "宽屏模式同时保留两侧栏。中栏模式保留导航栏，把 context 推进抽屉。紧凑模式把两侧栏都改成临时 overlay。",
+            ),
+          ],
+        ),
       ],
     }),
     "doc-button": createArticle({
       id: "doc-button",
       title: "Button",
-      summary: "Buttons define the action language of the library and still expose the few action states that need design follow-up.",
-      eyebrow: "primitives / actions",
+      summary: localize(
+        locale,
+        "Buttons define the action language of the library and still expose the few action states that need design follow-up.",
+        "Button 定义了组件库的动作语言，同时把还需要设计补位的动作态显式暴露出来。",
+      ),
+      eyebrow: localize(locale, "primitives / actions", "基础组件 / 操作"),
       sections: [
-        createSection("button-current", "Current coverage", 2, [
-          "The current primitive covers primary, secondary, and ghost emphasis while already respecting theme, density, and reduced motion.",
-        ]),
-        createSection("button-missing", "What is still missing", 2, [
-          "The destructive family and loading choreography still need design coverage before the action set can be called complete.",
-        ]),
+        createSection(
+          "button-current",
+          localize(locale, "Current coverage", "当前覆盖面"),
+          2,
+          [
+            localize(
+              locale,
+              "The current primitive covers primary, secondary, and ghost emphasis while already respecting theme, density, and reduced motion.",
+              "当前 primitive 已经覆盖 primary、secondary 和 ghost 三档强调，同时尊重主题、密度和减弱动效偏好。",
+            ),
+          ],
+        ),
+        createSection(
+          "button-missing",
+          localize(locale, "What is still missing", "还缺什么"),
+          2,
+          [
+            localize(
+              locale,
+              "The destructive family and loading choreography still need design coverage before the action set can be called complete.",
+              "在把动作体系称为完整之前，破坏性按钮族和 loading 编排还需要设计补齐。",
+            ),
+          ],
+        ),
       ],
     }),
     "doc-field-input": createArticle({
       id: "doc-field-input",
-      title: "Field And Input",
-      summary: "Field, Input, Textarea, and Select Trigger share one calm data-entry contract.",
-      eyebrow: "primitives / data-entry",
+      title: localize(locale, "Field And Input", "Field 与 Input"),
+      summary: localize(
+        locale,
+        "Field, Input, Textarea, and Select Trigger share one calm data-entry contract.",
+        "Field、Input、Textarea 和 Select Trigger 共享同一套克制的数据录入契约。",
+      ),
+      eyebrow: localize(locale, "primitives / data-entry", "基础组件 / 数据录入"),
       sections: [
-        createSection("field-input-contract", "One field language", 2, [
-          "Labels, help text, text inputs, and select triggers should feel like one family. The current primitive set keeps them aligned through one surface, focus, and support-text treatment.",
-        ]),
-        createSection("field-input-gap", "Where the contract still needs work", 2, [
-          "Combobox and dense search surfaces still need a final compact-mode rule before the family is complete.",
-        ]),
+        createSection(
+          "field-input-contract",
+          localize(locale, "One field language", "一套统一的 field 语言"),
+          2,
+          [
+            localize(
+              locale,
+              "Labels, help text, text inputs, and select triggers should feel like one family. The current primitive set keeps them aligned through one surface, focus, and support-text treatment.",
+              "标签、帮助文案、文本输入框和 select trigger 应该像一个家族。当前 primitive 通过统一表面、focus 和辅助文本处理把它们收在一起。",
+            ),
+          ],
+        ),
+        createSection(
+          "field-input-gap",
+          localize(locale, "Where the contract still needs work", "这套契约还缺哪块"),
+          2,
+          [
+            localize(
+              locale,
+              "Combobox and dense search surfaces still need a final compact-mode rule before the family is complete.",
+              "在把这套家族称为完整之前，combobox 和高密搜索表面还需要最终的紧凑模式规则。",
+            ),
+          ],
+        ),
       ],
     }),
     "doc-tree-nav": createArticle({
       id: "doc-tree-nav",
       title: "TreeNav",
-      summary: "TreeNav is the shared navigation pattern for filesystem views and other layered navigation surfaces.",
-      eyebrow: "patterns / navigation",
+      summary: localize(
+        locale,
+        "TreeNav is the shared navigation pattern for filesystem views and other layered navigation surfaces.",
+        "TreeNav 是文件系统视图以及其他分层导航表面的共享导航模式。",
+      ),
+      eyebrow: localize(locale, "patterns / navigation", "模式 / 导航"),
       sections: [
-        createSection("tree-nav-states", "State priority comes first", 2, [
-          "Current, selected, expanded, hover, and focus-visible can all exist at once. The pattern owns their visual priority so product surfaces do not improvise.",
-        ]),
-        createSection("tree-nav-gap", "Search match is still unresolved", 2, [
-          "Search match needs to read as informative without stealing ownership from current or selected. That gap stays visible until design finalizes it.",
-        ]),
+        createSection(
+          "tree-nav-states",
+          localize(locale, "State priority comes first", "状态优先级先行"),
+          2,
+          [
+            localize(
+              locale,
+              "Current, selected, expanded, hover, and focus-visible can all exist at once. The pattern owns their visual priority so product surfaces do not improvise.",
+              "current、selected、expanded、hover 和 focus-visible 可能同时存在。模式层必须统一定义它们的视觉优先级，避免业务表面临时 improvisation。",
+            ),
+          ],
+        ),
+        createSection(
+          "tree-nav-gap",
+          localize(locale, "Search match is still unresolved", "搜索命中态还没收敛"),
+          2,
+          [
+            localize(
+              locale,
+              "Search match needs to read as informative without stealing ownership from current or selected. That gap stays visible until design finalizes it.",
+              "搜索命中态需要保持信息性，但不能抢走 current 或 selected 的所有权。在设计定稿前，这个缺口必须保持可见。",
+            ),
+          ],
+        ),
       ],
     }),
     "doc-view-state-layout": createArticle({
       id: "doc-view-state-layout",
-      title: "View State Layout",
-      summary: "ViewStateLayout gives loading, ready, empty, and error states a reusable wrapper so product code only decides which state applies.",
-      eyebrow: "patterns / states",
+      title: "ViewStateLayout",
+      summary: localize(
+        locale,
+        "ViewStateLayout gives loading, ready, empty, and error states a reusable wrapper so product code only decides which state applies.",
+        "ViewStateLayout 把 loading、ready、empty 和 error 包成统一壳层，业务代码只需要判断当前属于哪种状态。",
+      ),
+      eyebrow: localize(locale, "patterns / states", "模式 / 状态"),
       sections: [
-        createSection("view-state-layout-role", "A state wrapper, not a spinner shortcut", 2, [
-          "The pattern owns pacing, hierarchy, and state-surface weight. Product code passes state and copy but does not build a new state shell every time.",
-        ]),
-        createSection("view-state-layout-gap", "Where the pattern still needs design", 2, [
-          "Some empty-state treatments still need design confirmation before the pattern can be treated as complete.",
-        ]),
+        createSection(
+          "view-state-layout-role",
+          localize(locale, "A state wrapper, not a spinner shortcut", "它是状态壳层，不是 spinner 捷径"),
+          2,
+          [
+            localize(
+              locale,
+              "The pattern owns pacing, hierarchy, and state-surface weight. Product code passes state and copy but does not build a new state shell every time.",
+              "这个模式统一负责节奏、层级和状态表面的重量。业务代码只传入状态和值得展示的文案，而不是每次再拼一套新的状态壳。",
+            ),
+          ],
+        ),
+        createSection(
+          "view-state-layout-gap",
+          localize(locale, "Where the pattern still needs design", "模式层还需要哪些设计补位"),
+          2,
+          [
+            localize(
+              locale,
+              "Some empty-state treatments still need design confirmation before the pattern can be treated as complete.",
+              "在把这个模式视为完整之前，部分空态处理还需要设计确认。",
+            ),
+          ],
+        ),
       ],
     }),
     "doc-design-gaps": createArticle({
       id: "doc-design-gaps",
-      title: "Design Gaps",
-      summary: "The audit page collects every open visual or interaction contract that still blocks a fully reusable library.",
-      eyebrow: "audit / design",
+      title: localize(locale, "Design Gaps", "设计缺口"),
+      summary: localize(
+        locale,
+        "The audit page collects every open visual or interaction contract that still blocks a fully reusable library.",
+        "审计页把所有仍然阻塞“可复用组件库”的视觉和交互契约缺口集中列出来。",
+      ),
+      eyebrow: localize(locale, "audit / design", "审计 / 设计"),
       sections: [
-        createSection("design-gaps-purpose", "Why the gaps stay public", 2, [
-          "The audit view keeps pending design work visible so engineering does not quietly paper over missing contracts with one-off implementation details.",
-        ]),
+        createSection(
+          "design-gaps-purpose",
+          localize(locale, "Why the gaps stay public", "为什么这些缺口必须公开存在"),
+          2,
+          [
+            localize(
+              locale,
+              "The audit view keeps pending design work visible so engineering does not quietly paper over missing contracts with one-off implementation details.",
+              "审计视图要让待完成的设计工作持续可见，避免工程侧用一次性实现细节悄悄把缺失契约糊过去。",
+            ),
+          ],
+        ),
       ],
     }),
   };
@@ -439,26 +735,98 @@ function createOverviewArticleDocuments(): Record<DocumentId, ArticleDocument> {
 
 export function getOverviewDocumentMeta(
   documentId: DocumentId,
+  locale: AppLocale = DEFAULT_LOCALE,
 ): Option<OverviewDocumentMeta> {
-  const meta = overviewDocumentMetaById[documentId];
+  const documentMetaById = getOverviewDocumentMetaById(locale);
 
-  return meta === undefined ? none() : some(meta);
+  return Object.prototype.hasOwnProperty.call(documentMetaById, documentId)
+    ? some(documentMetaById[documentId])
+    : none();
 }
 
 export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtures {
-  void locale;
-
-  const articleDocuments = createOverviewArticleDocuments();
+  const articleDocuments = createOverviewArticleDocuments(locale);
+  const homeTitle = localize(locale, "UI Library Overview", "UI 组件库总览");
+  const foundationTitle = localize(locale, "Foundation", "基础");
+  const layoutTitle = localize(locale, "Layout", "布局");
+  const primitivesTitle = localize(locale, "Primitives", "基础组件");
+  const patternsTitle = localize(locale, "Patterns", "模式");
+  const auditTitle = localize(locale, "Audit", "审计");
+  const actionsTitle = localize(locale, "Actions", "操作");
+  const dataEntryTitle = localize(locale, "Data Entry", "数据录入");
+  const navigationTitle = localize(locale, "Navigation", "导航");
+  const statesTitle = localize(locale, "States", "状态");
+  const defaultNodeMeta = {
+    childrenCount: none<number>(),
+    documentId: none<DocumentId>(),
+    publishedAt: none<string>(),
+    updatedAt: none<string>(),
+    readingMinutes: none<number>(),
+  };
   const directoryDescriptions: Record<NodeId, DirectoryContent["description"]> = {
-    foundation: some("Style runtime, token semantics, theme, density, and motion live here."),
-    layout: some("Shell behavior and reusable layout primitives belong to the layout layer."),
-    primitives: some("Action, input, and feedback components that product code should never re-invent."),
-    patterns: some("Shared structural patterns that assemble primitives into reusable UI behavior."),
-    audit: some("Coverage, design asks, and implementation gaps stay visible here."),
-    "primitives-actions": some("Action primitives define the system's baseline interaction language."),
-    "primitives-data-entry": some("Field and input surfaces share one calm data-entry contract."),
-    "patterns-navigation": some("Navigation patterns centralize ownership and state priority."),
-    "patterns-states": some("State wrappers keep loading, empty, and error surfaces reusable."),
+    foundation: some(
+      localize(
+        locale,
+        "Style runtime, token semantics, theme, density, and motion live here.",
+        "样式运行时、token 语义、主题、密度和动效都收在这里。",
+      ),
+    ),
+    layout: some(
+      localize(
+        locale,
+        "Shell behavior and reusable layout primitives belong to the layout layer.",
+        "外壳行为和可复用布局原语都归在布局层。",
+      ),
+    ),
+    primitives: some(
+      localize(
+        locale,
+        "Action, input, and feedback components that product code should never re-invent.",
+        "操作、输入和反馈组件都不该由业务代码重复发明。",
+      ),
+    ),
+    patterns: some(
+      localize(
+        locale,
+        "Shared structural patterns that assemble primitives into reusable UI behavior.",
+        "把基础组件组装成可复用 UI 行为的共享结构模式都放在这里。",
+      ),
+    ),
+    audit: some(
+      localize(
+        locale,
+        "Coverage, design asks, and implementation gaps stay visible here.",
+        "覆盖面、设计诉求和实现缺口都在这里保持可见。",
+      ),
+    ),
+    "primitives-actions": some(
+      localize(
+        locale,
+        "Action primitives define the system's baseline interaction language.",
+        "操作类 primitive 定义了系统的基础交互语言。",
+      ),
+    ),
+    "primitives-data-entry": some(
+      localize(
+        locale,
+        "Field and input surfaces share one calm data-entry contract.",
+        "Field 和 input 表面共享同一套克制的数据录入契约。",
+      ),
+    ),
+    "patterns-navigation": some(
+      localize(
+        locale,
+        "Navigation patterns centralize ownership and state priority.",
+        "导航模式负责收口 ownership 和状态优先级。",
+      ),
+    ),
+    "patterns-states": some(
+      localize(
+        locale,
+        "State wrappers keep loading, empty, and error surfaces reusable.",
+        "状态壳层让 loading、empty 和 error 表面保持可复用。",
+      ),
+    ),
   };
   const contentNodes: ContentNode[] = [
     {
@@ -478,240 +846,260 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       readingMinutes: none(),
     },
     createNode({
+      ...defaultNodeMeta,
       id: "home",
       kind: "home",
-      title: "UI Library Overview",
+      title: homeTitle,
       slug: "home",
       parentId: ROOT_NODE_ID,
       ancestorIds: [ROOT_NODE_ID],
       pathSegments: [],
-      documentId: "home-doc",
+      documentId: some("home-doc"),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "foundation",
       kind: "folder",
-      title: "Foundation",
+      title: foundationTitle,
       slug: "foundation",
       parentId: ROOT_NODE_ID,
       ancestorIds: [ROOT_NODE_ID],
       pathSegments: ["foundation"],
-      childrenCount: 3,
+      childrenCount: some(3),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "layout",
       kind: "folder",
-      title: "Layout",
+      title: layoutTitle,
       slug: "layout",
       parentId: ROOT_NODE_ID,
       ancestorIds: [ROOT_NODE_ID],
       pathSegments: ["layout"],
-      childrenCount: 2,
+      childrenCount: some(2),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "primitives",
       kind: "folder",
-      title: "Primitives",
+      title: primitivesTitle,
       slug: "primitives",
       parentId: ROOT_NODE_ID,
       ancestorIds: [ROOT_NODE_ID],
       pathSegments: ["primitives"],
-      childrenCount: 2,
+      childrenCount: some(2),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "patterns",
       kind: "folder",
-      title: "Patterns",
+      title: patternsTitle,
       slug: "patterns",
       parentId: ROOT_NODE_ID,
       ancestorIds: [ROOT_NODE_ID],
       pathSegments: ["patterns"],
-      childrenCount: 2,
+      childrenCount: some(2),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "audit",
       kind: "folder",
-      title: "Audit",
+      title: auditTitle,
       slug: "audit",
       parentId: ROOT_NODE_ID,
       ancestorIds: [ROOT_NODE_ID],
       pathSegments: ["audit"],
-      childrenCount: 1,
+      childrenCount: some(1),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "article-style-provider",
       kind: "article",
-      title: "StyleProvider",
+      title: articleDocuments["doc-style-provider"].title,
       slug: "style-provider",
       parentId: "foundation",
       ancestorIds: [ROOT_NODE_ID, "foundation"],
       pathSegments: ["foundation", "style-provider"],
-      documentId: "doc-style-provider",
-      publishedAt: "2026-03-21T08:30:00.000Z",
-      updatedAt: "2026-03-22T07:30:00.000Z",
-      readingMinutes: 4,
+      documentId: some("doc-style-provider"),
+      publishedAt: some("2026-03-21T08:30:00.000Z"),
+      updatedAt: some("2026-03-22T07:30:00.000Z"),
+      readingMinutes: some(4),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "article-token-map",
       kind: "article",
-      title: "Token Map",
+      title: articleDocuments["doc-tokens"].title,
       slug: "token-map",
       parentId: "foundation",
       ancestorIds: [ROOT_NODE_ID, "foundation"],
       pathSegments: ["foundation", "token-map"],
-      documentId: "doc-tokens",
-      publishedAt: "2026-03-20T08:30:00.000Z",
-      updatedAt: "2026-03-22T07:15:00.000Z",
-      readingMinutes: 4,
+      documentId: some("doc-tokens"),
+      publishedAt: some("2026-03-20T08:30:00.000Z"),
+      updatedAt: some("2026-03-22T07:15:00.000Z"),
+      readingMinutes: some(4),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "article-theme-density",
       kind: "article",
-      title: "Theme And Density",
+      title: articleDocuments["doc-theme-density"].title,
       slug: "theme-and-density",
       parentId: "foundation",
       ancestorIds: [ROOT_NODE_ID, "foundation"],
       pathSegments: ["foundation", "theme-and-density"],
-      documentId: "doc-theme-density",
-      publishedAt: "2026-03-19T08:30:00.000Z",
-      updatedAt: "2026-03-22T06:30:00.000Z",
-      readingMinutes: 4,
+      documentId: some("doc-theme-density"),
+      publishedAt: some("2026-03-19T08:30:00.000Z"),
+      updatedAt: some("2026-03-22T06:30:00.000Z"),
+      readingMinutes: some(4),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "article-layout-primitives",
       kind: "article",
-      title: "Layout Primitives",
+      title: articleDocuments["doc-layout-primitives"].title,
       slug: "layout-primitives",
       parentId: "layout",
       ancestorIds: [ROOT_NODE_ID, "layout"],
       pathSegments: ["layout", "layout-primitives"],
-      documentId: "doc-layout-primitives",
-      publishedAt: "2026-03-20T07:30:00.000Z",
-      updatedAt: "2026-03-21T11:00:00.000Z",
-      readingMinutes: 4,
+      documentId: some("doc-layout-primitives"),
+      publishedAt: some("2026-03-20T07:30:00.000Z"),
+      updatedAt: some("2026-03-21T11:00:00.000Z"),
+      readingMinutes: some(4),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "article-app-shell",
       kind: "article",
-      title: "App Shell",
+      title: articleDocuments["doc-app-shell"].title,
       slug: "app-shell",
       parentId: "layout",
       ancestorIds: [ROOT_NODE_ID, "layout"],
       pathSegments: ["layout", "app-shell"],
-      documentId: "doc-app-shell",
-      publishedAt: "2026-03-21T07:30:00.000Z",
-      updatedAt: "2026-03-22T06:45:00.000Z",
-      readingMinutes: 5,
+      documentId: some("doc-app-shell"),
+      publishedAt: some("2026-03-21T07:30:00.000Z"),
+      updatedAt: some("2026-03-22T06:45:00.000Z"),
+      readingMinutes: some(5),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "primitives-actions",
       kind: "folder",
-      title: "Actions",
+      title: actionsTitle,
       slug: "actions",
       parentId: "primitives",
       ancestorIds: [ROOT_NODE_ID, "primitives"],
       pathSegments: ["primitives", "actions"],
-      childrenCount: 1,
+      childrenCount: some(1),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "primitives-data-entry",
       kind: "folder",
-      title: "Data Entry",
+      title: dataEntryTitle,
       slug: "data-entry",
       parentId: "primitives",
       ancestorIds: [ROOT_NODE_ID, "primitives"],
       pathSegments: ["primitives", "data-entry"],
-      childrenCount: 1,
+      childrenCount: some(1),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "article-button",
       kind: "article",
-      title: "Button",
+      title: articleDocuments["doc-button"].title,
       slug: "button",
       parentId: "primitives-actions",
       ancestorIds: [ROOT_NODE_ID, "primitives", "primitives-actions"],
       pathSegments: ["primitives", "actions", "button"],
-      documentId: "doc-button",
-      publishedAt: "2026-03-18T07:45:00.000Z",
-      updatedAt: "2026-03-22T05:20:00.000Z",
-      readingMinutes: 4,
+      documentId: some("doc-button"),
+      publishedAt: some("2026-03-18T07:45:00.000Z"),
+      updatedAt: some("2026-03-22T05:20:00.000Z"),
+      readingMinutes: some(4),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "article-field-input",
       kind: "article",
-      title: "Field And Input",
+      title: articleDocuments["doc-field-input"].title,
       slug: "field-and-input",
       parentId: "primitives-data-entry",
       ancestorIds: [ROOT_NODE_ID, "primitives", "primitives-data-entry"],
       pathSegments: ["primitives", "data-entry", "field-and-input"],
-      documentId: "doc-field-input",
-      publishedAt: "2026-03-18T07:50:00.000Z",
-      updatedAt: "2026-03-21T16:20:00.000Z",
-      readingMinutes: 4,
+      documentId: some("doc-field-input"),
+      publishedAt: some("2026-03-18T07:50:00.000Z"),
+      updatedAt: some("2026-03-21T16:20:00.000Z"),
+      readingMinutes: some(4),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "patterns-navigation",
       kind: "folder",
-      title: "Navigation",
+      title: navigationTitle,
       slug: "navigation",
       parentId: "patterns",
       ancestorIds: [ROOT_NODE_ID, "patterns"],
       pathSegments: ["patterns", "navigation"],
-      childrenCount: 1,
+      childrenCount: some(1),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "patterns-states",
       kind: "folder",
-      title: "States",
+      title: statesTitle,
       slug: "states",
       parentId: "patterns",
       ancestorIds: [ROOT_NODE_ID, "patterns"],
       pathSegments: ["patterns", "states"],
-      childrenCount: 1,
+      childrenCount: some(1),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "article-tree-nav",
       kind: "article",
-      title: "TreeNav",
+      title: articleDocuments["doc-tree-nav"].title,
       slug: "tree-nav",
       parentId: "patterns-navigation",
       ancestorIds: [ROOT_NODE_ID, "patterns", "patterns-navigation"],
       pathSegments: ["patterns", "navigation", "tree-nav"],
-      documentId: "doc-tree-nav",
-      publishedAt: "2026-03-18T08:30:00.000Z",
-      updatedAt: "2026-03-22T05:45:00.000Z",
-      readingMinutes: 4,
+      documentId: some("doc-tree-nav"),
+      publishedAt: some("2026-03-18T08:30:00.000Z"),
+      updatedAt: some("2026-03-22T05:45:00.000Z"),
+      readingMinutes: some(4),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "article-view-state-layout",
       kind: "article",
-      title: "View State Layout",
+      title: articleDocuments["doc-view-state-layout"].title,
       slug: "view-state-layout",
       parentId: "patterns-states",
       ancestorIds: [ROOT_NODE_ID, "patterns", "patterns-states"],
       pathSegments: ["patterns", "states", "view-state-layout"],
-      documentId: "doc-view-state-layout",
-      publishedAt: "2026-03-18T08:40:00.000Z",
-      updatedAt: "2026-03-21T10:10:00.000Z",
-      readingMinutes: 4,
+      documentId: some("doc-view-state-layout"),
+      publishedAt: some("2026-03-18T08:40:00.000Z"),
+      updatedAt: some("2026-03-21T10:10:00.000Z"),
+      readingMinutes: some(4),
     }),
     createNode({
+      ...defaultNodeMeta,
       id: "article-design-gaps",
       kind: "article",
-      title: "Design Gaps",
+      title: articleDocuments["doc-design-gaps"].title,
       slug: "design-gaps",
       parentId: "audit",
       ancestorIds: [ROOT_NODE_ID, "audit"],
       pathSegments: ["audit", "design-gaps"],
-      documentId: "doc-design-gaps",
-      publishedAt: "2026-03-22T04:05:00.000Z",
-      updatedAt: "2026-03-22T04:25:00.000Z",
-      readingMinutes: 3,
+      documentId: some("doc-design-gaps"),
+      publishedAt: some("2026-03-22T04:05:00.000Z"),
+      updatedAt: some("2026-03-22T04:25:00.000Z"),
+      readingMinutes: some(3),
     }),
   ];
   const homeContents: Record<DocumentId, HomeContent> = {
     "home-doc": {
       kind: "home",
-      title: "UI Library Overview",
+      title: homeTitle,
     },
   };
 

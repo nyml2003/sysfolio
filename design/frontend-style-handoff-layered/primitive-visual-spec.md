@@ -22,7 +22,8 @@
 - `styles/primitives/feedback.css`
 - `styles/primitives/overlays.css`
 
-这份规范现在已经覆盖 `Select / Combobox / Menu / Dialog content / Table row` 这批新增 primitive；后续继续扩展同家族控件时，也应先对齐这份规范，再写具体样式。
+这份规范现在已经覆盖 `Select / Combobox / Menu / Dialog content / Table row` 这批新增 primitive；后续继续扩展同家族控件时，也应先对齐这份规范，再写具体样式。  
+[primitive-component-catalog.md](primitive-component-catalog.md) 中新加入的 `Text / Label / Link / SearchInput / NumberInput / DateInput / Slider / Toolbar / ListItem / MessageBar / Banner` 目前仍属于 `priority-next`，组件范围已收口，但视觉基线还要继续补。
 
 ## 文档边界
 

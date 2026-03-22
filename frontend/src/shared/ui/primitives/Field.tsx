@@ -1,10 +1,11 @@
 import type { ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 
+import { isSome, none, type Option } from "@/shared/lib/monads/option";
 import { Inline, Stack } from "@/shared/ui/layout";
 
 type FieldProps = {
   label: string;
-  description?: string;
+  description: Option<string>;
   children: ReactNode;
 };
 
@@ -12,14 +13,18 @@ type TextInputProps = React.InputHTMLAttributes<HTMLInputElement>;
 type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement>;
 type SelectProps = SelectHTMLAttributes<HTMLSelectElement>;
 
-export function Field({ label, description, children }: FieldProps) {
+export function Field({
+  label,
+  description = none(),
+  children,
+}: FieldProps) {
   return (
     <Stack className="sf-field" gap="xs">
       <label className="sf-field__label">{label}</label>
       {children}
-      {description === undefined ? null : (
-        <div className="sf-field__description">{description}</div>
-      )}
+      {isSome(description) ? (
+        <div className="sf-field__description">{description.value}</div>
+      ) : null}
     </Stack>
   );
 }
@@ -50,4 +55,3 @@ export function FieldRow({ children }: { children: ReactNode }) {
     </Inline>
   );
 }
-

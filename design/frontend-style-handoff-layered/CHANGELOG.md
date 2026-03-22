@@ -35,3 +35,17 @@
 - 在 `view-density-spec.md` 中补充 `uiDensity` 的全局密度偏好边界。
 - 在 `dark-theme-spec.md` 中补充 `themeMode` 的 raw preference 与 resolved theme 关系。
 - 在 `motion-spec.md` 中补充 `motionMode` 的 raw preference 与 resolved motion 关系。
+
+### Research And Prioritization
+
+- 新增 `preference-system-research-report.md`，整理 preference system 仍缺的能力、范围模型与业界对照。
+- 新增 `ui-ux-system-gap-research-report.md`，整理 preference 之外的系统级 UI UX 缺口与优先级。
+- 在 `design-todo.md` 中新增 `System Gaps`，把研究结论并入主 TODO，而不是维持平行推进清单。
+- 在 `README.md` 中新增 `Research Reports` 入口，明确调研文档是补充材料，不是新的主规范入口。
+
+### Primitive Catalog Expansion
+
+- 扩展 `primitive-component-catalog.md`，将 primitive 集合从“当前已有 CSS 的控件”提升为“应被 primitive 层承接的基础组件版图”。
+- 新增 `Text / Label / Link / CodeInline / Kbd` 这组基础语义原件。
+- 新增 `Toolbar / SplitButton / SearchInput / NumberInput / DateInput / Slider / FileTrigger / Disclosure / List / ListItem / KeyValue / Token / MessageBar / Banner / Toast` 等补充组件。
+- 为新增组件补充 `Support` 等级、职责、slot、变体、状态与 known gaps，并同步更新 `design-todo.md` 的 primitive 主线。
