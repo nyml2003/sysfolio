@@ -4,10 +4,15 @@ import type { Option } from "@/shared/lib/monads/option";
 import { err, isErr, ok } from "@/shared/lib/monads/result";
 import type { Result } from "@/shared/lib/monads/result";
 import { DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@/shared/lib/i18n/locale.types";
+import {
+  DEFAULT_DENSITY,
+  type DensityPreference,
+} from "@/shared/lib/style/style.types";
 import { DEFAULT_THEME } from "@/shared/lib/theme/theme.types";
 import type { ThemePreference } from "@/shared/lib/theme/theme.types";
 
 const THEME_KEY = "sysfolio.theme";
+const DENSITY_KEY = "sysfolio.density";
 const LOCALE_KEY = "sysfolio.locale";
 const ONBOARDING_KEY = "sysfolio.onboarding";
 const READING_PROGRESS_KEY = "sysfolio.reading-progress";
@@ -15,6 +20,10 @@ const READING_PROGRESS_KEY = "sysfolio.reading-progress";
 type PreferencesAdapter = {
   getThemePreference(): Result<RepositoryError, ThemePreference>;
   setThemePreference(theme: ThemePreference): Result<RepositoryError, ThemePreference>;
+  getDensityPreference(): Result<RepositoryError, DensityPreference>;
+  setDensityPreference(
+    density: DensityPreference,
+  ): Result<RepositoryError, DensityPreference>;
   getLocalePreference(): Result<RepositoryError, AppLocale>;
   setLocalePreference(locale: AppLocale): Result<RepositoryError, AppLocale>;
   getOnboardingState(): Result<RepositoryError, OnboardingState>;
@@ -63,6 +72,14 @@ function writeStorage(key: string, value: string): Result<RepositoryError, strin
 
 function parseTheme(raw: string): ThemePreference {
   return raw === "dark" ? "dark" : DEFAULT_THEME;
+}
+
+function parseDensity(raw: string): DensityPreference {
+  if (raw === "medium" || raw === "compact") {
+    return raw;
+  }
+
+  return DEFAULT_DENSITY;
 }
 
 function parseLocale(raw: string): AppLocale {
@@ -123,6 +140,22 @@ export function createBrowserPreferencesAdapter(): PreferencesAdapter {
       const writeResult = writeStorage(THEME_KEY, theme);
 
       return isErr(writeResult) ? writeResult : ok(theme);
+    },
+    getDensityPreference() {
+      const storedDensityResult = readStorage(DENSITY_KEY);
+
+      if (isErr(storedDensityResult)) {
+        return storedDensityResult;
+      }
+
+      return isSome(storedDensityResult.value)
+        ? ok(parseDensity(storedDensityResult.value.value))
+        : ok(DEFAULT_DENSITY);
+    },
+    setDensityPreference(density) {
+      const writeResult = writeStorage(DENSITY_KEY, density);
+
+      return isErr(writeResult) ? writeResult : ok(density);
     },
     getLocalePreference() {
       const storedLocaleResult = readStorage(LOCALE_KEY);

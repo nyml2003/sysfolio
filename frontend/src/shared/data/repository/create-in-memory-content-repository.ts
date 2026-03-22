@@ -15,6 +15,7 @@ import type {
   UnsupportedContent,
 } from "@/entities/content";
 import { DEFAULT_LOCALE, type AppLocale } from "@/shared/lib/i18n/locale.types";
+import type { DensityPreference } from "@/shared/lib/style/style.types";
 import { ROOT_PATH, normalizePath, pathFromSegments } from "@/shared/lib/path/content-path";
 import {
   emptyState,
@@ -628,6 +629,20 @@ export function createInMemoryContentRepository(
       return isErr(result)
         ? withLatency(errorState(result.error))
         : withLatency(readyState<ThemePreference, RepositoryError>(result.value));
+    },
+    async getDensityPreference() {
+      const result = browserPreferencesAdapter.getDensityPreference();
+
+      return isErr(result)
+        ? withLatency(errorState(result.error))
+        : withLatency(readyState<DensityPreference, RepositoryError>(result.value));
+    },
+    async setDensityPreference(density) {
+      const result = browserPreferencesAdapter.setDensityPreference(density);
+
+      return isErr(result)
+        ? withLatency(errorState(result.error))
+        : withLatency(readyState<DensityPreference, RepositoryError>(result.value));
     },
     async getLocalePreference() {
       const result = browserPreferencesAdapter.getLocalePreference();

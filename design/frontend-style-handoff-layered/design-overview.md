@@ -17,20 +17,22 @@
 
 当前方案用一个组合模型来组织设计与前端实现：
 
-`6 层架构 x 环境能力矩阵 x view-state 分层`
+`6 层架构 x 环境能力矩阵 x preference system x view-state 分层`
 
-三部分分别解决不同问题：
+四部分分别解决不同问题：
 
 | 维度 | 负责回答的问题 | 当前结论 |
 | --- | --- | --- |
 | `6 layers` | 东西应该放在哪一层 | `tokens -> utilities -> primitives -> patterns -> business -> component` |
 | `capability matrix` | 不同宽度、输入能力下怎样变化 | 按 `spacious / medium / compact` 与 `fine / coarse / hover / keyboard` 组织 |
+| `preference system` | 哪些东西是用户长期偏好，怎样覆盖默认值 | 主题、密度、动效、左右栏/TOC/ContextPanel 的持久偏好单独建模 |
 | `view-state layering` | `idle / loading / ready / empty / error` 由谁承接 | `primitives` 提供状态原件，`patterns` 承担五态，`business / component` 负责编排 |
 
 一句话：
 
 - `layers` 管职责边界
 - `capability matrix` 管响应式和多端交互
+- `preference system` 管用户长期偏好
 - `view-state layering` 管动态状态承接
 
 ## 6 层架构
@@ -60,6 +62,58 @@
 | `spacious` | 左栏常驻，主内容常驻，右栏常驻 |
 | `medium` | 左栏常驻，主内容常驻，右栏改可唤起层 |
 | `compact` | 单主列，左右辅助区都转临时层 |
+
+## Preference System
+
+这里的 preference 指“用户主动选择、可跨会话保留、默认应被尊重”的长期偏好。  
+它不是：
+
+- 设备环境能力
+- 页面瞬时 UI 状态
+- 数据加载状态
+
+### 当前核心偏好集合
+
+| 偏好 | 建议值 | 作用范围 |
+| --- | --- | --- |
+| `themeMode` | `system / light / dark` | 全局外观 |
+| `uiDensity` | `comfortable / compact` | 全局 UI 密度，影响导航、列表、面板与部分阅读前奏 |
+| `motionMode` | `system / full / reduced` | 全局动效强度 |
+| `leftRailPref` | `auto / pinned / closed` | 左栏默认行为 |
+| `tocPref` | `auto / open / closed` | 文档 TOC 的默认驻留方式 |
+| `contextPanelPref` | `auto / open / closed` | 右侧上下文区的默认驻留方式 |
+
+### Preference 与其他系统的边界
+
+- `capability matrix`
+  决定当前设备“能不能这样做”
+- `preference system`
+  决定在“能做”的前提下，用户“更想怎么用”
+- `view-state layering`
+  决定此刻内容“正在发生什么”
+
+例如：
+
+- `compact` 下即使用户偏好左栏常驻，也必须退化成临时层。
+- 用户选择 `dark` 可以覆盖系统浅色主题，但不能让 dark theme 违反可读性约束。
+- 用户选择 `reduced` 会压低动效；OS 已要求 reduced motion 时，产品不应反向放大动画。
+
+### Preference 优先级
+
+推荐按以下顺序理解最终生效值：
+
+`a11y / OS 硬约束 > 环境能力 > 用户显式偏好 > workspace / account 默认值 > 产品默认值`
+
+### 在 6 层中的落位
+
+| 层级 | 与 preference 的关系 |
+| --- | --- |
+| `Tokens` | 提供 theme、density、motion 的变量别名与切换入口 |
+| `Utilities` | 提供基于 preference 的基础选择器与 helper |
+| `Primitives` | 消费 theme/density/motion，不直接读写 preference 存储 |
+| `Patterns` | 根据 preference 决定通用结构的默认展开/收起方式 |
+| `Business` | 决定哪些 preference 对 TOC / FileTree / ContextPanel 真正有意义 |
+| `Component` | 负责读取、合并、持久化 preference，并产出最终 resolved mode |
 
 ## View-State 分层
 
@@ -117,6 +171,7 @@
 4. hover 只能增强理解，不能承担关键反馈。
 5. 小屏适配优先重排任务路径，不优先 `display: none`。
 6. `TOC` 与 `FileTree` 共享 `TreeNav pattern`，但不合并成同一个业务组件。
+7. preference 必须和 capability、view state 分开建模，不要把持久偏好写成瞬时类名状态。
 
 ## Archive 说明
 

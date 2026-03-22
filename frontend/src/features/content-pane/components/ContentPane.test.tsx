@@ -18,6 +18,8 @@ import { ContentPane } from "./ContentPane";
 const preferencesValue: PreferencesContextValue = {
   theme: "light",
   toggleTheme() {},
+  density: "comfortable",
+  setDensity() {},
   locale: "en-US",
   toggleLocale() {},
   onboardingVisible: false,
@@ -88,9 +90,9 @@ describe("ContentPane", () => {
     const onNavigate = vi.fn();
     const user = userEvent.setup();
     const homeResource = await repository.getRenderableEntryByPath("/");
-    const directoryResource = await repository.getRenderableEntryByPath("/archive");
+    const directoryResource = await repository.getRenderableEntryByPath("/foundation");
     const articleResource = await repository.getRenderableEntryByPath(
-      "/archive/essays/filesystem-reading",
+      "/foundation/style-provider",
     );
 
     if (
@@ -112,7 +114,7 @@ describe("ContentPane", () => {
     const firstDirectoryEntry = directoryResource.value.content.children[0];
 
     if (firstDirectoryEntry === undefined) {
-      throw new Error("Expected at least one directory entry in the archive fixture.");
+      throw new Error("Expected at least one directory entry in the foundation fixture.");
     }
 
     const { rerender } = renderWithProviders(

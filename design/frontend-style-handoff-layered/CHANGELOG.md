@@ -26,3 +26,12 @@
 - 将 `README.md` 重写为当前 active docs 的入口页。
 - 新增 `archive/README.md`，用于承接已被当前结构吸收的历史专题文档。
 - 将 active specs 统一补充 `Remaining TODO` 段落，避免待办散落在独立路线或过程文档中。
+
+### Preference System
+
+- 将整体模型扩展为 `6 层架构 x 环境能力矩阵 x preference system x view-state 分层`。
+- 在 `design-overview.md` 中补充 preference system 的定义、优先级和 6 层落位。
+- 在 `layout-behavior-spec.md` 中补充 `leftRailPref / tocPref / contextPanelPref` 的布局偏好合同。
+- 在 `view-density-spec.md` 中补充 `uiDensity` 的全局密度偏好边界。
+- 在 `dark-theme-spec.md` 中补充 `themeMode` 的 raw preference 与 resolved theme 关系。
+- 在 `motion-spec.md` 中补充 `motionMode` 的 raw preference 与 resolved motion 关系。

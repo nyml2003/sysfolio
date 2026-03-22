@@ -14,6 +14,7 @@ import type {
 import type { Option } from "@/shared/lib/monads/option";
 import type { ResourceState } from "@/shared/lib/resource/resource-state";
 import type { AppLocale } from "@/shared/lib/i18n/locale.types";
+import type { DensityPreference } from "@/shared/lib/style/style.types";
 import type { ThemePreference } from "@/shared/lib/theme/theme.types";
 
 export interface ContentRepository {
@@ -40,6 +41,10 @@ export interface ContentRepository {
   setThemePreference(
     theme: ThemePreference,
   ): Promise<ResourceState<ThemePreference, RepositoryError>>;
+  getDensityPreference(): Promise<ResourceState<DensityPreference, RepositoryError>>;
+  setDensityPreference(
+    density: DensityPreference,
+  ): Promise<ResourceState<DensityPreference, RepositoryError>>;
   getLocalePreference(): Promise<ResourceState<AppLocale, RepositoryError>>;
   setLocalePreference(
     locale: AppLocale,

@@ -11,7 +11,6 @@ import type { OnboardingState } from "@/entities/content";
 import { useContentRepository } from "@/shared/data/repository";
 import { detachPromise } from "@/shared/lib/async/detach-promise";
 import {
-  useDocumentElementAttribute,
   useDocumentElementLanguage,
 } from "@/shared/lib/dom/useDocumentElementAttribute";
 import {
@@ -19,9 +18,12 @@ import {
   type AppLocale,
 } from "@/shared/lib/i18n/locale.types";
 import { some } from "@/shared/lib/monads/option";
+import {
+  DEFAULT_DENSITY,
+  type DensityPreference,
+} from "@/shared/lib/style/style.types";
 import { DEFAULT_THEME, type ThemePreference } from "@/shared/lib/theme/theme.types";
 import {
-  DOCUMENT_THEME_ATTRIBUTE_NAME,
   INITIAL_ONBOARDING_STATE,
   NEXT_LOCALE_BY_LOCALE,
   NEXT_THEME_BY_THEME,
@@ -38,6 +40,7 @@ type PreferencesProviderProps = {
 export function PreferencesProvider({ children }: PreferencesProviderProps) {
   const repository = useContentRepository();
   const [theme, setTheme] = useState<ThemePreference>(DEFAULT_THEME);
+  const [density, setDensity] = useState<DensityPreference>(DEFAULT_DENSITY);
   const [locale, setLocale] = useState<AppLocale>(DEFAULT_LOCALE);
   const [hydrated, setHydrated] = useState(false);
   const [onboardingState, setOnboardingState] = useState<OnboardingState>(
@@ -45,15 +48,23 @@ export function PreferencesProvider({ children }: PreferencesProviderProps) {
   );
 
   const hydratePreferences = useEffectEvent(async () => {
-    const [themeResource, localeResource, onboardingResource] = await Promise.all([
+    const [themeResource, densityResource, localeResource, onboardingResource] =
+      await Promise.all([
       repository.getThemePreference(),
+      repository.getDensityPreference(),
       repository.getLocalePreference(),
       repository.getOnboardingState(),
-    ]);
+      ]);
 
     if (themeResource.tag === "ready") {
       startTransition(() => {
         setTheme(themeResource.value);
+      });
+    }
+
+    if (densityResource.tag === "ready") {
+      startTransition(() => {
+        setDensity(densityResource.value);
       });
     }
 
@@ -85,6 +96,16 @@ export function PreferencesProvider({ children }: PreferencesProviderProps) {
     }
   });
 
+  const updateDensity = useEffectEvent(async (nextDensity: DensityPreference) => {
+    const densityResource = await repository.setDensityPreference(nextDensity);
+
+    if (densityResource.tag === "ready") {
+      startTransition(() => {
+        setDensity(densityResource.value);
+      });
+    }
+  });
+
   const toggleLocale = useEffectEvent(async () => {
     const nextLocale: AppLocale = NEXT_LOCALE_BY_LOCALE[locale];
     const localeResource = await repository.setLocalePreference(nextLocale);
@@ -110,15 +131,18 @@ export function PreferencesProvider({ children }: PreferencesProviderProps) {
     detachPromise(hydratePreferences());
   }, [hydratePreferences]);
 
-  useDocumentElementAttribute(DOCUMENT_THEME_ATTRIBUTE_NAME, theme);
   useDocumentElementLanguage(locale);
 
   const value = useMemo<PreferencesContextValue>(
     () => ({
       theme,
       locale,
+      density,
       toggleTheme: () => {
         detachPromise(toggleTheme());
+      },
+      setDensity: (nextDensity) => {
+        detachPromise(updateDensity(nextDensity));
       },
       toggleLocale: () => {
         detachPromise(toggleLocale());
@@ -130,10 +154,12 @@ export function PreferencesProvider({ children }: PreferencesProviderProps) {
     }),
     [
       dismissOnboarding,
+      density,
       hydrated,
       locale,
       onboardingState.dismissed,
       theme,
+      updateDensity,
       toggleLocale,
       toggleTheme,
     ],

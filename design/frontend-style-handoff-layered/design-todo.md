@@ -16,7 +16,8 @@
 2. 收完整交互状态矩阵，补齐 `success / warning / destructive / drag-target / reordering` 在不同 primitive 与 pattern 中的边界。
 3. 定稿 `medium / compact` 下左右栏、TOC、ContextPanel 与 PathBar 的最终交互策略。
 4. 再收一轮 `TOC / FileTree / PathBar` 的状态层级，明确 `current / selected / search-match / clickable` 的视觉差异。
-5. 校准 `Home / Directory / Document` 三类视图在 `comfortable / medium / compact` 使用场景下的密度与状态容器重量。
+5. 校准 `Home / Directory / Document` 三类视图在不同宽度和 `uiDensity` 下的密度与状态容器重量。
+6. 把 preference system 的第二层细节补齐，尤其是 layout panel preference 与 density preference 的实际生效边界。
 
 ## Next
 
@@ -26,6 +27,7 @@
 2. 统一 motion 节奏，补齐 overlay、panel、tree expansion 和 onboarding 的 reduced motion 降级。
 3. 补完整树导航相关的键盘与多输入行为说明，确保 `TreeNav pattern` 可被 TOC / FileTree 稳定复用。
 4. 继续补齐 primitive 组件目录中的“已支持 / 待扩展”差异，避免文档和 CSS 漏同步。
+5. 评估第二批 preference，包含 `tocExpandDepth / fileTreeRevealMode / codeWrap` 等更细的阅读与导航偏好。
 
 ## Later
 

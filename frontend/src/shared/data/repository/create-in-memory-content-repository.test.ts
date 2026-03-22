@@ -14,9 +14,9 @@ describe("createInMemoryContentRepository", () => {
   it("returns the expected renderable kinds for home, directory, article, and unknown paths", async () => {
     const repository = createRepository();
     const homeResource = await repository.getRenderableEntryByPath("/");
-    const directoryResource = await repository.getRenderableEntryByPath("/archive");
+    const directoryResource = await repository.getRenderableEntryByPath("/foundation");
     const articleResource = await repository.getRenderableEntryByPath(
-      "/archive/essays/filesystem-reading",
+      "/foundation/style-provider",
     );
     const missingResource = await repository.getRenderableEntryByPath("/missing");
 
@@ -50,9 +50,9 @@ describe("createInMemoryContentRepository", () => {
 
     const nodeIds = treeRoot.value.nodes.map((node) => node.id);
 
-    expect(nodeIds).toContain("archive");
-    expect(nodeIds).toContain("archive-essays");
-    expect(nodeIds).not.toContain("article-filesystem-reading");
+    expect(nodeIds).toContain("primitives");
+    expect(nodeIds).toContain("primitives-actions");
+    expect(nodeIds).not.toContain("article-button");
   });
 
   it("persists reading progress through the repository boundary", async () => {
@@ -62,11 +62,11 @@ describe("createInMemoryContentRepository", () => {
       updatedAt: "2026-03-22T08:00:00.000Z",
     };
     const saveResult = await repository.saveReadingProgress(
-      "/archive/essays/filesystem-reading",
+      "/foundation/style-provider",
       position,
     );
     const restoredResult = await repository.getSavedReadingProgress(
-      "/archive/essays/filesystem-reading",
+      "/foundation/style-provider",
     );
 
     expect(saveResult.tag).toBe("ready");

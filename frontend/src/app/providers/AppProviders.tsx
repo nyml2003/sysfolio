@@ -7,6 +7,7 @@ import {
 } from "@/shared/data/repository";
 import { none, type Option, unwrapOr } from "@/shared/lib/monads/option";
 import { PreferencesProvider } from "@/shared/store/preferences";
+import { StyleProvider } from "@/shared/ui/foundation";
 
 type AppProvidersProps = {
   children: ReactNode;
@@ -25,7 +26,9 @@ export function AppProviders({ children, repository }: AppProvidersProps) {
 
   return (
     <ContentRepositoryProvider value={resolvedRepository}>
-      <PreferencesProvider>{children}</PreferencesProvider>
+      <PreferencesProvider>
+        <StyleProvider>{children}</StyleProvider>
+      </PreferencesProvider>
     </ContentRepositoryProvider>
   );
 }

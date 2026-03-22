@@ -97,7 +97,36 @@
 | `DirectoryView` | 中等 | 扫描、比较、过滤、进入 | 先扫列表，再决定进入 |
 | `DocumentView` | 最稳 | 阅读、定位、连续理解 | 先沉浸阅读，再参考辅助信息 |
 
-## 三、HomeView 规范
+## 三、Density Preference
+
+密度不只是当前页面的设计结果，也应允许用户做长期偏好选择。
+
+当前建议只开放一层全局 `uiDensity`：
+
+- `comfortable`
+- `compact`
+
+### 作用原则
+
+1. density preference 是“整体偏移”，不是把三类视图拉平。
+2. `Home` 仍应最疏，`Document` 仍应最稳，preference 只在各自基线上做轻量增减。
+3. `compact` 可以压缩导航、meta、列表和工具条，但不能把正文阅读节奏压坏。
+
+### 解析规则
+
+`comfortable`
+
+- 保留更开的 section 间距
+- 保留更充足的 entry 内边距
+- document header 与摘要呼吸感更明显
+
+`compact`
+
+- 收紧列表、导航、meta 与辅助块间距
+- 可以让 directory 与 shell chrome 更紧凑
+- document 正文只允许轻量收紧，不应大幅降低行高、段距或正文 measure
+
+## 四、HomeView 规范
 
 ## 1. 任务定位
 
@@ -160,7 +189,7 @@ Home 不是列表页，也不是正文页。
 - 应给用户一个明确的回退或重试动作
 - 但不需要像 document error 那样抢占全部阅读空间
 
-## 四、DirectoryView 规范
+## 五、DirectoryView 规范
 
 ## 1. 任务定位
 
@@ -224,7 +253,7 @@ Directory 主要解决：
 - 应优先提供重试与返回路径
 - 重量高于 home empty，但仍低于文档阅读错误
 
-## 五、DocumentView 规范
+## 六、DocumentView 规范
 
 ## 1. 任务定位
 
@@ -280,7 +309,7 @@ Document 的唯一主任务是：
   - 返回上一级
   - 查看目录或其他可读项
 
-## 六、View State 容器的密度差异
+## 七、View State 容器的密度差异
 
 ## 1. LoadingState
 
@@ -354,7 +383,7 @@ Document 的唯一主任务是：
 - 说明阅读对象不可用
 - 给重试、返回目录、回上一级的明确路径
 
-## 七、当前 CSS 文件的调整重点
+## 八、当前 CSS 文件的调整重点
 
 ## 1. `styles/business/views.css`
 
@@ -381,7 +410,7 @@ Document 的唯一主任务是：
 - 在三类视图中的适配方式
 - 是否需要更轻或更重的状态容器变体
 
-## 八、Phase 4 推荐实施边界
+## 九、Phase 4 推荐实施边界
 
 这一轮建议只做以下几类事情：
 
@@ -397,7 +426,7 @@ Document 的唯一主任务是：
 - 布局入口行为回改
 - primitive 家族再扩新组件
 
-## 九、Phase 4 验收清单
+## 十、Phase 4 验收清单
 
 Phase 4 完成时，至少应满足：
 
@@ -419,3 +448,4 @@ Phase 4 完成时，至少应满足：
 1. 再校准 `Home / Directory / Document` 在真实内容长度下的密度差，尤其是中屏与小屏。
 2. 继续补齐 `loading / empty / error` 在三类主视图中的语气、动作区和容器重量差异。
 3. 后续业务内容模块接入时，需要按这份文档补 `footer / comments / recommendations` 的密度与状态容器规则。
+4. 把 `uiDensity` 在 shell、list、document header、view-state 容器上的偏移量再定成可落地的 token 或 alias。

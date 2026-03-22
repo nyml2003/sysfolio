@@ -41,6 +41,22 @@
 - 导航与 TOC 细则见 [navigation-state-spec.md](navigation-state-spec.md)
 - view-state 在不同主视图中的密度语气见 [view-density-spec.md](view-density-spec.md)
 
+## Preference 不是 State
+
+以下对象不应进入这份状态矩阵：
+
+- `themeMode`
+- `uiDensity`
+- `motionMode`
+- `leftRailPref / tocPref / contextPanelPref`
+
+原因很简单：
+
+- preference 是长期持久偏好
+- state 是当前 UI 或当前数据的瞬时状态
+
+两者都可能影响界面，但不应混成同一套类名状态。
+
 ## 一、状态分层
 
 当前推荐把状态分成 5 组：
