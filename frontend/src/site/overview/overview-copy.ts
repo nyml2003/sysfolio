@@ -59,8 +59,23 @@ type OverviewCopy = {
   directory: {
     fallbackDescription: string;
     entryFallbackDescription: string;
+    rootLabel: string;
+  };
+  rail: {
+    fileTreeTitle: string;
+  };
+  shellViewState: {
+    loadingTitle: string;
+    loadingBody: string;
+    emptyTitle: string;
+    notRenderableBody: string;
+    errorTitle: string;
   };
   context: {
+    panelTitle: string;
+    onThisPageTitle: string;
+    recentEntriesTitle: string;
+    placeholderBody: string;
     runtimeTitle: string;
     coverageTitle: string;
     noOpenDesignGaps: string;
@@ -241,8 +256,23 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
     directory: {
       fallbackDescription: "先浏览当前这一层组件库切片，再决定往下钻到哪条契约。",
       entryFallbackDescription: "打开这条入口，查看当前契约的实现、演示和缺口。",
+      rootLabel: "根",
+    },
+    rail: {
+      fileTreeTitle: "文件树",
+    },
+    shellViewState: {
+      loadingTitle: "正在加载文档",
+      loadingBody: "总览站正在解析当前路径。",
+      emptyTitle: "暂无可渲染内容",
+      notRenderableBody: "这条路径暂时没有可渲染内容。",
+      errorTitle: "路径未找到",
     },
     context: {
+      panelTitle: "上下文",
+      onThisPageTitle: "本页",
+      recentEntriesTitle: "最近",
+      placeholderBody: "当前文档解析完成后会显示上下文。",
       runtimeTitle: "运行时",
       coverageTitle: "覆盖情况",
       noOpenDesignGaps: "当前页面没有待处理的设计缺口。",
@@ -469,8 +499,23 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
     directory: {
       fallbackDescription: "Browse the current slice of the UI library before drilling into a specific contract.",
       entryFallbackDescription: "Open this entry to inspect the current contract, its demos, and the remaining gaps.",
+      rootLabel: "root",
+    },
+    rail: {
+      fileTreeTitle: "Filesystem",
+    },
+    shellViewState: {
+      loadingTitle: "Loading document",
+      loadingBody: "The overview station is resolving the current path.",
+      emptyTitle: "Nothing to render",
+      notRenderableBody: "This path does not have renderable content yet.",
+      errorTitle: "Path not found",
     },
     context: {
+      panelTitle: "Context",
+      onThisPageTitle: "On this page",
+      recentEntriesTitle: "Recent",
+      placeholderBody: "Context appears once the current document is resolved.",
       runtimeTitle: "Runtime",
       coverageTitle: "Coverage",
       noOpenDesignGaps: "No open design gaps on this page.",

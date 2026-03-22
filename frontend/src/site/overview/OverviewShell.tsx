@@ -8,6 +8,7 @@ import { useArticleReading } from "@/features/article/hooks/useArticleReading";
 import { useRenderableEntry } from "@/features/content-pane/hooks/useRenderableEntry";
 import { detachPromise } from "@/shared/lib/async/detach-promise";
 import { fromNullable, isSome, none, some, type Option } from "@/shared/lib/monads/option";
+import { useOverviewCopy } from "@/site/overview/overview-copy";
 import { ROOT_PATH, normalizePath, splitPathSegments } from "@/shared/lib/path/content-path";
 import { useStyleContext } from "@/shared/ui/foundation";
 import { AppShellLayout, ViewStateLayout } from "@/shared/ui/patterns";
@@ -85,6 +86,7 @@ function OverviewContent({
   onNavigate: (path: string) => void;
 }) {
   const { layoutMode } = useStyleContext();
+  const copy = useOverviewCopy();
   const { registerScrollContainer } = useArticleDom();
   const resource = useRenderableEntry(currentPath);
   const [activeOverlay, setActiveOverlay] = useState<"none" | "navigation" | "context">("none");
@@ -126,8 +128,8 @@ function OverviewContent({
               resource.tag === "error"
                 ? resource.error.message
                 : resource.tag === "loading"
-                  ? "The overview station is resolving the current path."
-                  : "This path does not have renderable content yet.",
+                  ? copy.shellViewState.loadingBody
+                  : copy.shellViewState.notRenderableBody,
             )}
             state={
               resource.tag === "ready"
@@ -140,12 +142,12 @@ function OverviewContent({
             }
             title={
               resource.tag === "error"
-                ? some("Path not found")
+                ? some(copy.shellViewState.errorTitle)
                 : resource.tag === "empty"
-                  ? some("Nothing to render")
+                  ? some(copy.shellViewState.emptyTitle)
                   : resource.tag === "ready"
                     ? none()
-                    : some("Loading document")
+                    : some(copy.shellViewState.loadingTitle)
             }
             actionLabel={none()}
             onAction={none()}

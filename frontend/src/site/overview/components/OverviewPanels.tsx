@@ -5,11 +5,14 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import type { BreadcrumbSegment, RenderableEntryPayload, RepositoryError } from "@/entities/content";
 import { useFileTree } from "@/features/file-tree/hooks/useFileTree";
 import { getOverviewDocumentMeta } from "@/shared/data/mock/content.fixtures";
+import { getThemeToggleAriaLabel } from "@/shared/lib/i18n/ui-copy";
+import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import { fromNullable, isSome, none, type Option, unwrapOr } from "@/shared/lib/monads/option";
 import { ROOT_PATH, pathFromSegments } from "@/shared/lib/path/content-path";
 import type { ResourceState } from "@/shared/lib/resource/resource-state";
 import { usePreferences } from "@/shared/store/preferences";
 import { useStyleContext } from "@/shared/ui/foundation";
+import { useOverviewCopy } from "@/site/overview/overview-copy";
 import { Grid, Inline, Stack, Surface } from "@/shared/ui/layout";
 import { Button, SegmentedControl, Tag } from "@/shared/ui/primitives";
 import { iconStyle } from "@/shared/ui/primitives/Icon.style";
@@ -66,6 +69,8 @@ export function OverviewPathBar({
 }: OverviewPathBarProps) {
   const { density, layoutMode, motion, theme } = useStyleContext();
   const { locale, setDensity, toggleLocale, toggleTheme } = usePreferences();
+  const copy = useOverviewCopy();
+  const ui = useUiCopy();
   const isCompact = layoutMode === "compact";
   const showContextToggle = layoutMode !== "spacious";
 
@@ -75,7 +80,7 @@ export function OverviewPathBar({
         <Inline className="overview-breadcrumbs" gap="xs" wrap>
           {isCompact ? (
             <Button onClick={onOpenNavigation} size="sm" tone="ghost">
-              Files
+              {copy.topBar.filesButton}
             </Button>
           ) : null}
           {breadcrumbs.map((segment, index) => {
@@ -102,10 +107,10 @@ export function OverviewPathBar({
           })}
         </Inline>
         <Inline align="center" className="overview-topbar__tools" gap="sm" wrap>
-          <Tag>{layoutMode}</Tag>
-          <Tag>{motion}</Tag>
+          <Tag>{copy.runtime.layoutModeLabel(layoutMode)}</Tag>
+          <Tag>{copy.runtime.motionLabel(motion)}</Tag>
           <SegmentedControl
-            label="Density"
+            label={copy.topBar.densityLabel}
             onChange={setDensity}
             options={[
               { value: "comfortable", label: "C" },
@@ -114,15 +119,25 @@ export function OverviewPathBar({
             ]}
             value={density}
           />
-          <Button onClick={toggleTheme} size="sm" tone="ghost">
+          <Button
+            aria-label={getThemeToggleAriaLabel(locale, theme)}
+            onClick={toggleTheme}
+            size="sm"
+            tone="ghost"
+          >
             {theme === "light" ? <MoonIcon size={16} /> : <SunIcon size={16} />}
           </Button>
-          <Button onClick={toggleLocale} size="sm" tone="ghost">
-            {locale === "en-US" ? "中" : "EN"}
+          <Button
+            aria-label={ui.localeToggle.ariaLabel}
+            onClick={toggleLocale}
+            size="sm"
+            tone="ghost"
+          >
+            {ui.localeToggle.buttonLabel}
           </Button>
           {showContextToggle ? (
             <Button onClick={onOpenContext} size="sm" tone="ghost">
-              Context
+              {copy.topBar.contextButton}
             </Button>
           ) : null}
         </Inline>
@@ -140,6 +155,7 @@ export function OverviewFileTree({
   currentPath,
   onNavigate,
 }: OverviewFileTreeProps) {
+  const copy = useOverviewCopy();
   const [scrollElement, setScrollElement] = useState<Option<HTMLDivElement>>(none());
   const { rows, rootState, expandedIds, toggleNode } = useFileTree(currentPath);
   const registerScrollElement = useCallback((node: HTMLDivElement | null) => {
@@ -154,7 +170,7 @@ export function OverviewFileTree({
 
   return (
     <Stack className="overview-rail" gap="sm">
-      <div className="overview-rail__title">Filesystem</div>
+      <div className="overview-rail__title">{copy.rail.fileTreeTitle}</div>
       {rootState.tag === "error" ? <Surface tone="danger">{rootState.error.message}</Surface> : null}
       <div className="overview-tree" ref={registerScrollElement}>
         <div className="overview-tree__viewport" style={{ height: `${virtualizer.getTotalSize()}px` }}>
@@ -229,12 +245,13 @@ export function OverviewContextPanel({
   onScrollToHeading,
 }: OverviewContextPanelProps) {
   const style = useStyleContext();
+  const copy = useOverviewCopy();
 
   if (resource.tag !== "ready") {
     return (
       <Stack className="overview-rail" gap="sm">
-        <div className="overview-rail__title">Context</div>
-        <Surface tone="muted">Context appears once the current document is resolved.</Surface>
+        <div className="overview-rail__title">{copy.context.panelTitle}</div>
+        <Surface tone="muted">{copy.context.placeholderBody}</Surface>
       </Stack>
     );
   }
@@ -253,22 +270,22 @@ export function OverviewContextPanel({
 
   return (
     <Stack className="overview-rail" gap="sm">
-      <div className="overview-rail__title">Context</div>
+      <div className="overview-rail__title">{copy.context.panelTitle}</div>
       <Surface>
         <Stack gap="sm">
-          <div className="overview-section-title">Runtime</div>
+          <div className="overview-section-title">{copy.context.runtimeTitle}</div>
           <Grid columns={2}>
-            <Tag tone="accent">{style.theme}</Tag>
-            <Tag>{style.density}</Tag>
-            <Tag>{style.layoutMode}</Tag>
-            <Tag>{style.motion}</Tag>
+            <Tag tone="accent">{copy.runtime.themeLabel(style.theme)}</Tag>
+            <Tag>{copy.runtime.densityLabel(style.density)}</Tag>
+            <Tag>{copy.runtime.layoutModeLabel(style.layoutMode)}</Tag>
+            <Tag>{copy.runtime.motionLabel(style.motion)}</Tag>
           </Grid>
         </Stack>
       </Surface>
       {resource.value.content.kind === "article" ? (
         <Surface>
           <Stack gap="sm">
-            <div className="overview-section-title">On this page</div>
+            <div className="overview-section-title">{copy.context.onThisPageTitle}</div>
             {resource.value.content.toc.map((item) => (
               <button
                 className={[
@@ -292,11 +309,11 @@ export function OverviewContextPanel({
       {isSome(articleMeta) ? (
         <Surface>
           <Stack gap="sm">
-            <div className="overview-section-title">Coverage</div>
+            <div className="overview-section-title">{copy.context.coverageTitle}</div>
             <Inline gap="xs" wrap>
-              <Tag tone="accent">{articleMeta.value.layer}</Tag>
-              <Tag>{articleMeta.value.status}</Tag>
-              <Tag>{articleMeta.value.designStatus}</Tag>
+              <Tag tone="accent">{copy.meta.layerLabel(articleMeta.value.layer)}</Tag>
+              <Tag>{copy.meta.statusLabel(articleMeta.value.status)}</Tag>
+              <Tag>{copy.meta.designStatusLabel(articleMeta.value.designStatus)}</Tag>
             </Inline>
             {articleMeta.value.gaps.length > 0 ? (
               <Stack gap="xs">
@@ -305,7 +322,7 @@ export function OverviewContextPanel({
                 ))}
               </Stack>
             ) : (
-              <div className="overview-copy">No open design gaps on this page.</div>
+              <div className="overview-copy">{copy.context.noOpenDesignGaps}</div>
             )}
           </Stack>
         </Surface>
@@ -313,7 +330,7 @@ export function OverviewContextPanel({
       {context.recentEntries.length > 0 ? (
         <Surface>
           <Stack gap="sm">
-            <div className="overview-section-title">Recent</div>
+            <div className="overview-section-title">{copy.context.recentEntriesTitle}</div>
             {context.recentEntries.map((entry) => (
               <button
                 className="overview-context-link"

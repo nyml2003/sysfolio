@@ -69,6 +69,14 @@
 | 结构与信息 | `expanded / collapsed / search-match` | `patterns + business` |
 | 数据搬运与视图态 | `drag-target / reordering / idle / ready / empty / error` | `patterns + business` |
 
+补充一组局部对象态：
+
+| 状态组 | 状态 | 主要承接层 |
+| --- | --- | --- |
+| 对象局部态 | `read-only / filled / visited / dragging / dismissible / sticky / paused / muted` | `primitives` 定义，按对象局部使用 |
+
+这些局部对象态不应被误用成全局 ownership 或页面主状态。
+
 ## 二、优先级
 
 ### 1. Primitive 交互优先级
@@ -102,8 +110,16 @@
 | `search-match` | `business` | `.is-search-match` + `__hit` | 行只做轻提示，主要高亮 label 局部 |
 | `expanded` | `patterns + business` | `[aria-expanded=\"true\"]` | 主要作用于 toggle，不抢 current |
 | `collapsed` | `patterns + business` | 默认态 / `[aria-expanded=\"false\"]` | 与 expanded 成对出现 |
+| `read-only` | `primitives` 局部对象态 | `[readonly]` / `.is-read-only` | 主要用于 `Input / NumberInput / DateInput / Textarea`，不等于 disabled |
+| `filled` | `primitives` 局部对象态 | `.is-filled` / `[data-filled=\"true\"]` | 主要用于 `SearchInput / SelectTrigger / Combobox / TokenInput` 一类有值表面 |
+| `visited` | `primitives` 局部对象态 | `:visited` | 仅用于 `Link`，不应扩散到按钮或菜单项 |
+| `dragging` | `primitives + business` 局部对象态 | `.is-dragging` / `[data-dragging=\"true\"]` | 主要用于 `Slider thumb / drag handle / file drop interaction` |
 | `drag-target` | `business` | `.is-drag-target` | 当前已落在 `FileTree / TableRow` |
 | `reordering` | `business` | `.is-reordering` / `.is-reorder-before` / `.is-reorder-after` | 当前已落在 `TableRow`，FileTree 先保留轻量层 |
+| `dismissible` | `primitives` 局部对象态 | `.is-dismissible` | 仅用于 `InlineNotice / MessageBar / Banner / Toast` 这类可关闭反馈 |
+| `sticky` | `patterns + business` 局部对象态 | `.is-sticky` | 当前主要用于 `Banner`，表示布局驻留方式，不等于 current |
+| `paused` | `primitives` 局部对象态 | `.is-paused` / `[data-state=\"paused\"]` | 当前主要用于 `Spinner / Toast / autoplay progress` 一类短时对象 |
+| `muted` | `primitives` 局部对象态 | `.is-muted` / `--subtle` 变体 | 主要用于 `Text / Label / helper`，是文字层级，不是禁用态 |
 | `idle` | `patterns` | `.m-idle-state` | 无数据请求或等待入口时使用 |
 | `ready` | `patterns` | `.m-ready-state` | 正常内容态骨架 |
 | `empty` | `patterns + business` | `.m-empty-state` | 通过 `.is-home / .is-directory / .is-document` 区分语气 |

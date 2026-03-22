@@ -12,8 +12,10 @@ import {
   overviewHomeCollections,
 } from "@/shared/data/mock/content.fixtures";
 import { formatDate } from "@/shared/lib/date/format-date";
+import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import { fromNullable, isSome, none, unwrapOr } from "@/shared/lib/monads/option";
 import { usePreferences } from "@/shared/store/preferences";
+import { useOverviewCopy } from "@/site/overview/overview-copy";
 import { Grid, Inline, Stack, Surface } from "@/shared/ui/layout";
 import { Button, Tag } from "@/shared/ui/primitives";
 
@@ -69,14 +71,14 @@ export function OverviewHomePage({
   context,
   onNavigate,
 }: OverviewHomePageProps) {
+  const copy = useOverviewCopy();
+
   return (
     <Stack className="overview-page" gap="lg">
       <Stack className="overview-hero" gap="sm">
-        <div className="overview-eyebrow">system-library / overview</div>
+        <div className="overview-eyebrow">{copy.home.eyebrow}</div>
         <h1 className="overview-title">{content.title}</h1>
-        <p className="overview-summary">
-          A filesystem-style documentation station for the internal UI library. Start with the runtime, move through layout and primitives, and use the audit layer to track missing design coverage.
-        </p>
+        <p className="overview-summary">{copy.home.summary}</p>
       </Stack>
       <Grid columns={3}>
         {overviewHomeCollections.map((collection) => (
@@ -85,9 +87,9 @@ export function OverviewHomePage({
               <div className="overview-section-title">{collection.title}</div>
               <p className="overview-copy">{collection.description}</p>
               <Stack gap="xs">
-                {collection.paths.map((path) => (
-                  <Button key={path} onClick={() => onNavigate(path)} tone="ghost">
-                    {path.replaceAll("/", " ").trim()}
+                {collection.entries.map((entry) => (
+                  <Button key={entry.path} onClick={() => onNavigate(entry.path)} tone="ghost">
+                    {entry.label}
                   </Button>
                 ))}
               </Stack>
@@ -97,7 +99,7 @@ export function OverviewHomePage({
       </Grid>
       <Surface>
         <Stack gap="sm">
-          <div className="overview-section-title">Recently touched docs</div>
+          <div className="overview-section-title">{copy.home.recentDocsTitle}</div>
           <Grid columns={3}>
             {context.recentEntries.map((entry) => (
               <button className="overview-link-card" key={entry.id} onClick={() => onNavigate(entry.path)} type="button">
@@ -119,13 +121,19 @@ export function OverviewDirectoryPage({
   onNavigate,
 }: OverviewDirectoryPageProps) {
   const content = payload.content as DirectoryContent;
+  const copy = useOverviewCopy();
+  const ui = useUiCopy();
 
   return (
     <Stack className="overview-page" gap="lg">
       <Stack gap="sm">
-        <div className="overview-eyebrow">{payload.node.pathSegments.join(" / ") || "root"}</div>
+        <div className="overview-eyebrow">
+          {payload.node.pathSegments.join(" / ") || copy.directory.rootLabel}
+        </div>
         <h1 className="overview-title">{content.title}</h1>
-        <p className="overview-summary">{unwrapOr(content.description, "Browse the current slice of the UI library.")}</p>
+        <p className="overview-summary">
+          {unwrapOr(content.description, copy.directory.fallbackDescription)}
+        </p>
       </Stack>
       <Grid columns={3}>
         {content.children.map((entry) => (
@@ -133,12 +141,16 @@ export function OverviewDirectoryPage({
             <Stack gap="sm">
               <Inline align="between" wrap>
                 <strong>{entry.title}</strong>
-                <Tag>{entry.kind}</Tag>
+                <Tag>{ui.common.kindLabel(entry.kind)}</Tag>
               </Inline>
               {isSome(entry.readingMinutes) ? (
-                <div className="overview-copy">{entry.readingMinutes.value} min read</div>
+                <div className="overview-copy">
+                  {ui.common.minuteCount(entry.readingMinutes.value)}
+                </div>
               ) : null}
-              <div className="overview-copy">{unwrapOr(entry.description, "Open this entry to inspect the current contract.")}</div>
+              <div className="overview-copy">
+                {unwrapOr(entry.description, copy.directory.entryFallbackDescription)}
+              </div>
             </Stack>
           </button>
         ))}
@@ -153,6 +165,8 @@ export function OverviewArticlePage({
   scrollToTop,
 }: OverviewArticlePageProps) {
   const { locale } = usePreferences();
+  const copy = useOverviewCopy();
+  const ui = useUiCopy();
   const { registerArticleBody, registerBottomSentinel, registerHeadingOrder } = useArticleDom();
   const document = payload.content.kind === "article" ? payload.content : null;
   const meta = document === null ? none() : getOverviewDocumentMeta(document.id);
@@ -194,10 +208,14 @@ export function OverviewArticlePage({
           <div className="overview-eyebrow">{document.eyebrow}</div>
           <h1 className="overview-title">{document.title}</h1>
           <Inline gap="sm" wrap>
-            {isSome(meta) ? <Tag tone="accent">{meta.value.layer}</Tag> : null}
-            {isSome(meta) ? <Tag>{meta.value.status}</Tag> : null}
+            {isSome(meta) ? (
+              <Tag tone="accent">{copy.meta.layerLabel(meta.value.layer)}</Tag>
+            ) : null}
+            {isSome(meta) ? <Tag>{copy.meta.statusLabel(meta.value.status)}</Tag> : null}
             {isSome(payload.node.updatedAt) ? (
-              <Tag>updated {formatDate(payload.node.updatedAt.value, locale)}</Tag>
+              <Tag>
+                {ui.article.updatedAt(formatDate(payload.node.updatedAt.value, locale))}
+              </Tag>
             ) : null}
           </Inline>
           <p className="overview-summary">{document.summary}</p>
@@ -205,9 +223,9 @@ export function OverviewArticlePage({
         {restoreNoticeVisible ? (
           <Surface tone="accent">
             <Inline align="between" wrap>
-              <div className="overview-copy">Restored your previous reading position.</div>
+              <div className="overview-copy">{ui.article.restoreNotice}</div>
               <Button onClick={scrollToTop} tone="secondary">
-                Back to top
+                {ui.article.scrollToTop}
               </Button>
             </Inline>
           </Surface>
