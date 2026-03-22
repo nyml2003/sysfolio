@@ -14,6 +14,10 @@ export type ButtonOwnProps = {
   size: ButtonSize;
   type: "button" | "submit" | "reset";
   loading: boolean;
+  /** 块级宽度（表单、空态等）。 */
+  fullWidth: boolean;
+  /** 长文案单行省略（catalog：长文本截断）。 */
+  truncateLabel: boolean;
   leadingIcon: ButtonAffixSlot;
   trailingIcon: ButtonAffixSlot;
   children: NonNullable<ReactNode>;

@@ -8,6 +8,8 @@ export const ButtonGhostMd = createButtonPreset({
   size: "md",
   type: "button",
   loading: false,
+  fullWidth: false,
+  truncateLabel: false,
   leadingIcon: none(),
   trailingIcon: none(),
 });
@@ -18,6 +20,8 @@ export const ButtonGhostSm = createButtonPreset({
   size: "sm",
   type: "button",
   loading: false,
+  fullWidth: false,
+  truncateLabel: false,
   leadingIcon: none(),
   trailingIcon: none(),
 });
@@ -28,6 +32,8 @@ export const ButtonSecondaryMd = createButtonPreset({
   size: "md",
   type: "button",
   loading: false,
+  fullWidth: false,
+  truncateLabel: false,
   leadingIcon: none(),
   trailingIcon: none(),
 });
@@ -38,6 +44,8 @@ export const ButtonSecondarySm = createButtonPreset({
   size: "sm",
   type: "button",
   loading: false,
+  fullWidth: false,
+  truncateLabel: false,
   leadingIcon: none(),
   trailingIcon: none(),
 });
@@ -48,6 +56,8 @@ export const ButtonPrimaryMd = createButtonPreset({
   size: "md",
   type: "button",
   loading: false,
+  fullWidth: false,
+  truncateLabel: false,
   leadingIcon: none(),
   trailingIcon: none(),
 });

@@ -18,6 +18,8 @@ const btn = {
   size: "md" as const,
   type: "button" as const,
   loading: false,
+  fullWidth: false,
+  truncateLabel: false,
   leadingIcon: none(),
   trailingIcon: none(),
 };
@@ -54,6 +56,27 @@ describe("Button", () => {
     expect(el.getAttribute("aria-busy")).toBe("true");
     expect((el as HTMLButtonElement).disabled).toBe(true);
     expect(el.className).toContain("sf-button--loading");
+    expect(el.className).toContain("is-loading");
+  });
+
+  it("applies full-width and truncate classes", () => {
+    render(
+      <Button {...btn} fullWidth truncateLabel tone="secondary">
+        Label
+      </Button>,
+    );
+    const el = screen.getByRole("button", { name: "Label" });
+    expect(el.className).toContain("sf-button--full-width");
+    expect(el.className).toContain("sf-button--truncate");
+  });
+
+  it("adds has-affix when leading icon is present", () => {
+    render(
+      <Button {...btn} leadingIcon={some(<span>icon</span>)} tone="secondary">
+        Next
+      </Button>,
+    );
+    expect(screen.getByRole("button").className).toContain("sf-button--has-affix");
   });
 
   it("renders leadingIcon in layout", () => {

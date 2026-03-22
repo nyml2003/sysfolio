@@ -13,6 +13,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     size,
     type,
     loading,
+    fullWidth,
+    truncateLabel,
     leadingIcon,
     trailingIcon,
     className,
@@ -25,6 +27,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   const showLeading = loading || isSome(leadingIcon);
   const showTrailing = isSome(trailingIcon) && !loading;
   const useAffixLayout = showLeading || showTrailing;
+  const labelEl = <span className="sf-button__label">{children}</span>;
 
   const content = useAffixLayout ? (
     <>
@@ -41,7 +44,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       ) : (
         false
       )}
-      <span className="sf-button__label">{children}</span>
+      {labelEl}
       {showTrailing ? (
         <span aria-hidden className="sf-button__trailing">
           {isSome(trailingIcon) ? trailingIcon.value : false}
@@ -50,6 +53,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
         false
       )}
     </>
+  ) : truncateLabel ? (
+    labelEl
   ) : (
     children
   );
@@ -63,7 +68,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
         "sf-button",
         `sf-button--${tone}`,
         `sf-button--${size}`,
+        useAffixLayout && "sf-button--has-affix",
+        fullWidth && "sf-button--full-width",
+        truncateLabel && "sf-button--truncate",
         loading && "sf-button--loading",
+        loading && "is-loading",
         className,
       )}
       disabled={effectiveDisabled}

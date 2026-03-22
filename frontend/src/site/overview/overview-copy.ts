@@ -128,6 +128,18 @@ type OverviewCopy = {
     buttonLoadingBullets: readonly string[];
     buttonLoadingLabel: string;
     buttonWithLeadingLabel: string;
+    buttonLayoutHeading: string;
+    buttonLayoutBullets: readonly string[];
+    buttonFullWidthLabel: string;
+    buttonTruncateLongLabel: string;
+    buttonIconButtonHeading: string;
+    buttonIconButtonBullets: readonly string[];
+    buttonGroupHeading: string;
+    buttonGroupBullets: readonly string[];
+    buttonGroupSegmentLabel: string;
+    buttonGroupItemA: string;
+    buttonGroupItemB: string;
+    buttonGroupItemC: string;
     fieldTextInputLabel: string;
     fieldTextInputDescription: string;
     fieldTextInputValue: string;
@@ -378,7 +390,7 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
       buttonDestructive: "危险",
       buttonIntroHeading: "概述",
       buttonIntroBullets: [
-        "入口：从 @/shared/ui/primitives 导入 Button；主应用与总览壳内的交互按钮统一使用该组件。",
+        "入口：从 @/shared/ui/primitives 导入 Button / IconButton / ButtonGroup（及预设）；主应用与总览壳内的操作控件统一使用这些原语。",
         "约束：app / features / site 内业务 TSX 不直接使用原生 button 元素拼产品界面（shared/ui 内部封装除外）。",
         "样式：根节点挂 sf-button 与 sf-button--{tone|size} 修饰类；规则在 src/shared/ui/styles/components.css，颜色随主题 token 变化。",
         "设计对齐：design/frontend-style-handoff-layered 中 primitive-component-catalog 的 Button 家族（含语义 tone）与本节演示一致；改 token 或 CSS 后在此页做视觉回归。",
@@ -416,6 +428,30 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
       ],
       buttonLoadingLabel: "保存中…",
       buttonWithLeadingLabel: "带图标",
+      buttonLayoutHeading: "布局与溢出",
+      buttonLayoutBullets: [
+        "fullWidth：块级宽度（inline-size: 100%），用于表单与空态主操作。",
+        "truncateLabel：catalog 中长文案单行省略；与 leadingIcon/trailingIcon 混排时 label 占满剩余空间。",
+        "loading：同时挂 sf-button--loading 与 is-loading（interaction-state-matrix）；coarse pointer 下最小高度不低于 44px。",
+      ],
+      buttonFullWidthLabel: "全宽主操作",
+      buttonTruncateLongLabel: "这是一段会在窄容器内被截断的示例按钮文案",
+      buttonIconButtonHeading: "IconButton",
+      buttonIconButtonBullets: [
+        "catalog：primary / ghost / success / warning / destructive；结构为 icon + srLabel（aria-label）+ loading 时 spinner。",
+        "尺寸：md≈36px、sm 更密；coarse pointer 下最小点击面不低于 44px。",
+        "优先用 IconButtonGhostSm / IconButtonGhostMd 预设；危险操作用 destructive tone。",
+      ],
+      buttonGroupHeading: "ButtonGroup",
+      buttonGroupBullets: [
+        "variant：default（带 gap）与 attached（贴合并共享边框）。",
+        "子项使用 ButtonGroupItem 包裹 Button，可选 current 映射为 aria-pressed。",
+        "容器 role=\"group\"，须传入 label 作为可访问名称。",
+      ],
+      buttonGroupSegmentLabel: "对齐方式示例",
+      buttonGroupItemA: "左",
+      buttonGroupItemB: "中",
+      buttonGroupItemC: "右",
       fieldTextInputLabel: "文本输入",
       fieldTextInputDescription: "共享的平静输入表面。",
       fieldTextInputValue: "按钮文案",
@@ -666,7 +702,7 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
       buttonDestructive: "Destructive",
       buttonIntroHeading: "Overview",
       buttonIntroBullets: [
-        "Import: use Button from @/shared/ui/primitives for interactive buttons in the app shell and on this site.",
+        "Import: use Button / IconButton / ButtonGroup (and presets) from @/shared/ui/primitives for actions in the app shell and on this site.",
         "Rule: in app / features / site, do not use raw button elements for product UI (except inside shared/ui implementations).",
         "Styling: root classes sf-button and sf-button--{tone|size}; rules live in src/shared/ui/styles/components.css and follow theme tokens.",
         "Design alignment: the Button family in design/frontend-style-handoff-layered/primitive-component-catalog (including semantic tones) matches this demo; use this page for visual regression after token/CSS changes.",
@@ -704,6 +740,30 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
       ],
       buttonLoadingLabel: "Saving…",
       buttonWithLeadingLabel: "With icon",
+      buttonLayoutHeading: "Layout and overflow",
+      buttonLayoutBullets: [
+        "fullWidth: block-level width (inline-size: 100%) for forms and primary CTAs.",
+        "truncateLabel: single-line ellipsis for long labels (catalog); with leading/trailing icons the label flexes and truncates.",
+        "loading: applies sf-button--loading and is-loading (interaction-state-matrix); coarse pointers keep min height ≥ 44px.",
+      ],
+      buttonFullWidthLabel: "Full-width primary",
+      buttonTruncateLongLabel: "This long label truncates inside a narrow container",
+      buttonIconButtonHeading: "IconButton",
+      buttonIconButtonBullets: [
+        "catalog: primary / ghost / success / warning / destructive; structure is icon + srLabel (aria-label) + spinner when loading.",
+        "Sizes: md ≈ 36px, sm tighter; coarse pointers keep the hit target ≥ 44px.",
+        "Prefer IconButtonGhostSm / IconButtonGhostMd presets; destructive tone for dangerous actions.",
+      ],
+      buttonGroupHeading: "ButtonGroup",
+      buttonGroupBullets: [
+        "variant: default (with gap) vs attached (merged borders).",
+        "Children use ButtonGroupItem wrapping Button; optional current maps to aria-pressed.",
+        "Container uses role=\"group\"; pass label for the accessible name.",
+      ],
+      buttonGroupSegmentLabel: "Alignment sample",
+      buttonGroupItemA: "Left",
+      buttonGroupItemB: "Center",
+      buttonGroupItemC: "Right",
       fieldTextInputLabel: "Text input",
       fieldTextInputDescription: "Shared calm field surface.",
       fieldTextInputValue: "Button copy",

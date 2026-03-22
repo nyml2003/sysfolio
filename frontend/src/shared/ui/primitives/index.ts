@@ -1,4 +1,5 @@
 export { Button } from "./Button";
+export { ButtonGroup, ButtonGroupItem } from "./ButtonGroup";
 export { createButtonPreset } from "./button-factory";
 export {
   ButtonGhostMd,
@@ -7,7 +8,12 @@ export {
   ButtonSecondaryMd,
   ButtonSecondarySm,
 } from "./button-presets";
+export type { ButtonGroupItemProps, ButtonGroupProps, ButtonGroupVariant } from "./button-group.types";
 export type { ButtonAffixSlot, ButtonOwnProps, ButtonProps, ButtonSize, ButtonTone } from "./button.types";
+export { IconButton } from "./IconButton";
+export { createIconButtonPreset } from "./icon-button-factory";
+export { IconButtonGhostMd, IconButtonGhostSm } from "./icon-button-presets";
+export type { IconButtonOwnProps, IconButtonProps, IconButtonSize, IconButtonTone } from "./icon-button.types";
 export { Field } from "./Field";
 export { FieldRow } from "./FieldRow";
 export { SelectInput } from "./SelectInput";
