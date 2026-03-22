@@ -104,6 +104,7 @@ primitive 内部统一按以下顺序表达状态：
 
 对应对象：
 
+- `Heading`
 - `Text`
 - `Label`
 - `Link`
@@ -118,6 +119,7 @@ primitive 内部统一按以下顺序表达状态：
 
 | 对象 | 当前状态 | 目标气质 | 调整重点 |
 | --- | --- | --- | --- |
+| `Heading` | 主要散落在 doc header 和 article body | 结构标题、稳定层级 | level 清楚，但不靠上层自由改字号 |
 | `Text` | 尚未单独建 primitive | 稳定 UI 文本原件 | 建立 `ui / body / subtle / caption / mono` 的清晰层级 |
 | `Label` | 主要被 Field 吸收 | 控件名称、结构清楚 | required / optional 语气要稳定，不抢 message |
 | `Link` | 多数还混在业务文本里 | 可点击但克制 | 导航感清楚，不按钮化 |
@@ -125,6 +127,11 @@ primitive 内部统一按以下顺序表达状态：
 | `Kbd` | 仍未正式纳入 | 快捷键标记 | 轻量、规则、对齐稳定 |
 
 ### 具体要求
+
+`Heading`
+
+- 先定义视觉等级，再映射到语义层级，不能让上层逐个页面手调 `h1 / h2 / h3` 的字号和 margin。
+- UI heading 和 prose heading 应共用同一套 typographic scale，但由不同容器决定间距和上下文关系。
 
 `Text`
 
@@ -150,12 +157,14 @@ primitive 内部统一按以下顺序表达状态：
 ### 不建议
 
 - 不要把普通说明文本和 link 靠同一套颜色处理。
+- 不要让业务层通过局部样式去重写 `h1 / h2 / p` 的字面表现。
 - 不要把 label 做成近似标题。
 - 不要把 code inline 做成和 tag 一样的胶囊块。
 
 ### Phase 1 验收点
 
 - 页面中的普通文本、标签文本、链接文本和技术字面量能在 1 秒内区分职责。
+- heading 的等级感主要靠系统 scale，而不是靠业务层手调。
 - link 看起来像导航，不像次级按钮。
 - label、hint、message 形成稳定文本层级。
 

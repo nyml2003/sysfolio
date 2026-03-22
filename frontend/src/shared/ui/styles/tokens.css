@@ -37,12 +37,17 @@
     --sf-radius-md: 0.75rem;
     --sf-radius-lg: 1rem;
     --sf-radius-xl: 1.25rem;
+    /* Primitive controls — primitive-visual-spec § 圆角：常规控件优先 8px */
+    --sf-radius-control: 0.5rem;
 
     --sf-shadow-soft: 0 18px 40px rgb(58 48 37 / 0.08);
     --sf-shadow-strong: 0 24px 56px rgb(25 18 12 / 0.22);
 
     --sf-duration-fast: 140ms;
     --sf-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+    /* UI 控件字体 — primitive-visual-spec § 字体和字重：控件优先 ui font */
+    --sf-font-ui: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 
     --sf-reading-max: 72rem;
     --sf-shell-left: 18rem;

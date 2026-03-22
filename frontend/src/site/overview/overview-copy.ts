@@ -14,7 +14,9 @@ import type { ThemePreference } from "@/shared/lib/theme/theme.types";
 import { usePreferences } from "@/shared/store/preferences";
 
 type RuntimeKey = "theme" | "density" | "layoutMode" | "motion";
-type DemoId =
+
+/** 文档站 `OverviewDemoDeck` 中注册的 demo id（与 fixtures 中 demoIds 对齐） */
+export type OverviewDemoId =
   | "style-provider"
   | "preferences"
   | "tokens"
@@ -82,7 +84,7 @@ type OverviewCopy = {
   };
   demos: {
     liveTag: string;
-    titleById: (demoId: DemoId) => string;
+    titleById: (demoId: OverviewDemoId) => string;
     preferenceThemeButton: (theme: ThemePreference) => string;
     preferenceBackedTag: string;
     tokenCanvas: string;
@@ -106,6 +108,26 @@ type OverviewCopy = {
     buttonPrimary: string;
     buttonSecondary: string;
     buttonGhost: string;
+    buttonSuccess: string;
+    buttonWarning: string;
+    buttonDestructive: string;
+    buttonIntroHeading: string;
+    buttonIntroBullets: readonly string[];
+    buttonToneHeading: string;
+    buttonToneBullets: readonly string[];
+    buttonSizeHeading: string;
+    buttonSizeBullets: readonly string[];
+    buttonShowcaseMd: string;
+    buttonShowcaseSm: string;
+    buttonA11yHeading: string;
+    buttonA11yBullets: readonly string[];
+    buttonIconAriaLabel: string;
+    buttonDenseHeading: string;
+    buttonDenseBullets: readonly string[];
+    buttonLoadingHeading: string;
+    buttonLoadingBullets: readonly string[];
+    buttonLoadingLabel: string;
+    buttonWithLeadingLabel: string;
     fieldTextInputLabel: string;
     fieldTextInputDescription: string;
     fieldTextInputValue: string;
@@ -305,7 +327,7 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
         }
 
         if (demoId === "button") {
-          return "按钮集合";
+          return "按钮";
         }
 
         if (demoId === "field-input") {
@@ -351,6 +373,49 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
       buttonPrimary: "主按钮",
       buttonSecondary: "次按钮",
       buttonGhost: "幽灵按钮",
+      buttonSuccess: "成功",
+      buttonWarning: "警告",
+      buttonDestructive: "危险",
+      buttonIntroHeading: "概述",
+      buttonIntroBullets: [
+        "入口：从 @/shared/ui/primitives 导入 Button；主应用与总览壳内的交互按钮统一使用该组件。",
+        "约束：app / features / site 内业务 TSX 不直接使用原生 button 元素拼产品界面（shared/ui 内部封装除外）。",
+        "样式：根节点挂 sf-button 与 sf-button--{tone|size} 修饰类；规则在 src/shared/ui/styles/components.css，颜色随主题 token 变化。",
+        "设计对齐：design/frontend-style-handoff-layered 中 primitive-component-catalog 的 Button 家族（含语义 tone）与本节演示一致；改 token 或 CSS 后在此页做视觉回归。",
+      ],
+      buttonToneHeading: "变体 tone",
+      buttonToneBullets: [
+        "primary：主操作、单屏关键 CTA。",
+        "secondary：次主操作，或与 primary 成对出现。",
+        "ghost：工具栏、文件树行、面包屑等弱对比、依赖上下文的点击面。",
+        "success / warning / destructive：语义反馈（success/warning 用 surface + 语义色；destructive 用边框+浅底，避免整块重红底）。",
+      ],
+      buttonSizeHeading: "尺寸 size",
+      buttonSizeBullets: [
+        "md：默认控制高度，适用于表单与一般块内操作。",
+        "sm：顶栏、与 Tag / SegmentedControl 并排等密集区域。",
+      ],
+      buttonShowcaseMd: "默认 md",
+      buttonShowcaseSm: "紧凑 sm",
+      buttonA11yHeading: "可访问性",
+      buttonA11yBullets: [
+        "纯图标按钮：必须提供可访问名称（常用 aria-label），文案应走 i18n / useUiCopy。",
+        "其余：disabled、aria-expanded、aria-current 等原生属性由 Button 透传到根部的 button 元素。",
+      ],
+      buttonIconAriaLabel: "示例：切换主题",
+      buttonDenseHeading: "紧凑布局（覆盖全局样式）",
+      buttonDenseBullets: [
+        "场景：文件树 disclosure、窄轨等，全局 .sf-button 的 min-height / padding 与栅格冲突。",
+        "做法：在局部 CSS Module 用 .localClass:global(.sf-button) 等组合选择器覆盖。",
+        "参考：主应用 features/file-tree/components/FileTree.module.css；总览站见 overview.css 中的 .overview-tree__*.sf-button。",
+      ],
+      buttonLoadingHeading: "加载与图标位",
+      buttonLoadingBullets: [
+        "loading：前导 spinner、aria-busy、并禁用按钮至结束。",
+        "leadingIcon / trailingIcon：使用 Option（none()/some(…)）与 catalog slot 对齐；loading 时前导位仅显示 spinner。",
+      ],
+      buttonLoadingLabel: "保存中…",
+      buttonWithLeadingLabel: "带图标",
       fieldTextInputLabel: "文本输入",
       fieldTextInputDescription: "共享的平静输入表面。",
       fieldTextInputValue: "按钮文案",
@@ -548,7 +613,7 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
         }
 
         if (demoId === "button") {
-          return "Button set";
+          return "Button";
         }
 
         if (demoId === "field-input") {
@@ -596,6 +661,49 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
       buttonPrimary: "Primary",
       buttonSecondary: "Secondary",
       buttonGhost: "Ghost",
+      buttonSuccess: "Success",
+      buttonWarning: "Warning",
+      buttonDestructive: "Destructive",
+      buttonIntroHeading: "Overview",
+      buttonIntroBullets: [
+        "Import: use Button from @/shared/ui/primitives for interactive buttons in the app shell and on this site.",
+        "Rule: in app / features / site, do not use raw button elements for product UI (except inside shared/ui implementations).",
+        "Styling: root classes sf-button and sf-button--{tone|size}; rules live in src/shared/ui/styles/components.css and follow theme tokens.",
+        "Design alignment: the Button family in design/frontend-style-handoff-layered/primitive-component-catalog (including semantic tones) matches this demo; use this page for visual regression after token/CSS changes.",
+      ],
+      buttonToneHeading: "tone variants",
+      buttonToneBullets: [
+        "primary: main action / strongest CTA.",
+        "secondary: secondary action, or paired with primary.",
+        "ghost: toolbars, tree rows, breadcrumbs—low chrome, context-dependent.",
+        "success / warning / destructive: semantic feedback (success/warning use surface + semantic ink; destructive uses border + light fill, not a heavy solid red block).",
+      ],
+      buttonSizeHeading: "size",
+      buttonSizeBullets: [
+        "md: default control height for forms and general in-flow actions.",
+        "sm: top bars and dense rows next to Tag / SegmentedControl.",
+      ],
+      buttonShowcaseMd: "Default md",
+      buttonShowcaseSm: "Compact sm",
+      buttonA11yHeading: "Accessibility",
+      buttonA11yBullets: [
+        "Icon-only: provide an accessible name (commonly aria-label); copy via i18n / useUiCopy.",
+        "Other props: disabled, aria-expanded, aria-current, etc. pass through to the underlying button element.",
+      ],
+      buttonIconAriaLabel: "Example: toggle theme",
+      buttonDenseHeading: "Dense layouts (overriding globals)",
+      buttonDenseBullets: [
+        "When: file-tree disclosure, narrow rails, etc.—global .sf-button min-height/padding fights the grid.",
+        "How: in a local CSS Module, use compound selectors such as .localClass:global(.sf-button) to override.",
+        "Refs: main app features/file-tree/components/FileTree.module.css; overview overview.css (.overview-tree__*.sf-button).",
+      ],
+      buttonLoadingHeading: "Loading and icon slots",
+      buttonLoadingBullets: [
+        "loading: leading spinner, aria-busy, and disabled until cleared.",
+        "leadingIcon / trailingIcon: Option (none/some) aligned to catalog slots; trailing hides while loading.",
+      ],
+      buttonLoadingLabel: "Saving…",
+      buttonWithLeadingLabel: "With icon",
       fieldTextInputLabel: "Text input",
       fieldTextInputDescription: "Shared calm field surface.",
       fieldTextInputValue: "Button copy",

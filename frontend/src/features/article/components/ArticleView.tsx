@@ -6,7 +6,7 @@ import { formatDate } from "@/shared/lib/date/format-date";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
 import { fromNullable, unwrapOr } from "@/shared/lib/monads/option";
 import { usePreferences } from "@/shared/store/preferences";
-import { Button } from "@/shared/ui/primitives";
+import { ButtonSecondaryMd } from "@/shared/ui/primitives";
 
 import styles from "./ArticleView.module.css";
 
@@ -114,9 +114,7 @@ export function ArticleView({
         {restoreNoticeVisible ? (
           <div className={styles.progressNotice}>
             <span>{copy.article.restoreNotice}</span>
-            <Button onClick={scrollToTop} tone="secondary" type="button">
-              {copy.article.scrollToTop}
-            </Button>
+            <ButtonSecondaryMd onClick={scrollToTop}>{copy.article.scrollToTop}</ButtonSecondaryMd>
           </div>
         ) : null}
         <div className={styles.body} ref={registerArticleBodyElement}>

@@ -7,7 +7,7 @@ import { isSome, none, unwrapOr } from "@/shared/lib/monads/option";
 import type { Option } from "@/shared/lib/monads/option";
 import type { ResourceState } from "@/shared/lib/resource/resource-state";
 import { useUiCopy } from "@/shared/lib/i18n/use-ui-copy";
-import { Button } from "@/shared/ui/primitives";
+import { ButtonGhostMd, ButtonSecondaryMd } from "@/shared/ui/primitives";
 
 import styles from "./ContextPanel.module.css";
 
@@ -31,15 +31,13 @@ function renderParentSection(
   return (
     <section className={styles.section}>
       <div className={styles.title}>{title}</div>
-      <Button
+      <ButtonSecondaryMd
         onClick={() => {
           onNavigate(parent.value.path);
         }}
-        tone="secondary"
-        type="button"
       >
         {backToLabel(parent.value.title)}
-      </Button>
+      </ButtonSecondaryMd>
     </section>
   );
 }
@@ -84,7 +82,7 @@ export function ContextPanel({
           <div className={styles.title}>{copy.contextPanel.tocTitle}</div>
           <div className={styles.toc}>
             {resource.value.content.toc.map((item) => (
-              <Button
+              <ButtonGhostMd
                 aria-current={item.id === activeHeadingId ? "location" : false}
                 className={[
                   styles.tocItem,
@@ -96,11 +94,9 @@ export function ContextPanel({
                 onClick={() => {
                   onScrollToHeading(item.id);
                 }}
-                tone="ghost"
-                type="button"
               >
                 {item.title}
-              </Button>
+              </ButtonGhostMd>
             ))}
           </div>
         </section>
@@ -121,17 +117,15 @@ export function ContextPanel({
         <section className={styles.section}>
           <div className={styles.title}>{copy.contextPanel.recentTitle}</div>
           {context.recentEntries.map((entry) => (
-            <Button
+            <ButtonGhostMd
               className={styles.tocItem}
               key={entry.id}
               onClick={() => {
                 onNavigate(entry.path);
               }}
-              tone="ghost"
-              type="button"
             >
               {entry.title}
-            </Button>
+            </ButtonGhostMd>
           ))}
         </section>
       ) : null}

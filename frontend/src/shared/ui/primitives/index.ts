@@ -1,5 +1,13 @@
 export { Button } from "./Button";
-export type { ButtonProps } from "./button.types";
+export { createButtonPreset } from "./button-factory";
+export {
+  ButtonGhostMd,
+  ButtonGhostSm,
+  ButtonPrimaryMd,
+  ButtonSecondaryMd,
+  ButtonSecondarySm,
+} from "./button-presets";
+export type { ButtonAffixSlot, ButtonOwnProps, ButtonProps, ButtonSize, ButtonTone } from "./button.types";
 export { Field } from "./Field";
 export { FieldRow } from "./FieldRow";
 export { SelectInput } from "./SelectInput";

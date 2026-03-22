@@ -14,7 +14,7 @@ import { usePreferences } from "@/shared/store/preferences";
 import { useStyleContext } from "@/shared/ui/foundation";
 import { useOverviewCopy } from "@/site/overview/overview-copy";
 import { Grid, Inline, Stack, Surface } from "@/shared/ui/layout";
-import { Button, SegmentedControl, Tag } from "@/shared/ui/primitives";
+import { ButtonGhostMd, ButtonGhostSm, SegmentedControl, Tag } from "@/shared/ui/primitives";
 import { iconStyle } from "@/shared/ui/primitives/Icon.style";
 import {
   ArticleIcon,
@@ -79,16 +79,14 @@ export function OverviewPathBar({
       <Inline align="between" className="overview-topbar__row" gap="md" wrap>
         <Inline className="overview-breadcrumbs" gap="xs" wrap>
           {isCompact ? (
-            <Button onClick={onOpenNavigation} size="sm" tone="ghost">
-              {copy.topBar.filesButton}
-            </Button>
+            <ButtonGhostSm onClick={onOpenNavigation}>{copy.topBar.filesButton}</ButtonGhostSm>
           ) : null}
           {breadcrumbs.map((segment, index) => {
             const isCurrent = index === breadcrumbs.length - 1;
 
             return (
               <Inline className="overview-breadcrumbs__group" gap="xs" key={segment.id}>
-                <Button
+                <ButtonGhostMd
                   aria-current={isCurrent ? "page" : false}
                   className="overview-breadcrumbs__button"
                   disabled={isCurrent}
@@ -97,11 +95,9 @@ export function OverviewPathBar({
                       onNavigate(segment.path);
                     }
                   }}
-                  tone="ghost"
-                  type="button"
                 >
                   {segment.title}
-                </Button>
+                </ButtonGhostMd>
                 {isCurrent ? null : <span className="overview-breadcrumbs__separator">/</span>}
               </Inline>
             );
@@ -120,26 +116,17 @@ export function OverviewPathBar({
             ]}
             value={density}
           />
-          <Button
+          <ButtonGhostSm
             aria-label={getThemeToggleAriaLabel(locale, theme)}
             onClick={toggleTheme}
-            size="sm"
-            tone="ghost"
           >
             {theme === "light" ? <MoonIcon size={16} /> : <SunIcon size={16} />}
-          </Button>
-          <Button
-            aria-label={ui.localeToggle.ariaLabel}
-            onClick={toggleLocale}
-            size="sm"
-            tone="ghost"
-          >
+          </ButtonGhostSm>
+          <ButtonGhostSm aria-label={ui.localeToggle.ariaLabel} onClick={toggleLocale}>
             {ui.localeToggle.buttonLabel}
-          </Button>
+          </ButtonGhostSm>
           {showContextToggle ? (
-            <Button onClick={onOpenContext} size="sm" tone="ghost">
-              {copy.topBar.contextButton}
-            </Button>
+            <ButtonGhostSm onClick={onOpenContext}>{copy.topBar.contextButton}</ButtonGhostSm>
           ) : null}
         </Inline>
       </Inline>
@@ -196,8 +183,8 @@ export function OverviewFileTree({
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
               >
-                <Button
-                  aria-expanded={showDisclosure ? isExpanded : undefined}
+                <ButtonGhostMd
+                  {...(showDisclosure ? { "aria-expanded": isExpanded } : {})}
                   className="overview-tree__trigger"
                   disabled={!showDisclosure}
                   onClick={() => {
@@ -205,26 +192,24 @@ export function OverviewFileTree({
                       toggleNode(row.node.id);
                     }
                   }}
-                  tone="ghost"
-                  type="button"
                 >
                   {showDisclosure ? (
                     isExpanded ? <ChevronDownIcon size={14} /> : <ChevronRightIcon size={14} />
-                  ) : null}
-                </Button>
+                  ) : (
+                    false
+                  )}
+                </ButtonGhostMd>
                 {renderNodeIcon(row.node.kind)}
-                <Button
+                <ButtonGhostMd
                   className="overview-tree__label"
                   onClick={() => {
                     startTransition(() => {
                       onNavigate(nodePath);
                     });
                   }}
-                  tone="ghost"
-                  type="button"
                 >
                   {row.node.title}
-                </Button>
+                </ButtonGhostMd>
               </div>
             );
           })}
@@ -290,7 +275,7 @@ export function OverviewContextPanel({
           <Stack gap="sm">
             <div className="overview-section-title">{copy.context.onThisPageTitle}</div>
             {resource.value.content.toc.map((item) => (
-              <Button
+              <ButtonGhostMd
                 className={[
                   "overview-context-link",
                   item.id === activeHeadingId ? "overview-context-link--active" : "",
@@ -301,11 +286,9 @@ export function OverviewContextPanel({
                 onClick={() => {
                   onScrollToHeading(item.id);
                 }}
-                tone="ghost"
-                type="button"
               >
                 {item.title}
-              </Button>
+              </ButtonGhostMd>
             ))}
           </Stack>
         </Surface>
@@ -336,17 +319,15 @@ export function OverviewContextPanel({
           <Stack gap="sm">
             <div className="overview-section-title">{copy.context.recentEntriesTitle}</div>
             {context.recentEntries.map((entry) => (
-              <Button
+              <ButtonGhostMd
                 className="overview-context-link"
                 key={entry.id}
                 onClick={() => {
                   onNavigate(entry.path);
                 }}
-                tone="ghost"
-                type="button"
               >
                 {entry.title}
-              </Button>
+              </ButtonGhostMd>
             ))}
           </Stack>
         </Surface>

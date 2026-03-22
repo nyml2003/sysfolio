@@ -126,6 +126,77 @@
     text-align: left;
   }
 
+  /* `Button` adds `.sf-button` (control height, padding, hover surface); reset for rail chrome */
+  .overview-tree__trigger.sf-button {
+    min-block-size: 1rem;
+    max-block-size: 1rem;
+    min-inline-size: 1rem;
+    max-inline-size: 1rem;
+    padding: 0;
+    gap: 0;
+    border: none;
+    border-radius: var(--sf-radius-md);
+    background: transparent;
+    box-shadow: none;
+    color: inherit;
+    font: inherit;
+    font-weight: inherit;
+    transform: none;
+  }
+
+  .overview-tree__trigger.sf-button:hover {
+    transform: none;
+  }
+
+  .overview-tree__label.sf-button {
+    display: block;
+    inline-size: 100%;
+    min-block-size: 0;
+    padding: 0;
+    gap: 0;
+    border: none;
+    border-radius: var(--sf-radius-md);
+    background: transparent;
+    box-shadow: none;
+    color: inherit;
+    font: inherit;
+    font-weight: inherit;
+    transform: none;
+    justify-content: flex-start;
+  }
+
+  .overview-tree__label.sf-button:hover {
+    transform: none;
+  }
+
+  .overview-breadcrumbs__button.sf-button {
+    min-block-size: 0;
+    padding: 0;
+    gap: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .overview-breadcrumbs__button.sf-button:hover {
+    transform: none;
+  }
+
+  .overview-context-link.sf-button {
+    min-block-size: 0;
+    padding: 0;
+    gap: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .overview-context-link.sf-button:hover {
+    transform: none;
+  }
+
   .overview-tree__label,
   .overview-context-link {
     color: inherit;
@@ -148,6 +219,35 @@
   }
 
   .overview-demo__title { margin: 0; font-size: 1.05rem; }
+
+  .overview-demo-deck {
+    margin-block-end: var(--sf-space-2);
+  }
+
+  .overview-demo__subsection + .overview-demo__subsection {
+    padding-block-start: var(--sf-space-6);
+    border-block-start: 1px solid var(--sf-color-border);
+  }
+
+  .overview-demo-list {
+    margin: 0;
+    padding-inline-start: var(--sf-space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sf-space-2);
+    color: var(--sf-color-text-subtle);
+    font-size: 0.92rem;
+    line-height: 1.55;
+    list-style-type: disc;
+  }
+
+  .overview-demo-list li {
+    padding-inline-start: var(--sf-space-1);
+  }
+
+  .overview-demo-list li::marker {
+    color: var(--sf-color-text-faint);
+  }
   .overview-runtime-card__value { margin-top: var(--sf-space-2); font-size: 1.25rem; font-weight: 700; }
 
   .overview-token-swatch {

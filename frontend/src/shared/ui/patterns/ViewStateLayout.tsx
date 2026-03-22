@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { isSome, none, type Option } from "@/shared/lib/monads/option";
-import { Button } from "@/shared/ui/primitives";
+import { ButtonSecondaryMd } from "@/shared/ui/primitives";
 import { Stack, Surface } from "@/shared/ui/layout";
 
 type ViewStateLayoutState = "ready" | "loading" | "empty" | "error";
@@ -33,9 +33,7 @@ export function ViewStateLayout({
         {isSome(title) ? <h2 className="sf-view-state__title">{title.value}</h2> : null}
         {isSome(body) ? <p className="sf-view-state__body">{body.value}</p> : null}
         {isSome(actionLabel) && isSome(onAction) ? (
-          <Button onClick={onAction.value} tone="secondary">
-            {actionLabel.value}
-          </Button>
+          <ButtonSecondaryMd onClick={onAction.value}>{actionLabel.value}</ButtonSecondaryMd>
         ) : null}
       </Stack>
     </Surface>

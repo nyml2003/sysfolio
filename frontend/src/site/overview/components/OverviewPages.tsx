@@ -17,7 +17,7 @@ import { fromNullable, isSome, none, unwrapOr } from "@/shared/lib/monads/option
 import { usePreferences } from "@/shared/store/preferences";
 import { useOverviewCopy } from "@/site/overview/overview-copy";
 import { Grid, Inline, Stack, Surface } from "@/shared/ui/layout";
-import { Button, Tag } from "@/shared/ui/primitives";
+import { ButtonGhostMd, ButtonSecondaryMd, Tag } from "@/shared/ui/primitives";
 
 import { OverviewDemoDeck } from "../demo/OverviewDemos";
 
@@ -88,9 +88,9 @@ export function OverviewHomePage({
               <p className="overview-copy">{collection.description}</p>
               <Stack gap="xs">
                 {collection.entries.map((entry) => (
-                  <Button key={entry.path} onClick={() => onNavigate(entry.path)} tone="ghost">
+                  <ButtonGhostMd key={entry.path} onClick={() => onNavigate(entry.path)}>
                     {entry.label}
-                  </Button>
+                  </ButtonGhostMd>
                 ))}
               </Stack>
             </Stack>
@@ -102,18 +102,16 @@ export function OverviewHomePage({
           <div className="overview-section-title">{copy.home.recentDocsTitle}</div>
           <Grid columns={3}>
             {context.recentEntries.map((entry) => (
-              <Button
+              <ButtonGhostMd
                 className="overview-link-card"
                 key={entry.id}
                 onClick={() => onNavigate(entry.path)}
-                tone="ghost"
-                type="button"
               >
                 <Stack gap="xs">
                   <strong>{entry.title}</strong>
                   <div className="overview-copy">{unwrapOr(entry.description, "")}</div>
                 </Stack>
-              </Button>
+              </ButtonGhostMd>
             ))}
           </Grid>
         </Stack>
@@ -143,12 +141,10 @@ export function OverviewDirectoryPage({
       </Stack>
       <Grid columns={3}>
         {content.children.map((entry) => (
-          <Button
+          <ButtonGhostMd
             className="overview-link-card"
             key={entry.id}
             onClick={() => onNavigate(entry.path)}
-            tone="ghost"
-            type="button"
           >
             <Stack gap="sm">
               <Inline align="between" wrap>
@@ -164,7 +160,7 @@ export function OverviewDirectoryPage({
                 {unwrapOr(entry.description, copy.directory.entryFallbackDescription)}
               </div>
             </Stack>
-          </Button>
+          </ButtonGhostMd>
         ))}
       </Grid>
     </Stack>
@@ -215,7 +211,7 @@ export function OverviewArticlePage({
 
   return (
     <article className="overview-page overview-article">
-      <Stack gap="lg">
+      <Stack gap="xl">
         <Stack className="overview-hero" gap="sm">
           <div className="overview-eyebrow">{document.eyebrow}</div>
           <h1 className="overview-title">{document.title}</h1>
@@ -236,9 +232,7 @@ export function OverviewArticlePage({
           <Surface tone="accent">
             <Inline align="between" wrap>
               <div className="overview-copy">{ui.article.restoreNotice}</div>
-              <Button onClick={scrollToTop} tone="secondary">
-                {ui.article.scrollToTop}
-              </Button>
+              <ButtonSecondaryMd onClick={scrollToTop}>{ui.article.scrollToTop}</ButtonSecondaryMd>
             </Inline>
           </Surface>
         ) : null}

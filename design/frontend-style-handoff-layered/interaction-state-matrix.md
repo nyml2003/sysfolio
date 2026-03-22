@@ -131,6 +131,8 @@
 
 ### 1. Text And Inline Semantics
 
+- `Heading`
+  支持 `default / current / muted`
 - `Text`
   支持 `default / muted / success / warning / destructive / disabled`
 - `Label`

@@ -94,6 +94,28 @@
     color: inherit;
   }
 
+  /* `Button` adds global `.sf-button` (padding, min-height, hover surface); reset for tree row chrome */
+  .trigger:global(.sf-button) {
+    min-block-size: 1rem;
+    max-block-size: 1rem;
+    min-inline-size: 1rem;
+    max-inline-size: 1rem;
+    padding: 0;
+    gap: 0;
+    border: none;
+    border-radius: var(--sys-radius-8);
+    background: transparent;
+    box-shadow: none;
+    color: inherit;
+    font: inherit;
+    font-weight: inherit;
+    transform: none;
+  }
+
+  .trigger:global(.sf-button):hover {
+    transform: none;
+  }
+
   .label {
     min-inline-size: 0;
     overflow: hidden;
@@ -103,6 +125,28 @@
     font-size: var(--sys-font-size-13);
     line-height: var(--sys-line-height-ui);
     text-align: left;
+  }
+
+  .label:global(.sf-button) {
+    display: block;
+    inline-size: 100%;
+    min-block-size: 0;
+    padding: 0;
+    gap: 0;
+    border: none;
+    border-radius: var(--sys-radius-8);
+    background: transparent;
+    box-shadow: none;
+    color: inherit;
+    font: inherit;
+    font-weight: inherit;
+    text-align: left;
+    transform: none;
+    justify-content: flex-start;
+  }
+
+  .label:global(.sf-button):hover {
+    transform: none;
   }
 
   .trigger:focus-visible,

@@ -71,6 +71,15 @@
 
 这组对象目前还没有单独拆出 `styles/primitives/content.css`，但在设计层面已经应被视作 primitive。
 
+### Heading
+
+- Support: `priority-next`
+- Purpose: 承担结构化标题，而不是让上层自由配置 `h1 / h2 / h3` 的字面样式。
+- Structure/slots: `content / anchor? / leadingIcon? / trailingMeta?`
+- Variants: `display / section / subsection / caption-heading`
+- States: `default / current / muted`
+- Known gaps: level 和视觉 variant 的映射、anchor affordance、heading group 与 summary 的组合还需补。
+
 ### Text
 
 - Support: `priority-next`
@@ -115,6 +124,15 @@
 - Variants: `default`
 - States: `default`
 - Known gaps: 多平台快捷键映射和本地化展示规则需要和 preference / capability 一起看。
+
+### Tag Ownership Note
+
+- `h1 - h6`
+  语义层级由上层结构决定，但视觉必须通过 `Heading primitive` 或 `Prose pattern` 统一承接。
+- `p`
+  在 prose/reading 容器中由 pattern 自动接管；在普通 UI 中应落到 `Text.body`。
+- `span`
+  默认只是 inline wrapper，不是设计对象；只有承担明确角色时才升级成 `Link / CodeInline / Kbd / emphasis / hit` 等受控原件。
 
 ## Actions
 

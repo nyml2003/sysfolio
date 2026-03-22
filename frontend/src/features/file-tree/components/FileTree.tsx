@@ -21,7 +21,7 @@ import {
   MediaIcon,
 } from "@/shared/ui/primitives/Icon";
 import { iconStyle } from "@/shared/ui/primitives/Icon.style";
-import { Button } from "@/shared/ui/primitives";
+import { ButtonGhostMd } from "@/shared/ui/primitives";
 import styles from "./FileTree.module.css";
 
 import {
@@ -136,15 +136,15 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                   paddingInlineStart: `calc(var(--sys-space-8) + ${row.depth} * var(--sys-space-12))`,
                 }}
               >
-                <Button
-                  aria-expanded={showDisclosure ? isExpanded : undefined}
-                  aria-label={
-                    showDisclosure
-                      ? isExpanded
-                        ? copy.fileTree.collapseDirectory(row.node.title)
-                        : copy.fileTree.expandDirectory(row.node.title)
-                      : undefined
-                  }
+                <ButtonGhostMd
+                  {...(showDisclosure
+                    ? {
+                        "aria-expanded": isExpanded,
+                        "aria-label": isExpanded
+                          ? copy.fileTree.collapseDirectory(row.node.title)
+                          : copy.fileTree.expandDirectory(row.node.title),
+                      }
+                    : {})}
                   className={styles.trigger}
                   disabled={!showDisclosure || isLoading}
                   onClick={() => {
@@ -154,8 +154,6 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
 
                     toggleNode(row.node.id);
                   }}
-                  tone="ghost"
-                  type="button"
                 >
                   {showDisclosure ? (
                     isExpanded ? (
@@ -163,10 +161,12 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                     ) : (
                       <ChevronRightIcon size={FILE_TREE_DISCLOSURE_ICON_SIZE} />
                     )
-                  ) : null}
-                </Button>
+                  ) : (
+                    false
+                  )}
+                </ButtonGhostMd>
                 {renderNodeIcon(row.node)}
-                <Button
+                <ButtonGhostMd
                   aria-current={row.isSelected ? "page" : false}
                   className={styles.label}
                   onClick={() => {
@@ -174,11 +174,9 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                       onNavigate(nodePath);
                     });
                   }}
-                  tone="ghost"
-                  type="button"
                 >
                   {row.node.title}
-                </Button>
+                </ButtonGhostMd>
                 {row.node.status === "coming_soon" ? (
                   <span className={styles.statusDot} />
                 ) : null}
