@@ -932,6 +932,263 @@
   .sf-tag--warning { background: var(--sf-color-surface-warning); color: var(--sf-color-warning-strong); }
   .sf-tag--danger { background: var(--sf-color-surface-danger); color: var(--sf-color-danger-strong); }
 
+  @keyframes sf-search-input-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* SearchInput — primitive-component-catalog：关键词查找；filled 由受控 value 推导 */
+  .sf-search-input {
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: var(--sf-space-2);
+    min-block-size: var(--sf-control-height);
+    max-inline-size: 100%;
+    padding-inline: var(--sf-space-3);
+    border: 1px solid var(--sf-color-border);
+    border-radius: var(--sf-radius-md);
+    background: var(--sf-color-surface-raised);
+    color: var(--sf-color-text);
+    transition:
+      border-color var(--sf-duration-fast) var(--sf-ease-standard),
+      opacity var(--sf-duration-fast) var(--sf-ease-standard);
+  }
+
+  .sf-search-input:hover:not(.sf-search-input--disabled) {
+    border-color: var(--sf-color-border-strong);
+  }
+
+  .sf-search-input:focus-within {
+    outline: 2px solid var(--sf-color-accent);
+    outline-offset: 1px;
+  }
+
+  .sf-search-input--subtle {
+    background: transparent;
+  }
+
+  .sf-search-input--filled:not(.sf-search-input--disabled) {
+    background: var(--sf-color-surface-raised);
+  }
+
+  .sf-search-input--subtle.sf-search-input--filled {
+    background: var(--sf-color-surface-muted);
+  }
+
+  .sf-search-input--loading {
+    opacity: 0.88;
+  }
+
+  .sf-search-input--disabled {
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .sf-search-input__leading {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    color: var(--sf-color-text-muted);
+  }
+
+  .sf-search-input__control {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    min-block-size: 0;
+    border: none;
+    padding-block: var(--sf-space-2);
+    background: transparent;
+    color: inherit;
+    font-family: var(--sf-font-ui);
+    font-size: 0.875rem;
+    line-height: 1.25;
+    outline: none;
+  }
+
+  .sf-search-input__control::placeholder {
+    color: var(--sf-color-text-faint);
+  }
+
+  .sf-search-input__control[type="search"]::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  .sf-search-input__trailing {
+    display: inline-flex;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sf-space-2);
+  }
+
+  .sf-search-input__slot {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .sf-search-input__spinner {
+    display: inline-block;
+    inline-size: 1rem;
+    block-size: 1rem;
+    border: 2px solid var(--sf-color-border);
+    border-top-color: var(--sf-color-accent);
+    border-radius: 999px;
+    animation: sf-search-input-spin 0.75s linear infinite;
+  }
+
+  .sf-search-input__scope {
+    display: inline-flex;
+    align-items: center;
+    padding-inline-start: var(--sf-space-2);
+    border-inline-start: 1px solid var(--sf-color-border);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--sf-color-text-muted);
+  }
+
+  /* NumberInput — primitive-component-catalog：数值与步进；内置 − / + 当 step 槽为 none */
+  .sf-number-input {
+    box-sizing: border-box;
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: var(--sf-space-2);
+    max-inline-size: 100%;
+    min-block-size: var(--sf-control-height);
+    padding-inline: var(--sf-space-2);
+    border: 1px solid var(--sf-color-border);
+    border-radius: var(--sf-radius-md);
+    background: var(--sf-color-surface-raised);
+    color: var(--sf-color-text);
+    transition:
+      border-color var(--sf-duration-fast) var(--sf-ease-standard),
+      opacity var(--sf-duration-fast) var(--sf-ease-standard);
+  }
+
+  .sf-number-input:hover:not(.sf-number-input--disabled) {
+    border-color: var(--sf-color-border-strong);
+  }
+
+  .sf-number-input:focus-within {
+    outline: 2px solid var(--sf-color-accent);
+    outline-offset: 1px;
+  }
+
+  .sf-number-input--invalid {
+    border-color: var(--sf-color-danger-strong);
+  }
+
+  .sf-number-input--warning {
+    border-color: var(--sf-color-warning-strong);
+  }
+
+  .sf-number-input--success {
+    border-color: var(--sf-color-success-strong);
+  }
+
+  .sf-number-input--loading {
+    opacity: 0.88;
+  }
+
+  .sf-number-input--disabled {
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .sf-number-input--read-only .sf-number-input__control {
+    cursor: default;
+  }
+
+  .sf-number-input__prefix,
+  .sf-number-input__suffix {
+    display: inline-flex;
+    align-items: center;
+    padding-inline: var(--sf-space-1);
+    font-size: 0.8125rem;
+    color: var(--sf-color-text-muted);
+  }
+
+  .sf-number-input__control {
+    flex: 1 1 auto;
+    min-inline-size: 3rem;
+    min-block-size: 0;
+    border: none;
+    padding-block: var(--sf-space-2);
+    background: transparent;
+    color: inherit;
+    font-family: var(--sf-font-ui);
+    font-size: 0.875rem;
+    line-height: 1.25;
+    outline: none;
+  }
+
+  .sf-number-input__control::-webkit-outer-spin-button,
+  .sf-number-input__control::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  .sf-number-input__control[type="number"] {
+    appearance: textfield;
+  }
+
+  .sf-number-input__spinner {
+    align-self: center;
+    display: inline-block;
+    inline-size: 1rem;
+    block-size: 1rem;
+    border: 2px solid var(--sf-color-border);
+    border-top-color: var(--sf-color-accent);
+    border-radius: 999px;
+    animation: sf-search-input-spin 0.75s linear infinite;
+  }
+
+  .sf-number-input__steps {
+    display: inline-flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    gap: 1px;
+    border-inline-start: 1px solid var(--sf-color-border);
+    padding-inline-start: var(--sf-space-1);
+  }
+
+  .sf-number-input__step,
+  .sf-number-input__step-slot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 1.75rem;
+    min-block-size: 1.25rem;
+  }
+
+  .sf-number-input__step {
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: var(--sf-radius-control);
+    background: var(--sf-color-surface-muted);
+    color: var(--sf-color-text);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      background-color var(--sf-duration-fast) var(--sf-ease-standard),
+      color var(--sf-duration-fast) var(--sf-ease-standard);
+  }
+
+  .sf-number-input__step:hover:not(:disabled) {
+    background: var(--sf-color-border);
+  }
+
+  .sf-number-input__step:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
   .sf-field { min-inline-size: min(100%, 17rem); }
   .sf-field__description { color: var(--sf-color-text-subtle); font-size: 0.84rem; line-height: 1.5; }
   .sf-field-row { align-items: stretch; }

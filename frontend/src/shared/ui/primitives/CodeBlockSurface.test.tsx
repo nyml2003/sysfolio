@@ -19,6 +19,18 @@ const emptySlots = {
 };
 
 describe('CodeBlockSurface', () => {
+  it('renders code string with pre/code shell classes', () => {
+    const { container } = render(
+      <CodeBlockSurface {...emptySlots} code="const x = 1;" scrollable={false} variant="default" />
+    );
+
+    expect(container.querySelector('.sf-code-block-surface__pre')).toBeTruthy();
+
+    expect(container.querySelector('.sf-code-block-surface__code')).toBeTruthy();
+
+    expect(screen.getByText('const x = 1;')).toBeTruthy();
+  });
+
   it('renders body', () => {
     render(
       <CodeBlockSurface {...emptySlots} scrollable={false} variant="default">

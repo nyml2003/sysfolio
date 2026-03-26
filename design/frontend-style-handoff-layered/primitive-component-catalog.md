@@ -17,6 +17,7 @@
 
 对应 CSS：
 
+- `styles/primitives/content.css`
 - `styles/primitives/actions.css`
 - `styles/primitives/data-entry.css`
 - `styles/primitives/navigation.css`
@@ -69,11 +70,11 @@
 
 ## Text And Inline Semantics
 
-这组对象目前还没有单独拆出 `styles/primitives/content.css`，但在设计层面已经应被视作 primitive。
+这组对象现在已经单独落在 `styles/primitives/content.css`，并作为独立 primitive 家族维护。
 
 ### Heading
 
-- Support: `priority-next`
+- Support: `baseline`
 - Purpose: 承担结构化标题，而不是让上层自由配置 `h1 / h2 / h3` 的字面样式。
 - Structure/slots: `content / anchor? / leadingIcon? / trailingMeta?`
 - Variants: `display / section / subsection / caption-heading`
@@ -82,7 +83,7 @@
 
 ### Text
 
-- Support: `priority-next`
+- Support: `baseline`
 - Purpose: 统一 UI 文案、说明文、弱化文本与技术文本的排版原件。
 - Structure/slots: `content`
 - Variants: `ui / body / strong / subtle / caption / mono`
@@ -91,7 +92,7 @@
 
 ### Label
 
-- Support: `priority-next`
+- Support: `baseline`
 - Purpose: 为单个控件或一组控件提供名称。
 - Structure/slots: `content / requiredMark? / optionalMark? / infoAffordance?`
 - Variants: `default / strong / subtle`
@@ -100,7 +101,7 @@
 
 ### Link
 
-- Support: `priority-next`
+- Support: `baseline`
 - Purpose: 承担导航型文本交互，而不是动作型点击。
 - Structure/slots: `label / leadingIcon? / trailingIcon?`
 - Variants: `default / subtle / external`
@@ -109,7 +110,7 @@
 
 ### CodeInline
 
-- Support: `later`
+- Support: `baseline`
 - Purpose: 展示命令、路径、代码标识等技术字面量。
 - Structure/slots: `content`
 - Variants: `code / code-strong`
@@ -118,16 +119,17 @@
 
 ### CodeBlockSurface
 
-- Support: `priority-next`
+- Support: `baseline`
 - Purpose: 承接块级代码的基础表面能力，而不是让业务层直接给 `pre / code` 自由写样式。
 - Structure/slots: `header? / language? / meta? / actions? / body / footer?`
+- Body contract: `body` slot 自己就应承接多行代码排版；`pre / code` 只作为可选语义标签，不应成为样式必填结构。
 - Variants: `default / command / diff-neutral`
 - States: `default / focus-within / wrapped / scrollable`
 - Known gaps: line numbers、highlighted lines、copy feedback、folding 和 diff semantics 不属于 surface，需要交给更上层 pattern。
 
 ### Kbd
 
-- Support: `later`
+- Support: `baseline`
 - Purpose: 展示快捷键按键组合。
 - Structure/slots: `key[]`
 - Variants: `default`
@@ -603,7 +605,7 @@
 1. 继续补齐 `Combobox / Menu / DialogContent / DrawerContent / TableRow` 的高级子场景。
 2. 收完整体 primitive 的 `success / warning / destructive` 在不同家族中的重量边界。
 3. 再校准 coarse pointer 下 icon-only 控件、trigger 类控件和 overlay 关闭控件的点击基线。
-4. 把新增的 `Heading / Text / Label / Link / SearchInput / NumberInput / DateInput / Slider / Toolbar / ListItem / MessageBar / Banner / CodeBlockSurface` 继续细化到视觉 spec 和状态矩阵。
+4. 把 `SearchInput / NumberInput / DateInput / Slider / Toolbar / ListItem / MessageBar / Banner` 继续细化到视觉 spec、状态矩阵和对象级 CSS 合同。
 
 ## 当前边界
 

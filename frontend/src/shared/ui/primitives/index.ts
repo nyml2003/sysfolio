@@ -54,6 +54,18 @@ export { FieldRow } from './FieldRow';
 export { SelectInput } from './SelectInput';
 export { TextArea } from './TextArea';
 export { TextInput } from './TextInput';
+export { SearchInput } from './SearchInput';
+export type {
+  SearchInputOwnProps,
+  SearchInputProps,
+  SearchInputVariant,
+} from './search-input.types';
+export { NumberInput } from './NumberInput';
+export type {
+  NumberInputOwnProps,
+  NumberInputProps,
+  NumberInputVariant,
+} from './number-input.types';
 export { Notice } from './Notice';
 export { ProgressBar } from './ProgressBar';
 export { SegmentedControl } from './SegmentedControl';

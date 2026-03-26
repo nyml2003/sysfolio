@@ -1,5 +1,5 @@
-import type { Option } from './option.types';
+import type { Option, TNone } from './option.types';
 
-export function isNone<T>(option: Option<T>): option is { tag: 'none' } {
+export function isNone(option: Option<unknown>): option is TNone {
   return option.tag === 'none';
 }

@@ -112,3 +112,13 @@ export function SunIcon(props: Omit<IconProps, 'children'>) {
     </IconBase>
   );
 }
+
+/** SearchInput 默认 leading；primitive-component-catalog leadingSearchIcon 槽位 */
+export function SearchIcon(props: Omit<IconProps, 'children'>) {
+  return (
+    <IconBase {...props}>
+      <circle cx="10.5" cy="10.5" r="5.5" />
+      <path d="M15 15l4.5 4.5" />
+    </IconBase>
+  );
+}

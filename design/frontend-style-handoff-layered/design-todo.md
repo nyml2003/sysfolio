@@ -17,7 +17,7 @@
 
 这些是当前最应继续推进的事项：
 
-1. 补齐 primitive 缺口，重点收口 `Select / Combobox / Menu / DialogContent / TableRow / DrawerContent` 的高级场景，并把 `Heading / Text / Label / Link / SearchInput / NumberInput / DateInput / Slider / Toolbar / ListItem / MessageBar / Banner / CodeBlockSurface` 这批 `priority-next` 原件继续细化到对象级视觉合同、状态矩阵和未来 CSS 落点。
+1. 补齐 primitive 缺口，重点收口 `Select / Combobox / Menu / DialogContent / TableRow / DrawerContent` 的高级场景，并把 `SearchInput / NumberInput / DateInput / Slider / Toolbar / ListItem / MessageBar / Banner` 这批仍未完全收口的 `priority-next` 原件继续细化到对象级视觉合同、状态矩阵和 CSS 落点。
 2. 收完整交互状态矩阵，补齐 `success / warning / destructive / drag-target / reordering` 在不同 primitive 与 pattern 中的边界。
 3. 定稿 `medium / compact` 下左右栏、TOC、ContextPanel 与 PathBar 的最终交互策略。
 4. 再收一轮 `TOC / FileTree / PathBar` 的状态层级，明确 `current / selected / search-match / clickable` 的视觉差异。

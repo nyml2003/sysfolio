@@ -16,10 +16,12 @@
 这份规范主要对应以下文件：
 
 - `styles/primitives/actions.css`
+- `styles/primitives/content.css`
 - `styles/primitives/data-entry.css`
 - `styles/primitives/data-display.css`
 - `styles/primitives/feedback.css`
 - `styles/primitives/overlays.css`
+- `styles/patterns/reading.css`
 - `styles/patterns/tree-navigation.css`
 - `styles/patterns/view-states.css`
 - `styles/business/navigation.css`

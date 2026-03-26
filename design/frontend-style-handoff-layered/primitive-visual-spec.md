@@ -15,6 +15,7 @@
 
 这份规范对应以下文件：
 
+- `styles/primitives/content.css`
 - `styles/primitives/actions.css`
 - `styles/primitives/data-entry.css`
 - `styles/primitives/navigation.css`
@@ -22,12 +23,8 @@
 - `styles/primitives/feedback.css`
 - `styles/primitives/overlays.css`
 
-如后续把基础文本与语义原件正式拆层，建议新增：
-
-- `styles/primitives/content.css`
-
 这份规范现在已经覆盖 `Select / Combobox / Menu / Dialog content / Table row` 这批新增 primitive；后续继续扩展同家族控件时，也应先对齐这份规范，再写具体样式。  
-[primitive-component-catalog.md](primitive-component-catalog.md) 中新加入的 `Text / Label / Link / SearchInput / NumberInput / DateInput / Slider / Toolbar / ListItem / MessageBar / Banner` 目前仍属于 `priority-next`，但已经纳入家族级视觉基线；接下来要继续补对象级视觉合同。
+`styles/primitives/content.css` 已正式承接 `Heading / Text / Label / Link / CodeInline / CodeBlockSurface / Kbd`；[primitive-component-catalog.md](primitive-component-catalog.md) 中的 `SearchInput / NumberInput / DateInput / Slider / Toolbar / ListItem / MessageBar / Banner` 仍属于下一轮优先补齐对象级合同的主线。
 
 ## 文档边界
 
@@ -159,6 +156,7 @@ primitive 内部统一按以下顺序表达状态：
 `CodeBlockSurface`
 
 - 只负责块级代码的表面能力，不负责 line number、copy、language badge 这类 richer viewer 功能。
+- `body` slot 必须是自足的代码展示面，不应强迫调用方再手写 `pre / code` 才能获得正确排版。
 - 应和正文区块明确分层，但不能比 dialog / drawer 更重。
 
 `Kbd`
@@ -656,4 +654,4 @@ Phase 1 完成时，至少应满足：
 1. 继续补齐 `Combobox / Menu / DialogContent / DrawerContent / TableRow` 的高级子场景。
 2. 收完整体 primitive 的 `success / warning / destructive` 在不同家族中的重量边界。
 3. 再校准 coarse pointer 下 icon-only 控件、trigger 类控件和 overlay 关闭控件的点击基线。
-4. 继续把 `Heading / Text / Label / Link / SearchInput / NumberInput / DateInput / Slider / Toolbar / ListItem / MessageBar / Banner / CodeBlockSurface` 从家族级视觉原则细化到对象级视觉合同。
+4. 继续把 `SearchInput / NumberInput / DateInput / Slider / Toolbar / ListItem / MessageBar / Banner` 从家族级视觉原则细化到对象级视觉合同，并补内容 primitives 的复杂组合示例。

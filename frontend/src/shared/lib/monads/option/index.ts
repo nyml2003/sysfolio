@@ -1,4 +1,4 @@
-export type { None, Option, Some } from './option.types';
+export type { TNone, TSome, Option } from './option.types';
 export { flatMap } from './flat-map';
 export { fromNullable } from './from-nullable';
 export { isNone } from './is-none';

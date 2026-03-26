@@ -1,12 +1,23 @@
 # SysFolio Frontend Style Handoff Layered Changelog
 
+## 2026-03-23
+
+### Content Primitive Implementation
+
+- 新增 `styles/primitives/content.css`，正式落地 `Heading / Text / Label / Link / CodeInline / CodeBlockSurface / Kbd` 这组内容 primitives。
+- 将 `styles/primitives/index.css` 接入 `content.css`，使内容 primitive 与其余 primitive 家族进入同一聚合入口。
+- 将 `CodeBlockSurface` 的 `body` slot 调整为自足代码展示面，调用方不再需要为了样式手动补 `pre / code`；语义标签仅保留为可选增强。
+- 收紧 `styles/patterns/reading.css`，将其职责收回到 `Document header / ArticleBody / CodeBlock` 的 prose 节奏与 pattern contract，不再把内容样式完全散落在 pattern 内部。
+- 为 `Link` 增加 visited 语义色，并把链接配色调整为更贴近当前暖纸面板系统的 slate 链接色。
+- 将 `primitive-component-catalog.md / primitive-visual-spec.md / interaction-state-matrix.md / design-overview.md / README.md / design-todo.md` 同步到已实现的 `content.css` 结构。
+- 校正文档中的源码入口说明，明确当前 handoff 直接以 `styles/index.css` 为聚合入口，而不是依赖根层兼容 wrapper。
+
 ## 2026-03-22
 
 ### Layered Style Architecture
 
 - 建立 `frontend-style-handoff-layered` 目录，作为并行验证的新 handoff 结构。
 - 将真实样式源码收拢到 `styles/`，明确分为 `tokens / utilities / primitives / patterns / business / component` 六层。
-- 保留根目录 `index.css / tokens.css / utilities.css / primitives.css / patterns.css / business.css / component.css` 作为兼容包装入口。
 - 将 primitive 样式按家族拆分到 `styles/primitives/`，将结构模式收拢到 `styles/patterns/`，将产品语义组件收拢到 `styles/business/`。
 
 ### Design Spec Expansion

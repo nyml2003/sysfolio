@@ -44,8 +44,9 @@
     --sys-color-drag-target-soft: var(--sys-color-info-soft);
     --sys-color-reorder-guide: var(--sys-color-border-strong);
 
-    --sys-color-link: #6679b4;
-    --sys-color-link-hover: #586aa5;
+    --sys-color-link: #6b7898;
+    --sys-color-link-hover: #5d6987;
+    --sys-color-link-visited: #7e6f90;
     --sys-color-code-bg: #f0e3cb;
     --sys-color-code-border: #d9cab0;
     --sys-color-code-text: #3a352e;
@@ -212,8 +213,9 @@
     --sys-color-info: #9fb0da;
     --sys-color-info-soft: #313a4c;
 
-    --sys-color-link: #a6b6e3;
-    --sys-color-link-hover: #bcc9ed;
+    --sys-color-link: #adbbdc;
+    --sys-color-link-hover: #c0ccea;
+    --sys-color-link-visited: #c5bad8;
     --sys-color-code-bg: #2a2e36;
     --sys-color-code-border: #444b57;
     --sys-color-code-text: #d8dde4;

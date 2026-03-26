@@ -51,13 +51,14 @@
 
 - `styles/tokens.css`
 - `styles/utilities.css`
+- `styles/primitives/content.css`
 - `styles/primitives/*`
 - `styles/patterns/*`
 - `styles/business/*`
 - `styles/component.css`
 - `styles/index.css`
 
-根目录中的 `index.css / tokens.css / utilities.css / primitives.css / patterns.css / business.css / component.css` 当前仅保留兼容包装角色。
+当前目录直接以 `styles/index.css` 作为样式聚合入口，没有额外的根层兼容 wrapper。
 
 ## Archive
 

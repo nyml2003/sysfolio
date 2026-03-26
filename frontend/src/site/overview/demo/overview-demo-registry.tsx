@@ -8,6 +8,8 @@ import { LabelDemo } from './demos/label.demo';
 import { TextDemo } from './demos/text.demo';
 import { LinkDemo } from './demos/link.demo';
 import { CodeBlockSurfaceDemo } from './demos/code-block-surface.demo';
+import { SearchInputDemo } from './demos/search-input.demo';
+import { NumberInputDemo } from './demos/number-input.demo';
 import { DesignGapsDemo } from './demos/design-gaps.demo';
 import { FieldInputDemo } from './demos/field-input.demo';
 import { LayoutPrimitivesDemo } from './demos/layout-primitives.demo';
@@ -32,6 +34,8 @@ export const overviewDemoRenderers: Record<OverviewDemoId, () => ReactNode> = {
   text: () => <TextDemo />,
   link: () => <LinkDemo />,
   'code-block-surface': () => <CodeBlockSurfaceDemo />,
+  'search-input': () => <SearchInputDemo />,
+  'number-input': () => <NumberInputDemo />,
   'field-input': () => <FieldInputDemo />,
   'tree-nav': () => <TreeNavDemo />,
   'view-state-layout': () => <ViewStateLayoutDemo />,

@@ -376,7 +376,61 @@ function createOverviewDocumentMetaByLocale(
           owner: 'design',
         },
       ],
-      relatedPaths: ['/primitives/actions/button'],
+      relatedPaths: [
+        '/primitives/data-entry/search-input',
+        '/primitives/data-entry/number-input',
+        '/primitives/actions/button',
+      ],
+    },
+    'doc-search-input': {
+      documentId: 'doc-search-input',
+      layer: 'primitive',
+      status: 'partial',
+      designStatus: 'needs-review',
+      demoIds: ['search-input'],
+      tags: ['search', 'input', 'data-entry'],
+      gaps: [
+        {
+          id: 'search-debounce-scope',
+          title: localize(locale, 'Debounced search and scope', '防抖与范围切换'),
+          description: localize(
+            locale,
+            'Debounced search, scope switching, mobile submit, and recent queries still need pattern-level closure.',
+            '防抖搜索、scope 切换、移动端提交与最近查询仍由 pattern 层收口。'
+          ),
+          owner: 'design',
+        },
+      ],
+      relatedPaths: [
+        '/primitives/data-entry/field-and-input',
+        '/primitives/data-entry/number-input',
+        '/primitives/actions/button',
+      ],
+    },
+    'doc-number-input': {
+      documentId: 'doc-number-input',
+      layer: 'primitive',
+      status: 'partial',
+      designStatus: 'needs-review',
+      demoIds: ['number-input'],
+      tags: ['number', 'input', 'data-entry'],
+      gaps: [
+        {
+          id: 'number-locale-wheel',
+          title: localize(locale, 'Locale formatting and wheel', '本地化与小滚轮'),
+          description: localize(
+            locale,
+            'Locale formatting, mouse wheel, large step, and unit messaging still need systematic follow-up.',
+            '本地化格式、鼠标滚轮、大步进与单位提示仍待系统化。'
+          ),
+          owner: 'design',
+        },
+      ],
+      relatedPaths: [
+        '/primitives/data-entry/field-and-input',
+        '/primitives/data-entry/search-input',
+        '/primitives/actions/button',
+      ],
     },
     'doc-tree-nav': {
       documentId: 'doc-tree-nav',
@@ -900,6 +954,68 @@ function createOverviewArticleDocuments(locale: AppLocale): Record<DocumentId, A
         ),
       ],
     }),
+    'doc-search-input': createArticle({
+      id: 'doc-search-input',
+      title: localize(locale, 'Search Input', '搜索输入'),
+      summary: localize(
+        locale,
+        'SearchInput carries keyword lookup rather than general-purpose text entry.',
+        'SearchInput 承担关键词查找，而不是通用文本填写。'
+      ),
+      eyebrow: localize(locale, 'primitives / data-entry', '基础组件 / 数据录入'),
+      sections: [
+        createSection('search-slots', localize(locale, 'Slots', '插槽'), 2, [
+          localize(
+            locale,
+            'leadingSearchIcon, clear, submit, and scope use Option; loading shows the built-in spinner and aria-busy.',
+            'leadingSearchIcon、clear、submit、scope 使用 Option；loading 展示内置 spinner 与 aria-busy。'
+          ),
+        ]),
+        createSection(
+          'search-variants',
+          localize(locale, 'Variants and filled state', '变体与 filled'),
+          2,
+          [
+            localize(
+              locale,
+              'default and subtle tune the surface; filled is derived from the controlled value when present.',
+              'default 与 subtle 调整表面；在受控 value 存在时由文案推导 filled。'
+            ),
+          ]
+        ),
+      ],
+    }),
+    'doc-number-input': createArticle({
+      id: 'doc-number-input',
+      title: localize(locale, 'Number Input', '数字输入'),
+      summary: localize(
+        locale,
+        'NumberInput carries numeric entry, stepping, and unit slots instead of a plain text field.',
+        'NumberInput 承担数值输入、步进与单位插槽，而不是普通文本框。'
+      ),
+      eyebrow: localize(locale, 'primitives / data-entry', '基础组件 / 数据录入'),
+      sections: [
+        createSection(
+          'number-slots',
+          localize(locale, 'Slots and built-in steppers', '插槽与内置步进'),
+          2,
+          [
+            localize(
+              locale,
+              'prefix and suffix use Option; stepDown and stepUp use Option with built-in minus and plus when none.',
+              'prefix、suffix 使用 Option；stepDown、stepUp 使用 Option，为 none 时提供内置 − 与 +。'
+            ),
+          ]
+        ),
+        createSection('number-variants', localize(locale, 'Semantic variants', '语义变体'), 2, [
+          localize(
+            locale,
+            'invalid, warning, and success tune border feedback; loading sets aria-busy and a spinner.',
+            'invalid、warning、success 调整边框反馈；loading 设置 aria-busy 与 spinner。'
+          ),
+        ]),
+      ],
+    }),
     'doc-tree-nav': createArticle({
       id: 'doc-tree-nav',
       title: 'TreeNav',
@@ -1279,7 +1395,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'primitives',
       ancestorIds: [ROOT_NODE_ID, 'primitives'],
       pathSegments: ['primitives', 'data-entry'],
-      childrenCount: some(1),
+      childrenCount: some(3),
     }),
     createNode({
       ...defaultNodeMeta,
@@ -1319,6 +1435,34 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       publishedAt: some('2026-03-18T07:50:00.000Z'),
       updatedAt: some('2026-03-21T16:20:00.000Z'),
       readingMinutes: some(4),
+    }),
+    createNode({
+      ...defaultNodeMeta,
+      id: 'article-search-input',
+      kind: 'article',
+      title: articleDocuments['doc-search-input'].title,
+      slug: 'search-input',
+      parentId: 'primitives-data-entry',
+      ancestorIds: [ROOT_NODE_ID, 'primitives', 'primitives-data-entry'],
+      pathSegments: ['primitives', 'data-entry', 'search-input'],
+      documentId: some('doc-search-input'),
+      publishedAt: some('2026-03-22T10:00:00.000Z'),
+      updatedAt: some('2026-03-22T10:00:00.000Z'),
+      readingMinutes: some(3),
+    }),
+    createNode({
+      ...defaultNodeMeta,
+      id: 'article-number-input',
+      kind: 'article',
+      title: articleDocuments['doc-number-input'].title,
+      slug: 'number-input',
+      parentId: 'primitives-data-entry',
+      ancestorIds: [ROOT_NODE_ID, 'primitives', 'primitives-data-entry'],
+      pathSegments: ['primitives', 'data-entry', 'number-input'],
+      documentId: some('doc-number-input'),
+      publishedAt: some('2026-03-22T10:15:00.000Z'),
+      updatedAt: some('2026-03-22T10:15:00.000Z'),
+      readingMinutes: some(3),
     }),
     createNode({
       ...defaultNodeMeta,

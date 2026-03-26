@@ -1,8 +1,17 @@
 import { clsx } from 'clsx';
 
+import type { ReactNode } from 'react';
+
 import { isSome } from '@/shared/lib/monads/option';
 
 import type { CodeBlockSurfaceProps } from './code-block-surface.types';
+
+/** 联合 body props 在参数解构时需同时出现可选 code/children（实现层收窄）。 */
+type CodeBlockSurfacePropsForImpl = CodeBlockSurfaceProps & {
+  code?: string;
+
+  children?: NonNullable<ReactNode>;
+};
 
 export function CodeBlockSurface({
   variant,
@@ -21,15 +30,26 @@ export function CodeBlockSurface({
 
   footer,
 
+  code,
+
   children,
 
   className,
 
   ...rest
-}: CodeBlockSurfaceProps) {
+}: CodeBlockSurfacePropsForImpl) {
   const showHeaderRow = isSome(header) || isSome(language) || isSome(meta) || isSome(actions);
 
   const bodyScrollable = scrollable && !lineWrap;
+
+  const bodyContent =
+    code !== undefined ? (
+      <pre className="sf-code-block-surface__pre">
+        <code className="sf-code-block-surface__code">{code}</code>
+      </pre>
+    ) : (
+      children
+    );
 
   return (
     <div
@@ -77,7 +97,7 @@ export function CodeBlockSurface({
           bodyScrollable && 'sf-code-block-surface__body--scrollable'
         )}
       >
-        {children}
+        {bodyContent}
       </div>
 
       {isSome(footer) ? <div className="sf-code-block-surface__footer">{footer.value}</div> : null}

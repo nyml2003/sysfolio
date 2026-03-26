@@ -25,6 +25,8 @@ export type OverviewDemoId =
   | 'text'
   | 'link'
   | 'code-block-surface'
+  | 'search-input'
+  | 'number-input'
   | 'field-input'
   | 'tree-nav'
   | 'view-state-layout'
@@ -217,6 +219,28 @@ type OverviewCopy = {
     codeBlockSurfaceMetaReadOnly: string;
     codeBlockSurfaceCopyAction: string;
     codeBlockSurfaceFooterNote: string;
+    searchInputIntroHeading: string;
+    searchInputIntroBullets: readonly string[];
+    searchInputVariantHeading: string;
+    searchInputVariantBullets: readonly string[];
+    searchInputPlaceholder: string;
+    searchInputLoadingHeading: string;
+    searchInputLoadingLabel: string;
+    searchInputSubmitLabel: string;
+    searchInputScopeLabel: string;
+    searchInputSlotsHeading: string;
+    searchInputSlotsBullets: readonly string[];
+    numberInputIntroHeading: string;
+    numberInputIntroBullets: readonly string[];
+    numberInputVariantHeading: string;
+    numberInputVariantBullets: readonly string[];
+    numberInputSlotsHeading: string;
+    numberInputSlotsBullets: readonly string[];
+    numberInputPrefixLabel: string;
+    numberInputSuffixLabel: string;
+    numberInputLoadingHeading: string;
+    numberInputDecrementLabel: string;
+    numberInputIncrementLabel: string;
     fieldTextInputLabel: string;
     fieldTextInputDescription: string;
     fieldTextInputValue: string;
@@ -437,6 +461,14 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
 
         if (demoId === 'code-block-surface') {
           return '代码块 CodeBlockSurface';
+        }
+
+        if (demoId === 'search-input') {
+          return '搜索 SearchInput';
+        }
+
+        if (demoId === 'number-input') {
+          return '数字 NumberInput';
         }
 
         if (demoId === 'field-input') {
@@ -673,7 +705,7 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
       linkNavOther: '其他页',
       codeBlockSurfaceIntroHeading: '概述',
       codeBlockSurfaceIntroBullets: [
-        '入口：从 @/shared/ui/primitives 导入 CodeBlockSurface；body 内使用 sf-code-block-surface__pre / __code 类承接等宽排版。',
+        '入口：从 @/shared/ui/primitives 导入 CodeBlockSurface；等宽正文传 `code` 字符串即可，组件会包一层 pre/code；完全自定义时再传 children。',
         '插槽：header / language / meta / actions / footer 均为 Option；行号与高亮仍属 pattern。',
         'lineWrap 与 scrollable 对应 wrapped / scrollable 表现；容器 :focus-within 呈现轮廓。',
       ],
@@ -694,6 +726,45 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
       codeBlockSurfaceMetaReadOnly: '只读',
       codeBlockSurfaceCopyAction: '复制',
       codeBlockSurfaceFooterNote: '行号与语法高亮不在 primitive 层实现。',
+      searchInputIntroHeading: '概述',
+      searchInputIntroBullets: [
+        '入口：从 @/shared/ui/primitives 导入 SearchInput；与通用 TextInput 区分，专注关键词查找。',
+        '插槽：leadingSearchIcon / clear / submit / scope 使用 Option；loading 时内置 spinner。',
+        '变体 default / subtle；filled 在受控 value 有内容时自动加上（用于表面反馈）。',
+      ],
+      searchInputVariantHeading: '变体 variant',
+      searchInputVariantBullets: ['default：常规抬升表面。', 'subtle：更弱对比，适合工具栏内嵌。'],
+      searchInputPlaceholder: '搜索文档…',
+      searchInputLoadingHeading: '加载状态',
+      searchInputLoadingLabel: '正在搜索',
+      searchInputSubmitLabel: '搜索',
+      searchInputScopeLabel: '全局',
+      searchInputSlotsHeading: '插槽示例',
+      searchInputSlotsBullets: [
+        'clear / submit 使用轻量按钮；scope 演示右侧范围标签。',
+        '防抖、范围切换与最近查询仍属 catalog known gaps，由 pattern 承接。',
+      ],
+      numberInputIntroHeading: '概述',
+      numberInputIntroBullets: [
+        '入口：从 @/shared/ui/primitives 导入 NumberInput；type="number"，隐藏原生 spinner，由槽位或内置 − / + 步进。',
+        'prefix / suffix 与 stepDown / stepUp 使用 Option；槽为 none 时渲染内置步进并尊重 step、min、max。',
+        '变体 invalid / warning / success 用于语义边框；loading 显示 spinner。',
+      ],
+      numberInputVariantHeading: '变体 variant',
+      numberInputVariantBullets: [
+        'default：常规录入。',
+        'invalid / warning / success：语义反馈边框（与校验状态配合）。',
+      ],
+      numberInputSlotsHeading: '前缀与后缀',
+      numberInputSlotsBullets: [
+        'prefix / suffix 承载单位或字段提示；stepDown/stepUp 为 none 时仍用内置 − / +。',
+        '受控示例用 value + onChange；步进会调用 onChange 写入新值。',
+      ],
+      numberInputPrefixLabel: '宽',
+      numberInputSuffixLabel: 'px',
+      numberInputLoadingHeading: '加载',
+      numberInputDecrementLabel: '减小',
+      numberInputIncrementLabel: '增大',
       fieldTextInputLabel: '文本输入',
       fieldTextInputDescription: '共享的平静输入表面。',
       fieldTextInputValue: '按钮文案',
@@ -914,6 +985,14 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
 
         if (demoId === 'code-block-surface') {
           return 'CodeBlockSurface';
+        }
+
+        if (demoId === 'search-input') {
+          return 'SearchInput';
+        }
+
+        if (demoId === 'number-input') {
+          return 'NumberInput';
         }
 
         if (demoId === 'field-input') {
@@ -1151,7 +1230,7 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
       linkNavOther: 'Other page',
       codeBlockSurfaceIntroHeading: 'Overview',
       codeBlockSurfaceIntroBullets: [
-        'Import CodeBlockSurface from @/shared/ui/primitives; put sf-code-block-surface__pre / __code inside the body for monospace rhythm.',
+        'Import CodeBlockSurface from @/shared/ui/primitives; pass a `code` string for monospace body (pre/code is internal), or `children` for custom markup.',
         'Slots header, language, meta, actions, and footer use Option; line numbers and highlighting belong to patterns.',
         'lineWrap and scrollable map to wrapped / scrollable presentation; the shell uses :focus-within for focus outline.',
       ],
@@ -1173,6 +1252,48 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
       codeBlockSurfaceCopyAction: 'Copy',
       codeBlockSurfaceFooterNote:
         'Line numbers and syntax highlighting are not implemented at the primitive layer.',
+      searchInputIntroHeading: 'Overview',
+      searchInputIntroBullets: [
+        'Import SearchInput from @/shared/ui/primitives; it is for keyword lookup, not general text entry.',
+        'Slots leadingSearchIcon, clear, submit, and scope use Option; loading shows the built-in spinner.',
+        'Variants default and subtle; filled is derived when a controlled value is non-empty.',
+      ],
+      searchInputVariantHeading: 'Variants',
+      searchInputVariantBullets: [
+        'default: standard raised surface.',
+        'subtle: lower contrast for inline toolbars.',
+      ],
+      searchInputPlaceholder: 'Search docs…',
+      searchInputLoadingHeading: 'Loading state',
+      searchInputLoadingLabel: 'Searching',
+      searchInputSubmitLabel: 'Search',
+      searchInputScopeLabel: 'Global',
+      searchInputSlotsHeading: 'Slot examples',
+      searchInputSlotsBullets: [
+        'clear and submit use small buttons; scope shows a trailing range label.',
+        'Debounce, scope switching, and recent queries stay in patterns per catalog gaps.',
+      ],
+      numberInputIntroHeading: 'Overview',
+      numberInputIntroBullets: [
+        'Import NumberInput from @/shared/ui/primitives; it uses type="number", hides native spinners, and uses slots or built-in − / +.',
+        'prefix, suffix, stepDown, and stepUp use Option; when step slots are none, built-in steppers respect step, min, and max.',
+        'invalid, warning, and success tune semantic borders; loading shows a spinner.',
+      ],
+      numberInputVariantHeading: 'Variants',
+      numberInputVariantBullets: [
+        'default: standard entry.',
+        'invalid / warning / success: semantic border feedback for validation states.',
+      ],
+      numberInputSlotsHeading: 'Prefix and suffix',
+      numberInputSlotsBullets: [
+        'prefix and suffix carry units or labels; built-in steppers stay unless step slots are provided.',
+        'The controlled demo uses value and onChange; nudging fires onChange with the next value.',
+      ],
+      numberInputPrefixLabel: 'W',
+      numberInputSuffixLabel: 'px',
+      numberInputLoadingHeading: 'Loading',
+      numberInputDecrementLabel: 'Decrease',
+      numberInputIncrementLabel: 'Increase',
       fieldTextInputLabel: 'Text input',
       fieldTextInputDescription: 'Shared calm field surface.',
       fieldTextInputValue: 'Button copy',

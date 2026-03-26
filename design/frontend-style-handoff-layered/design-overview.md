@@ -171,13 +171,14 @@
 
 - `styles/tokens.css`
 - `styles/utilities.css`
+- `styles/primitives/content.css`
 - `styles/primitives/*`
 - `styles/patterns/*`
 - `styles/business/*`
 - `styles/component.css`
 - `styles/index.css`
 
-根目录中的 `index.css / tokens.css / utilities.css / primitives.css / patterns.css / business.css / component.css` 仍保留兼容包装角色，用于平滑过渡旧引用。
+当前 handoff 直接以 `styles/index.css` 作为聚合入口；根目录没有再额外维护兼容包装文件。
 
 ## 接入约束
 

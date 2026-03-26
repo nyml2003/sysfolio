@@ -58,34 +58,29 @@ export function CodeBlockSurfaceDemo() {
         <DemoBulletList items={copy.demos.codeBlockSurfaceVariantBullets} />
 
         <Stack gap="md">
-          <CodeBlockSurface {...emptySlots} language={some('tsx')} scrollable variant="default">
-            <pre className="sf-code-block-surface__pre">
-              <code className="sf-code-block-surface__code">
-                {copy.demos.codeBlockSurfaceSnippetTsx}
-              </code>
-            </pre>
-          </CodeBlockSurface>
-
-          <CodeBlockSurface {...emptySlots} language={some('sh')} scrollable variant="command">
-            <pre className="sf-code-block-surface__pre">
-              <code className="sf-code-block-surface__code">
-                {copy.demos.codeBlockSurfaceSnippetCommand}
-              </code>
-            </pre>
-          </CodeBlockSurface>
+          <CodeBlockSurface
+            {...emptySlots}
+            code={copy.demos.codeBlockSurfaceSnippetTsx}
+            language={some('tsx')}
+            scrollable
+            variant="default"
+          />
 
           <CodeBlockSurface
             {...emptySlots}
+            code={copy.demos.codeBlockSurfaceSnippetCommand}
+            language={some('sh')}
+            scrollable
+            variant="command"
+          />
+
+          <CodeBlockSurface
+            {...emptySlots}
+            code={copy.demos.codeBlockSurfaceSnippetDiff}
             language={some('diff')}
             scrollable
             variant="diff-neutral"
-          >
-            <pre className="sf-code-block-surface__pre">
-              <code className="sf-code-block-surface__code">
-                {copy.demos.codeBlockSurfaceSnippetDiff}
-              </code>
-            </pre>
-          </CodeBlockSurface>
+          />
         </Stack>
       </Stack>
 
@@ -107,6 +102,7 @@ export function CodeBlockSurfaceDemo() {
               {copy.demos.codeBlockSurfaceCopyAction}
             </ButtonGhostSm>
           )}
+          code={copy.demos.codeBlockSurfaceSnippetTsx}
           footer={some(
             <Text tone="muted" variant="caption">
               {copy.demos.codeBlockSurfaceFooterNote}
@@ -117,13 +113,7 @@ export function CodeBlockSurfaceDemo() {
           meta={some(copy.demos.codeBlockSurfaceMetaReadOnly)}
           scrollable
           variant="default"
-        >
-          <pre className="sf-code-block-surface__pre">
-            <code className="sf-code-block-surface__code">
-              {copy.demos.codeBlockSurfaceSnippetTsx}
-            </code>
-          </pre>
-        </CodeBlockSurface>
+        />
       </Stack>
     </Stack>
   );

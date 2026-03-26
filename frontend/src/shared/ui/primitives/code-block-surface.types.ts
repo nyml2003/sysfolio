@@ -26,11 +26,18 @@ export type CodeBlockSurfaceOwnProps = {
   actions: Option<NonNullable<ReactNode>>;
 
   footer: Option<NonNullable<ReactNode>>;
+} & (
+  | {
+      /** 传入字符串时由组件自动包一层 `pre`/`code` 并挂上表面类名，无需手写。 */
 
-  /** body 插槽：通常传入带 `sf-code-block-surface__pre` / `__code` 的 pre/code。 */
+      code: string;
+    }
+  | {
+      /** 完全自定义 body（例如语法高亮子树）时使用；常用等宽文本请优先用 `code`。 */
 
-  children: NonNullable<ReactNode>;
-};
+      children: NonNullable<ReactNode>;
+    }
+);
 
 export type CodeBlockSurfaceProps = CodeBlockSurfaceOwnProps &
-  Omit<HTMLAttributes<HTMLDivElement>, 'children'>;
+  Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'code'>;
