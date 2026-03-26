@@ -9,6 +9,7 @@ import type {
 } from '@/entities/content';
 import { DEFAULT_LOCALE, type AppLocale } from '@/shared/lib/i18n/locale.types';
 import { none, some, unwrapOr, type Option } from '@/shared/lib/monads/option';
+import { createMarkdownDemoFixtures } from './markdown-fixtures';
 
 export const ROOT_NODE_ID = 'root';
 export const ROOT_NODE_TITLE = 'system-library';
@@ -1131,7 +1132,12 @@ export function getOverviewDocumentMeta(
 }
 
 export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtures {
-  const articleDocuments = createOverviewArticleDocuments(locale);
+  const baseArticleDocuments = createOverviewArticleDocuments(locale);
+  const markdownFixtures = createMarkdownDemoFixtures();
+  const articleDocuments: Record<DocumentId, ArticleDocument> = {
+    ...baseArticleDocuments,
+    ...markdownFixtures.articleDocuments,
+  };
   const homeTitle = localize(locale, 'UI Library Overview', 'UI 组件库总览');
   const foundationTitle = localize(locale, 'Foundation', '基础');
   const layoutTitle = localize(locale, 'Layout', '布局');
@@ -1303,7 +1309,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: ROOT_NODE_ID,
       ancestorIds: [ROOT_NODE_ID],
       pathSegments: ['audit'],
-      childrenCount: some(1),
+      childrenCount: some(1 + markdownFixtures.contentNodes.length),
     }),
     createNode({
       ...defaultNodeMeta,
@@ -1598,6 +1604,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       updatedAt: some('2026-03-22T04:25:00.000Z'),
       readingMinutes: some(3),
     }),
+    ...markdownFixtures.contentNodes,
   ];
   const homeContents: Record<DocumentId, HomeContent> = {
     'home-doc': {

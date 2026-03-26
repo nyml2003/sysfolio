@@ -3,14 +3,16 @@ import type { BreadcrumbSegment } from '@/entities/content';
 import { LocaleToggle } from '@/features/locale/components/LocaleToggle';
 import { ThemeToggle } from '@/features/theme/components/ThemeToggle';
 import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
+import { useStyleContext } from '@/shared/ui/foundation';
 import { ButtonGhostMd } from '@/shared/ui/primitives';
-
-import styles from './PathBar.module.css';
+import { ButtonGhostSm } from '@/shared/ui/primitives';
 
 type PathBarProps = {
   breadcrumbs: BreadcrumbSegment[];
   isLoading: boolean;
   onNavigate: (path: string) => void;
+  onOpenNavigation: () => void;
+  onOpenContext: () => void;
 };
 
 function getSkeletonWidth(title: string, isCurrent: boolean): string {
@@ -21,24 +23,37 @@ function getSkeletonWidth(title: string, isCurrent: boolean): string {
   return `${width}px`;
 }
 
-export function PathBar({ breadcrumbs, isLoading, onNavigate }: PathBarProps) {
+export function PathBar({
+  breadcrumbs,
+  isLoading,
+  onNavigate,
+  onOpenNavigation,
+  onOpenContext,
+}: PathBarProps) {
   const copy = useUiCopy();
+  const { layoutMode } = useStyleContext();
+  const showNavigationToggle = layoutMode === 'compact';
+  const showContextToggle = layoutMode !== 'spacious';
 
   return (
-    <header className={styles.root}>
-      <nav aria-busy={isLoading} aria-label={copy.pathBar.navLabel} className={styles.segments}>
+    <header className="sf-path-bar">
+      <nav
+        aria-busy={isLoading}
+        aria-label={copy.pathBar.navLabel}
+        className="sf-path-bar__segments"
+      >
+        {showNavigationToggle ? (
+          <ButtonGhostSm onClick={onOpenNavigation}>{copy.pathBar.filesButton}</ButtonGhostSm>
+        ) : null}
         {breadcrumbs.map((segment, index) => {
           const isCurrent = index === breadcrumbs.length - 1;
 
           return (
-            <div className={styles.segmentGroup} key={segment.id}>
+            <div className="sf-path-bar__segment-group" key={segment.id}>
               {isLoading ? (
                 <span
                   aria-hidden="true"
-                  className={[
-                    styles.segmentSkeleton,
-                    isCurrent ? styles.segmentSkeletonCurrent : '',
-                  ]
+                  className={['sf-path-bar__segment-skeleton', isCurrent ? 'is-current' : '']
                     .filter(Boolean)
                     .join(' ')}
                   style={{ width: getSkeletonWidth(segment.title, isCurrent) }}
@@ -46,7 +61,7 @@ export function PathBar({ breadcrumbs, isLoading, onNavigate }: PathBarProps) {
               ) : (
                 <ButtonGhostMd
                   aria-current={isCurrent ? 'page' : false}
-                  className={[styles.segment, isCurrent ? styles.current : '']
+                  className={['sf-path-bar__segment', isCurrent ? 'is-current' : '']
                     .filter(Boolean)
                     .join(' ')}
                   disabled={isCurrent}
@@ -59,12 +74,15 @@ export function PathBar({ breadcrumbs, isLoading, onNavigate }: PathBarProps) {
                   {segment.title}
                 </ButtonGhostMd>
               )}
-              {isCurrent ? null : <span className={styles.separator}>/</span>}
+              {isCurrent ? null : <span className="sf-path-bar__separator">/</span>}
             </div>
           );
         })}
       </nav>
-      <div className={styles.tools}>
+      <div className="sf-path-bar__tools">
+        {showContextToggle ? (
+          <ButtonGhostSm onClick={onOpenContext}>{copy.pathBar.contextButton}</ButtonGhostSm>
+        ) : null}
         <LocaleToggle />
         <ThemeToggle />
       </div>

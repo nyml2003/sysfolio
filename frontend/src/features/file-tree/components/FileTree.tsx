@@ -4,8 +4,10 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 
 import type { ContentNode } from '@/entities/content';
 import { fromNullable, isSome, none, type Option } from '@/shared/lib/monads/option';
-import { ROOT_PATH, pathFromSegments } from '@/shared/lib/path/content-path';
 import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
+import { ROOT_PATH, pathFromSegments } from '@/shared/lib/path/content-path';
+import { Stack, Surface } from '@/shared/ui/layout';
+import { ButtonGhostMd, Heading, Text } from '@/shared/ui/primitives';
 import {
   ArticleIcon,
   ChevronDownIcon,
@@ -16,8 +18,6 @@ import {
   MediaIcon,
 } from '@/shared/ui/primitives/Icon';
 import { iconStyle } from '@/shared/ui/primitives/Icon.style';
-import { ButtonGhostMd } from '@/shared/ui/primitives';
-import styles from './FileTree.module.css';
 
 import {
   FILE_TREE_DEFAULT_ICON_COLOR,
@@ -93,20 +93,40 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
   });
 
   return (
-    <aside className={styles.root} aria-label={copy.fileTree.ariaLabel}>
-      <div className={styles.title}>{copy.fileTree.title}</div>
+    <Stack as="aside" aria-label={copy.fileTree.ariaLabel} className="sf-file-tree" gap="sm">
+      <Heading
+        className="sf-file-tree__title"
+        level={4}
+        leadingIcon={none()}
+        tone="muted"
+        trailingMeta={none()}
+        variant="caption-heading"
+      >
+        {copy.fileTree.title}
+      </Heading>
       {rootState.tag === 'error' ? (
-        <div className={styles.status}>{rootState.error.message}</div>
+        <Surface tone="danger">
+          <Text tone="default" variant="subtle">
+            {rootState.error.message}
+          </Text>
+        </Surface>
       ) : null}
       {rootState.tag === 'loading' ? (
-        <div className={styles.status}>{copy.fileTree.loading}</div>
+        <Surface tone="muted">
+          <Text tone="muted" variant="subtle">
+            {copy.fileTree.loading}
+          </Text>
+        </Surface>
       ) : null}
       <div
         aria-busy={rootState.tag === 'loading' || loadingNodeIds.length > 0}
-        className={styles.list}
+        className="sf-file-tree__list"
         ref={registerScrollElement}
       >
-        <div className={styles.viewport} style={{ height: `${virtualizer.getTotalSize()}px` }}>
+        <div
+          className="sf-file-tree__viewport"
+          style={{ height: `${virtualizer.getTotalSize()}px` }}
+        >
           {virtualizer.getVirtualItems().map((virtualRow) => {
             const row = rows[virtualRow.index];
             const nodePath = getNodePath(row.node);
@@ -118,16 +138,16 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
             return (
               <div
                 className={[
-                  styles.row,
-                  row.isSelected ? styles.selected : '',
-                  row.node.status !== 'available' ? styles.muted : '',
+                  'sf-file-tree__row',
+                  row.isSelected ? 'is-selected' : '',
+                  row.node.status !== 'available' ? 'is-muted' : '',
                 ]
                   .filter(Boolean)
                   .join(' ')}
                 key={row.node.id}
                 style={{
                   transform: `translateY(${virtualRow.start}px)`,
-                  paddingInlineStart: `calc(var(--sys-space-8) + ${row.depth} * var(--sys-space-12))`,
+                  paddingInlineStart: `calc(var(--sf-space-3) + ${row.depth} * var(--sf-space-4))`,
                 }}
               >
                 <ButtonGhostMd
@@ -139,7 +159,7 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                           : copy.fileTree.expandDirectory(row.node.title),
                       }
                     : {})}
-                  className={styles.trigger}
+                  className="sf-file-tree__trigger"
                   disabled={!showDisclosure || isLoading}
                   onClick={() => {
                     if (!showDisclosure) {
@@ -162,7 +182,7 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                 {renderNodeIcon(row.node)}
                 <ButtonGhostMd
                   aria-current={row.isSelected ? 'page' : false}
-                  className={styles.label}
+                  className="sf-file-tree__label"
                   onClick={() => {
                     startTransition(() => {
                       onNavigate(nodePath);
@@ -171,12 +191,14 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                 >
                   {row.node.title}
                 </ButtonGhostMd>
-                {row.node.status === 'coming_soon' ? <span className={styles.statusDot} /> : null}
+                {row.node.status === 'coming_soon' ? (
+                  <span className="sf-file-tree__status-dot" />
+                ) : null}
               </div>
             );
           })}
         </div>
       </div>
-    </aside>
+    </Stack>
   );
 }

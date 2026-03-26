@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
 import type { ArticleDocument, BreadcrumbSegment } from '@/entities/content';
@@ -15,10 +15,11 @@ import { detachPromise } from '@/shared/lib/async/detach-promise';
 import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
 import { fromNullable, isSome, none, some, type Option } from '@/shared/lib/monads/option';
 import { normalizePath } from '@/shared/lib/path/content-path';
+import { AppShellLayout } from '@/shared/ui/patterns';
+import { useStyleContext } from '@/shared/ui/foundation';
 
 import { APP_SHELL_ROUTE_PATH } from './constant';
 import { buildFallbackBreadcrumbs } from './app-shell.model';
-import styles from './AppShell.module.css';
 
 type ShellContentProps = {
   currentPath: string;
@@ -33,7 +34,9 @@ function ShellContent({
   resource,
   onNavigate,
 }: ShellContentProps) {
+  const { layoutMode } = useStyleContext();
   const { registerScrollContainer } = useArticleDom();
+  const [activeOverlay, setActiveOverlay] = useState<'none' | 'navigation' | 'context'>('none');
   const renderableContent = resource.tag === 'ready' ? resource.value.content : false;
   const articleDocument = useMemo<Option<ArticleDocument>>(() => {
     if (renderableContent === false || renderableContent.kind !== 'article') {
@@ -61,14 +64,15 @@ function ShellContent({
       : fallbackBreadcrumbs;
   const pathBarLoading = resource.tag === 'idle' || resource.tag === 'loading';
 
+  useEffect(() => {
+    setActiveOverlay('none');
+  }, [currentPath, layoutMode]);
+
   return (
-    <div className={styles.root}>
-      <PathBar breadcrumbs={breadcrumbs} isLoading={pathBarLoading} onNavigate={onNavigate} />
-      <div className={styles.body}>
-        <div className={styles.left}>
-          <FileTree currentPath={currentPath} onNavigate={onNavigate} />
-        </div>
-        <main className={styles.main} ref={registerScrollContainerElement}>
+    <AppShellLayout
+      activeOverlay={activeOverlay}
+      content={
+        <main className="sf-app-shell__content-scroll-region" ref={registerScrollContainerElement}>
           <ContentPane
             onNavigate={onNavigate}
             resource={resource}
@@ -76,19 +80,35 @@ function ShellContent({
             scrollToTop={scrollToTop}
           />
         </main>
-        <div className={styles.right}>
-          <ContextPanel
-            activeHeadingId={activeHeadingId}
-            onNavigate={onNavigate}
-            onScrollToHeading={(headingId) => {
-              scrollToHeading(headingId);
-            }}
-            resource={resource}
-          />
-        </div>
-      </div>
-      <OnboardingHints />
-    </div>
+      }
+      contextPanel={
+        <ContextPanel
+          activeHeadingId={activeHeadingId}
+          onNavigate={onNavigate}
+          onScrollToHeading={(headingId) => {
+            scrollToHeading(headingId);
+          }}
+          resource={resource}
+        />
+      }
+      navigation={<FileTree currentPath={currentPath} onNavigate={onNavigate} />}
+      onDismissOverlay={() => {
+        setActiveOverlay('none');
+      }}
+      topBar={
+        <PathBar
+          breadcrumbs={breadcrumbs}
+          isLoading={pathBarLoading}
+          onNavigate={onNavigate}
+          onOpenContext={() => {
+            setActiveOverlay('context');
+          }}
+          onOpenNavigation={() => {
+            setActiveOverlay('navigation');
+          }}
+        />
+      }
+    />
   );
 }
 
@@ -102,14 +122,17 @@ function ShellRoute() {
 
   return (
     <ArticleDomProvider>
-      <ShellContent
-        currentPath={currentPath}
-        fallbackBreadcrumbs={fallbackBreadcrumbs}
-        onNavigate={(path) => {
-          detachPromise(navigate(path));
-        }}
-        resource={resource}
-      />
+      <>
+        <ShellContent
+          currentPath={currentPath}
+          fallbackBreadcrumbs={fallbackBreadcrumbs}
+          onNavigate={(path) => {
+            detachPromise(navigate(path));
+          }}
+          resource={resource}
+        />
+        <OnboardingHints />
+      </>
     </ArticleDomProvider>
   );
 }

@@ -15,6 +15,8 @@ type UiCopy = {
   };
   pathBar: {
     navLabel: string;
+    filesButton: string;
+    contextButton: string;
   };
   themeToggle: {
     switchToDark: string;
@@ -117,6 +119,8 @@ const uiCopyByLocale: Record<AppLocale, UiCopy> = {
     },
     pathBar: {
       navLabel: '当前路径',
+      filesButton: '文件',
+      contextButton: '上下文',
     },
     themeToggle: {
       switchToDark: '切换到深色主题',
@@ -225,6 +229,8 @@ const uiCopyByLocale: Record<AppLocale, UiCopy> = {
     },
     pathBar: {
       navLabel: 'Current path',
+      filesButton: 'Files',
+      contextButton: 'Context',
     },
     themeToggle: {
       switchToDark: 'Switch to dark theme',

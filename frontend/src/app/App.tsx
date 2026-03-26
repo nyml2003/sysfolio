@@ -1,14 +1,14 @@
 import { BrowserRouter } from 'react-router-dom';
 
 import { AppProviders } from '@/app/providers/AppProviders';
-import { OverviewShell } from '@/site/overview/OverviewShell';
 import { none } from '@/shared/lib/monads/option';
+import { AppShell } from './AppShell';
 
 export function App() {
   return (
     <AppProviders repository={none()}>
       <BrowserRouter>
-        <OverviewShell />
+        <AppShell />
       </BrowserRouter>
     </AppProviders>
   );

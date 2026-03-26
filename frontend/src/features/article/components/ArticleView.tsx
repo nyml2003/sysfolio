@@ -4,11 +4,10 @@ import type { ArticleDocument, ContentNode } from '@/entities/content';
 import { useArticleDom } from '@/features/article/context/article-dom.context';
 import { formatDate } from '@/shared/lib/date/format-date';
 import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
-import { fromNullable, unwrapOr } from '@/shared/lib/monads/option';
+import { fromNullable, none, unwrapOr } from '@/shared/lib/monads/option';
 import { usePreferences } from '@/shared/store/preferences';
-import { ButtonSecondaryMd } from '@/shared/ui/primitives';
-
-import styles from './ArticleView.module.css';
+import { Inline, Stack } from '@/shared/ui/layout';
+import { ButtonSecondaryMd, Heading, Notice, Tag, Text } from '@/shared/ui/primitives';
 
 type ArticleViewProps = {
   node: ContentNode;
@@ -32,26 +31,18 @@ function ArticleHeading({ id, level, title }: ArticleHeadingProps) {
     [id, registerHeading]
   );
 
-  if (level === 3) {
-    return (
-      <h3 id={id} ref={registerHeadingElement}>
-        {title}
-      </h3>
-    );
-  }
-
-  if (level === 4) {
-    return (
-      <h4 id={id} ref={registerHeadingElement}>
-        {title}
-      </h4>
-    );
-  }
-
   return (
-    <h2 id={id} ref={registerHeadingElement}>
+    <Heading
+      id={id}
+      level={level}
+      ref={registerHeadingElement}
+      leadingIcon={none()}
+      trailingMeta={none()}
+      tone="default"
+      variant={level === 2 ? 'section' : 'subsection'}
+    >
       {title}
-    </h2>
+    </Heading>
   );
 }
 
@@ -95,44 +86,63 @@ export function ArticleView({
   }, [registerHeadingOrder]);
 
   return (
-    <article className={styles.root}>
-      <div className={styles.inner}>
-        <header className={styles.header}>
-          <div className={styles.eyebrow}>{document.eyebrow}</div>
-          <h1 className={styles.title}>{document.title}</h1>
-          <div className={styles.meta}>
+    <Stack align="center" as="article" className="sf-article-view" gap="lg">
+      <Stack className="sf-article-view__inner" gap="lg">
+        <Stack as="header" gap="sm">
+          <Text tone="muted" variant="caption">
+            {document.eyebrow}
+          </Text>
+          <Heading
+            level={1}
+            leadingIcon={none()}
+            tone="default"
+            trailingMeta={none()}
+            variant="display"
+          >
+            {document.title}
+          </Heading>
+          <Inline gap="sm" wrap>
             {publishedAt === '' ? null : (
-              <span>{copy.article.publishedAt(formatDate(publishedAt, locale))}</span>
+              <Tag>{copy.article.publishedAt(formatDate(publishedAt, locale))}</Tag>
             )}
             {updatedAt === '' ? null : (
-              <span>{copy.article.updatedAt(formatDate(updatedAt, locale))}</span>
+              <Tag>{copy.article.updatedAt(formatDate(updatedAt, locale))}</Tag>
             )}
-            {readingMinutes === 0 ? null : <span>{copy.common.minuteCount(readingMinutes)}</span>}
-          </div>
-          <div className={styles.summary}>{document.summary}</div>
-        </header>
+            {readingMinutes === 0 ? null : <Tag>{copy.common.minuteCount(readingMinutes)}</Tag>}
+          </Inline>
+          <Text tone="muted" variant="body">
+            {document.summary}
+          </Text>
+        </Stack>
         {restoreNoticeVisible ? (
-          <div className={styles.progressNotice}>
-            <span>{copy.article.restoreNotice}</span>
+          <Notice title={copy.article.restoreNotice}>
             <ButtonSecondaryMd onClick={scrollToTop}>{copy.article.scrollToTop}</ButtonSecondaryMd>
-          </div>
+          </Notice>
         ) : null}
-        <div className={styles.body} ref={registerArticleBodyElement}>
-          {document.sections.map((section) => (
-            <section key={section.id}>
-              <ArticleHeading id={section.id} level={section.level} title={section.title} />
-              {section.paragraphs.map((paragraph) => (
-                <p key={`${section.id}-${paragraph.slice(0, 12)}`}>{paragraph}</p>
-              ))}
-            </section>
-          ))}
-          <div
-            aria-hidden="true"
-            className={styles.bottomSentinel}
-            ref={registerBottomSentinelElement}
-          />
+        <div className="sf-article-view__body" ref={registerArticleBodyElement}>
+          <Stack gap="lg">
+            {document.sections.map((section) => (
+              <Stack as="section" gap="sm" key={section.id}>
+                <ArticleHeading id={section.id} level={section.level} title={section.title} />
+                {section.paragraphs.map((paragraph) => (
+                  <Text
+                    key={`${section.id}-${paragraph.slice(0, 12)}`}
+                    tone="default"
+                    variant="body"
+                  >
+                    {paragraph}
+                  </Text>
+                ))}
+              </Stack>
+            ))}
+            <div
+              aria-hidden="true"
+              className="sf-article-view__bottom-sentinel"
+              ref={registerBottomSentinelElement}
+            />
+          </Stack>
         </div>
-      </div>
-    </article>
+      </Stack>
+    </Stack>
   );
 }

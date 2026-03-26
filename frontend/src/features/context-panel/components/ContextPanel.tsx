@@ -7,9 +7,8 @@ import { isSome, none, unwrapOr } from '@/shared/lib/monads/option';
 import type { Option } from '@/shared/lib/monads/option';
 import type { ResourceState } from '@/shared/lib/resource/resource-state';
 import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
-import { ButtonGhostMd, ButtonSecondaryMd } from '@/shared/ui/primitives';
-
-import styles from './ContextPanel.module.css';
+import { Stack, Surface } from '@/shared/ui/layout';
+import { ButtonGhostMd, ButtonSecondaryMd, Heading, Tag, Text } from '@/shared/ui/primitives';
 
 type ContextPanelProps = {
   resource: ResourceState<RenderableEntryPayload, RepositoryError>;
@@ -29,8 +28,16 @@ function renderParentSection(
   }
 
   return (
-    <section className={styles.section}>
-      <div className={styles.title}>{title}</div>
+    <Stack as="section" gap="sm">
+      <Heading
+        level={4}
+        leadingIcon={none()}
+        tone="muted"
+        trailingMeta={none()}
+        variant="caption-heading"
+      >
+        {title}
+      </Heading>
       <ButtonSecondaryMd
         onClick={() => {
           onNavigate(parent.value.path);
@@ -38,7 +45,7 @@ function renderParentSection(
       >
         {backToLabel(parent.value.title)}
       </ButtonSecondaryMd>
-    </section>
+    </Stack>
   );
 }
 
@@ -52,12 +59,24 @@ export function ContextPanel({
 
   if (resource.tag !== 'ready') {
     return (
-      <aside className={styles.root}>
-        <section className={styles.section}>
-          <div className={styles.title}>{copy.contextPanel.placeholderTitle}</div>
-          <div>{copy.contextPanel.placeholderBody}</div>
-        </section>
-      </aside>
+      <Stack as="aside" className="sf-context-panel" gap="md">
+        <Surface tone="muted">
+          <Stack as="section" gap="sm">
+            <Heading
+              level={4}
+              leadingIcon={none()}
+              tone="muted"
+              trailingMeta={none()}
+              variant="caption-heading"
+            >
+              {copy.contextPanel.placeholderTitle}
+            </Heading>
+            <Text tone="muted" variant="subtle">
+              {copy.contextPanel.placeholderBody}
+            </Text>
+          </Stack>
+        </Surface>
+      </Stack>
     );
   }
 
@@ -76,15 +95,26 @@ export function ContextPanel({
   );
 
   return (
-    <aside className={styles.root}>
+    <Stack as="aside" className="sf-context-panel" gap="md">
       {resource.value.content.kind === 'article' ? (
-        <section className={styles.section}>
-          <div className={styles.title}>{copy.contextPanel.tocTitle}</div>
-          <div className={styles.toc}>
+        <Surface>
+          <Stack as="section" gap="sm">
+            <Heading
+              level={4}
+              leadingIcon={none()}
+              tone="muted"
+              trailingMeta={none()}
+              variant="caption-heading"
+            >
+              {copy.contextPanel.tocTitle}
+            </Heading>
             {resource.value.content.toc.map((item) => (
               <ButtonGhostMd
                 aria-current={item.id === activeHeadingId ? 'location' : false}
-                className={[styles.tocItem, item.id === activeHeadingId ? styles.tocItemActive : '']
+                className={[
+                  'sf-context-panel__toc-item',
+                  item.id === activeHeadingId ? 'is-active' : '',
+                ]
                   .filter(Boolean)
                   .join(' ')}
                 key={item.id}
@@ -95,37 +125,57 @@ export function ContextPanel({
                 {item.title}
               </ButtonGhostMd>
             ))}
-          </div>
-        </section>
+          </Stack>
+        </Surface>
       ) : null}
 
       {isSome(context.stats) ? (
-        <section className={styles.section}>
-          <div className={styles.title}>{copy.contextPanel.directoryStatsTitle}</div>
-          <div>{copy.common.itemCount(context.stats.value.childCount)}</div>
-          <div>{copy.common.folderCount(context.stats.value.folderCount)}</div>
-          <div>{copy.common.articleCount(context.stats.value.articleCount)}</div>
-        </section>
+        <Surface>
+          <Stack as="section" gap="sm">
+            <Heading
+              level={4}
+              leadingIcon={none()}
+              tone="muted"
+              trailingMeta={none()}
+              variant="caption-heading"
+            >
+              {copy.contextPanel.directoryStatsTitle}
+            </Heading>
+            <Tag>{copy.common.itemCount(context.stats.value.childCount)}</Tag>
+            <Tag>{copy.common.folderCount(context.stats.value.folderCount)}</Tag>
+            <Tag>{copy.common.articleCount(context.stats.value.articleCount)}</Tag>
+          </Stack>
+        </Surface>
       ) : null}
 
       {parentSection}
 
       {context.recentEntries.length > 0 ? (
-        <section className={styles.section}>
-          <div className={styles.title}>{copy.contextPanel.recentTitle}</div>
-          {context.recentEntries.map((entry) => (
-            <ButtonGhostMd
-              className={styles.tocItem}
-              key={entry.id}
-              onClick={() => {
-                onNavigate(entry.path);
-              }}
+        <Surface>
+          <Stack as="section" gap="sm">
+            <Heading
+              level={4}
+              leadingIcon={none()}
+              tone="muted"
+              trailingMeta={none()}
+              variant="caption-heading"
             >
-              {entry.title}
-            </ButtonGhostMd>
-          ))}
-        </section>
+              {copy.contextPanel.recentTitle}
+            </Heading>
+            {context.recentEntries.map((entry) => (
+              <ButtonGhostMd
+                className="sf-context-panel__toc-item"
+                key={entry.id}
+                onClick={() => {
+                  onNavigate(entry.path);
+                }}
+              >
+                {entry.title}
+              </ButtonGhostMd>
+            ))}
+          </Stack>
+        </Surface>
       ) : null}
-    </aside>
+    </Stack>
   );
 }

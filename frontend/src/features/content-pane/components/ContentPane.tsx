@@ -5,10 +5,9 @@ import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
 import { isSome, none, unwrapOr } from '@/shared/lib/monads/option';
 import { ROOT_PATH } from '@/shared/lib/path/content-path';
 import type { ResourceState } from '@/shared/lib/resource/resource-state';
+import { Inline, Stack, Surface } from '@/shared/ui/layout';
 import { ArticleIcon, FolderIcon, GameIcon, MediaIcon } from '@/shared/ui/primitives/Icon';
-import { ButtonGhostMd, ButtonSecondaryMd } from '@/shared/ui/primitives';
-
-import styles from './ContentPane.module.css';
+import { ButtonGhostMd, ButtonSecondaryMd, Heading, Tag, Text } from '@/shared/ui/primitives';
 
 type ContentPaneProps = {
   resource: ResourceState<RenderableEntryPayload, RepositoryError>;
@@ -43,53 +42,67 @@ function renderDirectoryView(
   }
 
   return (
-    <section className={styles.directoryRoot}>
-      <header className={styles.directoryHeader}>
-        <div className={styles.directoryEyebrow}>
+    <Stack className="sf-content-pane-directory" gap="lg">
+      <Stack as="header" gap="sm">
+        <Text tone="muted" variant="caption">
           {payload.node.pathSegments.join(' / ') || copy.common.rootLabel}
-        </div>
-        <h1 className={styles.directoryTitle}>{payload.content.title}</h1>
+        </Text>
+        <Heading
+          level={1}
+          leadingIcon={none()}
+          tone="default"
+          trailingMeta={none()}
+          variant="display"
+        >
+          {payload.content.title}
+        </Heading>
         {unwrapOr(payload.content.description, '') === '' ? null : (
-          <div className={styles.directorySummary}>{unwrapOr(payload.content.description, '')}</div>
+          <Text tone="muted" variant="body">
+            {unwrapOr(payload.content.description, '')}
+          </Text>
         )}
-      </header>
-      <div className={styles.directoryMeta}>
-        <span>{copy.common.itemCount(payload.content.children.length)}</span>
-        <span>{copy.contentPane.directorySharedMeta}</span>
-      </div>
-      <div className={styles.directoryList}>
+      </Stack>
+      <Inline gap="sm" wrap>
+        <Tag>{copy.common.itemCount(payload.content.children.length)}</Tag>
+        <Tag>{copy.contentPane.directorySharedMeta}</Tag>
+      </Inline>
+      <Stack gap="sm">
         {payload.content.children.map((entry) => (
-          <ButtonGhostMd
-            className={[
-              styles.directoryEntry,
-              entry.status === 'coming_soon' ? styles.directoryEntryComingSoon : '',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-            key={entry.id}
-            onClick={() => {
-              onNavigate(entry.path);
-            }}
-          >
-            {renderDirectoryIcon(entry.kind)}
-            <div className={styles.directoryEntryBody}>
-              <div className={styles.directoryEntryTitle}>{entry.title}</div>
-              <div className={styles.directoryEntryMeta}>
-                <span>{copy.common.kindLabel(entry.kind)}</span>
-                {isSome(entry.readingMinutes) ? (
-                  <span>{copy.common.minuteCount(entry.readingMinutes.value)}</span>
-                ) : null}
-              </div>
-              {unwrapOr(entry.description, '') === '' ? null : (
-                <div className={styles.directoryEntrySummary}>
-                  {unwrapOr(entry.description, '')}
-                </div>
-              )}
-            </div>
-          </ButtonGhostMd>
+          <Surface key={entry.id}>
+            <ButtonGhostMd
+              className="sf-content-pane-directory__entry"
+              onClick={() => {
+                onNavigate(entry.path);
+              }}
+            >
+              {renderDirectoryIcon(entry.kind)}
+              <Stack className="sf-content-pane-directory__entry-body" gap="xs">
+                <Heading
+                  level={3}
+                  leadingIcon={none()}
+                  tone="default"
+                  trailingMeta={none()}
+                  variant="subsection"
+                >
+                  {entry.title}
+                </Heading>
+                <Inline gap="xs" wrap>
+                  <Tag>{copy.common.kindLabel(entry.kind)}</Tag>
+                  {isSome(entry.readingMinutes) ? (
+                    <Tag>{copy.common.minuteCount(entry.readingMinutes.value)}</Tag>
+                  ) : null}
+                </Inline>
+                {unwrapOr(entry.description, '') === '' ? null : (
+                  <Text tone="muted" variant="subtle">
+                    {unwrapOr(entry.description, '')}
+                  </Text>
+                )}
+              </Stack>
+            </ButtonGhostMd>
+          </Surface>
         ))}
-      </div>
-    </section>
+      </Stack>
+    </Stack>
   );
 }
 
@@ -105,11 +118,21 @@ function renderUnsupportedState(
       : ROOT_PATH;
 
   return (
-    <section className={styles.root}>
-      <div className={styles.inner}>
-        <div className={styles.emptyState}>
-          <h2 className={styles.emptyTitle}>{copy.contentPane.unsupportedTitle}</h2>
-          <p>{copy.contentPane.unsupportedBody}</p>
+    <Stack className="sf-content-pane-state" gap="md">
+      <Surface>
+        <Stack gap="md">
+          <Heading
+            level={2}
+            leadingIcon={none()}
+            tone="default"
+            trailingMeta={none()}
+            variant="section"
+          >
+            {copy.contentPane.unsupportedTitle}
+          </Heading>
+          <Text tone="muted" variant="body">
+            {copy.contentPane.unsupportedBody}
+          </Text>
           <ButtonSecondaryMd
             onClick={() => {
               onNavigate(fallbackPath);
@@ -117,22 +140,32 @@ function renderUnsupportedState(
           >
             {copy.contentPane.backToParent}
           </ButtonSecondaryMd>
-        </div>
-      </div>
-    </section>
+        </Stack>
+      </Surface>
+    </Stack>
   );
 }
 
 function renderStatusState(title: string, message: string) {
   return (
-    <section className={styles.root}>
-      <div className={styles.inner}>
-        <div className={styles.emptyState}>
-          <h2 className={styles.emptyTitle}>{title}</h2>
-          <p>{message}</p>
-        </div>
-      </div>
-    </section>
+    <Stack className="sf-content-pane-state" gap="md">
+      <Surface>
+        <Stack gap="md">
+          <Heading
+            level={2}
+            leadingIcon={none()}
+            tone="default"
+            trailingMeta={none()}
+            variant="section"
+          >
+            {title}
+          </Heading>
+          <Text tone="muted" variant="body">
+            {message}
+          </Text>
+        </Stack>
+      </Surface>
+    </Stack>
   );
 }
 

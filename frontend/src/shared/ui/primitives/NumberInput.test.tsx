@@ -1,3 +1,5 @@
+import type { ChangeEvent } from 'react';
+
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -32,11 +34,14 @@ describe('NumberInput', () => {
 
   it('increments controlled value', async () => {
     const user = userEvent.setup();
-    const onChange = vi.fn();
+    const onChange = vi.fn<(event: ChangeEvent<HTMLInputElement>) => void>();
     render(<NumberInput {...emptySlots} value={2} variant="default" onChange={onChange} />);
     await user.click(screen.getByRole('button', { name: 'Increase' }));
     expect(onChange).toHaveBeenCalled();
-    const first = onChange.mock.calls[0][0];
+    const first = onChange.mock.calls[0]?.[0];
+    if (!first) {
+      throw new Error('Expected first onChange call argument');
+    }
     expect(first.target.value).toBe('3');
   });
 
