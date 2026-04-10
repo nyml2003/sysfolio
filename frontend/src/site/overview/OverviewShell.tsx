@@ -7,6 +7,7 @@ import { ArticleDomProvider } from '@/features/article/providers/ArticleDomProvi
 import { useArticleReading } from '@/features/article/hooks/useArticleReading';
 import { useRenderableEntry } from '@/features/content-pane/hooks/useRenderableEntry';
 import { detachPromise } from '@/shared/lib/async/detach-promise';
+import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
 import { fromNullable, isSome, none, some, type Option } from '@/shared/lib/monads/option';
 import { useOverviewCopy } from '@/site/overview/overview-copy';
 import { ROOT_PATH, normalizePath, splitPathSegments } from '@/shared/lib/path/content-path';
@@ -87,6 +88,7 @@ function OverviewContent({
 }) {
   const { layoutMode } = useStyleContext();
   const copy = useOverviewCopy();
+  const uiCopy = useUiCopy();
   const { registerScrollContainer } = useArticleDom();
   const resource = useRenderableEntry(currentPath);
   const [activeOverlay, setActiveOverlay] = useState<'none' | 'navigation' | 'context'>('none');
@@ -189,6 +191,9 @@ function OverviewContent({
       onDismissOverlay={() => {
         setActiveOverlay('none');
       }}
+      contextOverlayLabel={uiCopy.appShell.contextPanelLabel}
+      dismissOverlayLabel={uiCopy.appShell.dismissOverlay}
+      navigationOverlayLabel={uiCopy.appShell.navigationPanelLabel}
       topBar={
         <OverviewPathBar
           breadcrumbs={breadcrumbs}

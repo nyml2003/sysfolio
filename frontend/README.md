@@ -7,6 +7,7 @@
 - `pnpm dev` / `pnpm build` / `pnpm preview`
 - `pnpm lint` / `pnpm typecheck`
 - `pnpm test` / `pnpm test:coverage`（纯 TS 模块覆盖率阈值见 `vite.config.ts` 与 `docs/testing-strategy.md`）
+- `pnpm test:e2e`（Playwright，默认使用移动端视口跑 `tests/e2e`）
 
 ## Structure
 

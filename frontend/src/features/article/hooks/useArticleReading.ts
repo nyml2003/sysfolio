@@ -127,9 +127,9 @@ export function useArticleReading({
     return isSome(currentHeadingId) ? currentHeadingId : layout.getFirstHeadingId();
   });
 
-  const saveReadingProgress = useEffectEvent(async (scrollTop: number) => {
+  const saveReadingProgress = useEffectEvent(async (pathToSave: string, scrollTop: number) => {
     try {
-      const result = await repository.saveReadingProgress(path, {
+      const result = await repository.saveReadingProgress(pathToSave, {
         scrollTop,
         updatedAt: new Date().toISOString(),
       });
@@ -151,8 +151,19 @@ export function useArticleReading({
         return;
       }
 
-      detachPromise(saveReadingProgress(getElementScrollTop(scrollContainer.value)));
+      detachPromise(saveReadingProgress(path, getElementScrollTop(scrollContainer.value)));
     }, TOC_READING_PROGRESS_DEBOUNCE_MS);
+  });
+
+  const syncReadingHeading = useEffectEvent(() => {
+    const lastHeadingId = layout.getLastHeadingId();
+
+    if (bottomVisibleRef.current && isSome(lastHeadingId)) {
+      setCurrentHeadingImmediate(lastHeadingId.value);
+      return;
+    }
+
+    setCurrentHeadingFromOptionImmediate(getResolvedHeadingId());
   });
 
   const {
@@ -161,6 +172,17 @@ export function useArticleReading({
     scrollTo: smoothScrollTo,
   } = useSmoothScroll({
     durationSeconds: none(),
+    onComplete: some((scrollTop) => {
+      clearNavigatingTimeout();
+
+      if (tocStateRef.current !== 'navigating') {
+        return;
+      }
+
+      setTocState('reading');
+      syncReadingHeading();
+      detachPromise(saveReadingProgress(path, scrollTop));
+    }),
     onUserInteraction: some(() => {
       if (!isSome(document) || !layout.hasScrollableContent() || !isSome(scrollContainer)) {
         return;
@@ -216,17 +238,6 @@ export function useArticleReading({
 
       userScrollWatchFrameIdRef.current = scheduleAnimationFrame(watchUserScroll);
     }),
-  });
-
-  const syncReadingHeading = useEffectEvent(() => {
-    const lastHeadingId = layout.getLastHeadingId();
-
-    if (bottomVisibleRef.current && isSome(lastHeadingId)) {
-      setCurrentHeadingImmediate(lastHeadingId.value);
-      return;
-    }
-
-    setCurrentHeadingFromOptionImmediate(getResolvedHeadingId());
   });
 
   const scheduleNavigatingTimeout = useEffectEvent(() => {
@@ -349,10 +360,13 @@ export function useArticleReading({
     }
 
     if (!layout.hasScrollableContent() || tocStateRef.current === 'short_content') {
-      setElementScrollTop(scrollContainerElement, layout.getHeadingTargetScrollTop(headingId));
+      const targetScrollTop = layout.getHeadingTargetScrollTop(headingId);
+
+      setElementScrollTop(scrollContainerElement, targetScrollTop);
       setTocState('short_content');
       observedActiveHeadingIdRef.current = firstHeadingId;
       setCurrentHeadingDeferred(firstHeadingId.value);
+      detachPromise(saveReadingProgress(path, targetScrollTop));
       return;
     }
 
@@ -384,6 +398,7 @@ export function useArticleReading({
       setTocState('short_content');
       observedActiveHeadingIdRef.current = firstHeadingId;
       setCurrentHeadingDeferred(firstHeadingId.value);
+      detachPromise(saveReadingProgress(path, 0));
       return;
     }
 
@@ -446,6 +461,11 @@ export function useArticleReading({
     detachPromise(restoreReadingProgress());
 
     return () => {
+      if (isSome(document) && isSome(scrollContainer)) {
+        clearSaveTimeout();
+        detachPromise(saveReadingProgress(path, getElementScrollTop(scrollContainer.value)));
+      }
+
       abortController.abort();
       cancelScheduledAnimationFrame(frameState.current);
       resetReadingState();

@@ -86,7 +86,13 @@ export function ArticleView({
   }, [registerHeadingOrder]);
 
   return (
-    <Stack align="center" as="article" className="sf-article-view" gap="lg">
+    <Stack
+      align="center"
+      as="article"
+      className="sf-article-view"
+      data-testid="article-view"
+      gap="lg"
+    >
       <Stack className="sf-article-view__inner" gap="lg">
         <Stack as="header" gap="sm">
           <Text tone="muted" variant="caption">

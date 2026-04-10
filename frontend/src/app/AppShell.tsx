@@ -34,6 +34,7 @@ function ShellContent({
   resource,
   onNavigate,
 }: ShellContentProps) {
+  const copy = useUiCopy();
   const { layoutMode } = useStyleContext();
   const { registerScrollContainer } = useArticleDom();
   const [activeOverlay, setActiveOverlay] = useState<'none' | 'navigation' | 'context'>('none');
@@ -72,14 +73,18 @@ function ShellContent({
     <AppShellLayout
       activeOverlay={activeOverlay}
       content={
-        <main className="sf-app-shell__content-scroll-region" ref={registerScrollContainerElement}>
+        <div
+          className="sf-app-shell__content-scroll-region"
+          data-testid="content-scroll-region"
+          ref={registerScrollContainerElement}
+        >
           <ContentPane
             onNavigate={onNavigate}
             resource={resource}
             restoreNoticeVisible={restoreNoticeVisible}
             scrollToTop={scrollToTop}
           />
-        </main>
+        </div>
       }
       contextPanel={
         <ContextPanel
@@ -95,6 +100,9 @@ function ShellContent({
       onDismissOverlay={() => {
         setActiveOverlay('none');
       }}
+      contextOverlayLabel={copy.appShell.contextPanelLabel}
+      dismissOverlayLabel={copy.appShell.dismissOverlay}
+      navigationOverlayLabel={copy.appShell.navigationPanelLabel}
       topBar={
         <PathBar
           breadcrumbs={breadcrumbs}

@@ -27,6 +27,7 @@
 | 加中英文字符串、换语言                  | `[i18n.md](./i18n.md)`                                                                          |
 | 用 `Option`、`Result`、资源 `tag` | `[option-result.md](./option-result.md)`、`[architecture.md](./architecture.md)` 中 ResourceState |
 | 状态放 store 还是 Context         | `[state-management.md](./state-management.md)`                                                  |
+| 想了解文档阅读器终态架构 / 长期重构方向 | `[reader-end-state.md](./reader-end-state.md)`                                                   |
 | 写样式、主题、token                 | `[styling-system.md](./styling-system.md)`、`[theme-mapping.md](./theme-mapping.md)`             |
 | 能不能用原生 `button`/`input` 等      | `[code-organization.md](./code-organization.md)`（UI 库与原生 HTML）                              |
 | 内容类型、节点 kind                 | `[content-model.md](./content-model.md)`                                                        |
@@ -49,6 +50,7 @@
 | ---------------------------------------------------- | ------------------------------------------------- |
 | `[architecture.md](./architecture.md)`               | `0.5` 范围、Layers、`site`、运行时数据规则、ResourceState、渲染约束 |
 | `[repository-contract.md](./repository-contract.md)` | 唯一数据边界、API 列表、返回形状、读路径约定                          |
+| `[reader-end-state.md](./reader-end-state.md)`       | 阅读器终态蓝图：Reader Core、Query Layer、State Machine、DOM Adapter |
 
 
 ### 代码写法与工具类型
@@ -124,4 +126,3 @@
 - 规范仅约束 **`frontend/`** 目录。  
 - **`app`** 与 **`site`**：`app` 主产品壳；`site`（如 overview）并列入口，复用 `features`/`shared`，勿让主工程依赖 `site` 专有实现（分层见 `architecture.md`）。  
 - **`0.5` 期**：核心边界不临时发明；与阶段不符的能力见 `implementation-phases.md`。
-

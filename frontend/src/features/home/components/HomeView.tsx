@@ -19,7 +19,7 @@ export function HomeView({ content, context, onNavigate }: HomeViewProps) {
   const copy = useUiCopy();
 
   return (
-    <section className={styles.root}>
+    <section className={styles.root} data-testid="home-view">
       <div className={styles.hero}>
         <div className={styles.eyebrow}>{copy.home.eyebrow}</div>
         <h1 className={styles.title}>{content.title}</h1>

@@ -1,7 +1,7 @@
 # State Management
 
 > **本文档**：全局 store / Context / 局部状态如何选、偏好与全局范围、为何不滥用 `Result` 表达页面资源。  
-> **相关**：[文档索引](./README.md) · [架构 · ResourceState](./architecture.md) · [repository 偏好 API](./repository-contract.md)
+> **相关**：[文档索引](./README.md) · [架构 · ResourceState](./architecture.md) · [repository 偏好 API](./repository-contract.md) · [阅读器终态蓝图](./reader-end-state.md)
 
 ## Rule
 
@@ -15,6 +15,15 @@
   - 使用范围
   - 更新频率
   - 数据复杂度
+
+## Relation To Reader End State
+
+- 本文档约束 **当前实现阶段** 的状态放置：哪些状态进全局 Provider、哪些状态留在 feature Context、哪些状态留在局部 hook。
+- 终态蓝图见 [`reader-end-state.md`](./reader-end-state.md)：
+  - 终态会把阅读器运行时收敛到 Reader Core
+  - 阅读流程会进一步升级为显式 state machine
+  - query、persistence、overlay a11y 会从当前组件 / hook 组合中继续拆层
+- 在终态重构真正落地前，当前代码仍以本文档为准，不因为存在终态蓝图就提前把所有状态塞进新的抽象。
 
 ## Storage Selection
 

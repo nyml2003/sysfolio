@@ -1,7 +1,7 @@
 # Architecture
 
 > **本文档**：产品范围、目录分层（含 `site`）、运行时数据规则、资源状态形状、渲染约束。  
-> **相关**：[文档索引](./README.md) · [代码组织 · UI 库与原生标签](./code-organization.md) · [状态与偏好](./state-management.md) · [`Option`/`Result`](./option-result.md) · [UI 文案](./i18n.md) · [数据边界](./repository-contract.md)
+> **相关**：[文档索引](./README.md) · [代码组织 · UI 库与原生标签](./code-organization.md) · [状态与偏好](./state-management.md) · [`Option`/`Result`](./option-result.md) · [UI 文案](./i18n.md) · [数据边界](./repository-contract.md) · [阅读器终态蓝图](./reader-end-state.md)
 
 ## Scope
 
@@ -120,3 +120,9 @@ type ResourceState<T, E> =
 - 右栏只展示当前文档上下文，不重复主导航。
 - 中栏统一为 `ContentPane`，目录节点与文件节点共用同一个页面壳。
 - `home`、`directory` 与 `article` 都通过 repository 进入前端，但内容模型彼此独立。
+
+## Relation To Reader End State
+
+- 本文档描述 **当前与近期实现约束**，用于统一现阶段代码边界。
+- [`reader-end-state.md`](./reader-end-state.md) 描述 **长期目标架构**，包括 Reader Core、Query Layer、Reading Session State Machine 与 DOM Adapter 分层。
+- 如果当前实现与终态蓝图存在差异，以本文档作为当前落地约束；终态蓝图用于指导后续系统性重构，而不是覆盖当前规则。

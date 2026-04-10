@@ -22,6 +22,7 @@ import { useArticleDom } from '../context/article-dom.context';
 type UseSmoothScrollOptions = {
   durationSeconds: Option<number>;
   onUserInteraction: Option<() => void>;
+  onComplete: Option<(scrollTop: number) => void>;
 };
 
 type UseSmoothScrollResult = {
@@ -53,15 +54,18 @@ function clampScrollTop(scrollContainer: HTMLElement, scrollTop: number): number
 export function useSmoothScroll({
   durationSeconds,
   onUserInteraction,
+  onComplete,
 }: UseSmoothScrollOptions): UseSmoothScrollResult {
   const { scrollContainer } = useArticleDom();
   const [isProgrammaticScrolling, setIsProgrammaticScrolling] = useState(false);
   const scrollTopValue = useMotionValue(0);
   const animationRef = useRef<Option<{ stop: () => void }>>(none());
   const onUserInteractionRef = useRef(onUserInteraction);
+  const onCompleteRef = useRef(onComplete);
   const isProgrammaticScrollingRef = useRef(isProgrammaticScrolling);
 
   onUserInteractionRef.current = onUserInteraction;
+  onCompleteRef.current = onComplete;
   isProgrammaticScrollingRef.current = isProgrammaticScrolling;
 
   const cancel = () => {
@@ -89,6 +93,11 @@ export function useSmoothScroll({
       ARTICLE_SMOOTH_SCROLL_COMPLETION_EPSILON
     ) {
       setElementScrollTop(scrollContainerElement, nextScrollTop);
+
+      if (isSome(onCompleteRef.current)) {
+        onCompleteRef.current.value(nextScrollTop);
+      }
+
       return;
     }
 
@@ -112,6 +121,10 @@ export function useSmoothScroll({
   useMotionValueEvent(scrollTopValue, 'animationComplete', () => {
     animationRef.current = none();
     setIsProgrammaticScrolling(false);
+
+    if (isSome(onCompleteRef.current)) {
+      onCompleteRef.current.value(scrollTopValue.get());
+    }
   });
 
   useMotionValueEvent(scrollTopValue, 'animationCancel', () => {

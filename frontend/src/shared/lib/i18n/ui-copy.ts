@@ -18,6 +18,11 @@ type UiCopy = {
     filesButton: string;
     contextButton: string;
   };
+  appShell: {
+    dismissOverlay: string;
+    navigationPanelLabel: string;
+    contextPanelLabel: string;
+  };
   themeToggle: {
     switchToDark: string;
     switchToLight: string;
@@ -30,8 +35,10 @@ type UiCopy = {
     ariaLabel: string;
     title: string;
     loading: string;
+    retryButton: string;
     expandDirectory: (title: string) => string;
     collapseDirectory: (title: string) => string;
+    retryDirectoryLoad: (title: string) => string;
   };
   article: {
     publishedAt: (formattedDate: string) => string;
@@ -122,6 +129,11 @@ const uiCopyByLocale: Record<AppLocale, UiCopy> = {
       filesButton: '文件',
       contextButton: '上下文',
     },
+    appShell: {
+      dismissOverlay: '关闭面板',
+      navigationPanelLabel: '文件导航',
+      contextPanelLabel: '上下文面板',
+    },
     themeToggle: {
       switchToDark: '切换到深色主题',
       switchToLight: '切换到浅色主题',
@@ -134,11 +146,15 @@ const uiCopyByLocale: Record<AppLocale, UiCopy> = {
       ariaLabel: '文件树',
       title: '文件树',
       loading: '正在展开目录视图…',
+      retryButton: '重试',
       expandDirectory(title) {
         return `展开 ${title}`;
       },
       collapseDirectory(title) {
         return `折叠 ${title}`;
+      },
+      retryDirectoryLoad(title) {
+        return `重新加载 ${title}`;
       },
     },
     article: {
@@ -232,6 +248,11 @@ const uiCopyByLocale: Record<AppLocale, UiCopy> = {
       filesButton: 'Files',
       contextButton: 'Context',
     },
+    appShell: {
+      dismissOverlay: 'Dismiss panel',
+      navigationPanelLabel: 'File navigation',
+      contextPanelLabel: 'Context panel',
+    },
     themeToggle: {
       switchToDark: 'Switch to dark theme',
       switchToLight: 'Switch to light theme',
@@ -244,11 +265,15 @@ const uiCopyByLocale: Record<AppLocale, UiCopy> = {
       ariaLabel: 'File tree',
       title: 'Filesystem',
       loading: 'Expanding the directory view…',
+      retryButton: 'Retry',
       expandDirectory(title) {
         return `Expand ${title}`;
       },
       collapseDirectory(title) {
         return `Collapse ${title}`;
+      },
+      retryDirectoryLoad(title) {
+        return `Retry loading ${title}`;
       },
     },
     article: {

@@ -1,7 +1,7 @@
 # Testing Strategy
 
 > **本文档**：合并前必跑命令、测试分层、`0.5` 聚焦范围、必覆盖场景。  
-> **相关**：[文档索引](./README.md) · [依赖](./dependencies.md) · [实现阶段](./implementation-phases.md)
+> **相关**：[文档索引](./README.md) · [依赖](./dependencies.md) · [实现阶段](./implementation-phases.md) · [阅读器终态蓝图](./reader-end-state.md)
 
 ## Required Checks
 
@@ -31,6 +31,17 @@
 - 路由与 renderer 分派测试
 - 主题与引导偏好层测试
 - 基础 a11y smoke checks
+
+## Reader End State Expansion
+
+- 当前测试分层描述的是现阶段质量门槛。
+- 终态阅读器落地后，测试面应扩展到：
+  - query layer 的 cancellation / dedupe / stale discard
+  - reading session state machine 的状态迁移表
+  - persistence layer 的 lifecycle flush
+  - tree explorer 的节点级失败恢复与键盘导航
+  - shell / overlay 的焦点恢复与 a11y 交互
+- 终态设计边界见 [`reader-end-state.md`](./reader-end-state.md)。
 
 ## Must Cover
 

@@ -81,7 +81,8 @@ function toStableElementOption(
 export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
   const [scrollElement, setScrollElement] = useState<Option<HTMLDivElement>>(none());
   const copy = useUiCopy();
-  const { rows, rootState, loadingNodeIds, expandedIds, toggleNode } = useFileTree(currentPath);
+  const { rows, rootState, loadingNodeIds, expandedIds, nodeErrorsById, retryNode, toggleNode } =
+    useFileTree(currentPath);
   const registerScrollElement = useCallback((node: HTMLDivElement | null) => {
     setScrollElement((currentElement) => toStableElementOption(currentElement, node));
   }, []);
@@ -132,6 +133,7 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
             const nodePath = getNodePath(row.node);
             const isFolder = row.node.kind === 'folder';
             const isLoading = loadingNodeIds.includes(row.node.id);
+            const nodeError = nodeErrorsById[row.node.id];
             const showDisclosure = isFolder && row.node.hasChildren;
             const isExpanded = row.isExpanded || expandedIds.includes(row.node.id);
 
@@ -140,6 +142,7 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                 className={[
                   'sf-file-tree__row',
                   row.isSelected ? 'is-selected' : '',
+                  nodeError !== undefined ? 'is-error' : '',
                   row.node.status !== 'available' ? 'is-muted' : '',
                 ]
                   .filter(Boolean)
@@ -191,7 +194,19 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                 >
                   {row.node.title}
                 </ButtonGhostMd>
-                {row.node.status === 'coming_soon' ? (
+                {nodeError !== undefined ? (
+                  <button
+                    aria-label={copy.fileTree.retryDirectoryLoad(row.node.title)}
+                    className="sf-file-tree__retry-button"
+                    onClick={() => {
+                      retryNode(row.node.id);
+                    }}
+                    title={nodeError.message}
+                    type="button"
+                  >
+                    {copy.fileTree.retryButton}
+                  </button>
+                ) : row.node.status === 'coming_soon' ? (
                   <span className="sf-file-tree__status-dot" />
                 ) : null}
               </div>

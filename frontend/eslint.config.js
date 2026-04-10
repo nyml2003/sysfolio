@@ -9,7 +9,14 @@ import eslintPluginPrettier from "eslint-plugin-prettier";
 
 export default tseslint.config(
   {
-    ignores: ["dist/**", "coverage/**", "eslint.config.js", "postcss.config.cjs"],
+    ignores: [
+      "dist/**",
+      "coverage/**",
+      "playwright-report/**",
+      "test-results/**",
+      "eslint.config.js",
+      "postcss.config.cjs",
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
@@ -58,6 +65,31 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { prefer: "type-imports" },
+      ],
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-misused-promises": [
+        "error",
+        { checksVoidReturn: false },
+      ],
+    },
+  },
+  {
+    files: ["tests/**/*.ts", "playwright.config.ts"],
+    languageOptions: {
+      ecmaVersion: 2023,
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+      parserOptions: {
+        project: ["./tsconfig.app.json", "./tsconfig.node.json"],
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    rules: {
       "@typescript-eslint/consistent-type-imports": [
         "error",
         { prefer: "type-imports" },

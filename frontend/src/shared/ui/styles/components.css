@@ -1322,6 +1322,11 @@
     box-shadow: var(--sf-shadow-strong);
   }
 
+  .sf-app-shell__overlay-panel:focus-visible {
+    outline: 2px solid var(--sf-color-accent-strong);
+    outline-offset: -2px;
+  }
+
   .sf-app-shell__overlay-panel--navigation {
     border-inline-start: none;
     border-inline-end: 1px solid var(--sf-color-border);
@@ -1403,6 +1408,11 @@
     background: var(--sf-color-surface-muted);
   }
 
+  .sf-file-tree__row.is-error {
+    background: var(--sf-color-surface-muted);
+    box-shadow: inset 0 0 0 1px var(--sf-color-accent-strong);
+  }
+
   .sf-file-tree__row.is-muted {
     opacity: 0.65;
   }
@@ -1426,6 +1436,20 @@
     block-size: 0.45rem;
     border-radius: 999px;
     background: var(--sf-color-text-faint);
+  }
+
+  .sf-file-tree__retry-button {
+    border: none;
+    padding: 0;
+    background: none;
+    color: var(--sf-color-accent-strong);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .sf-file-tree__retry-button:hover,
+  .sf-file-tree__retry-button:focus-visible {
+    text-decoration: underline;
   }
 
   .sf-context-panel {
@@ -1537,4 +1561,3 @@
     .sf-grid--cols-4 { grid-template-columns: minmax(0, 1fr); }
   }
 }
-
