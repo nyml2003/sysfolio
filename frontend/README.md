@@ -39,6 +39,7 @@
   - 省略 `--release-tag` 时，脚本会调用 GitHub `releases/latest` 并部署最新 Release
   - 如需指定版本：`python scripts/release.py deploy --repo <owner/name> --release-tag <tag>`
   - 指定端口：`python scripts/release.py deploy --port 8080`
+  - 默认部署目录是 `~/apps/sysfolio-frontend`，其中会生成 `dist/` 和 `nginx.conf`
 
 GitHub Release / 本机部署支持环境变量：
 

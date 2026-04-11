@@ -138,9 +138,7 @@ def check_health(url: str, timeout_seconds: int, interval_seconds: float) -> boo
                 if response.status == 200:
                     print(f"healthz ok: status=200 body={body!r}")
                     return True
-        except URLError:
-            pass
-        except TimeoutError:
+        except (OSError, TimeoutError, URLError):
             pass
 
         time.sleep(interval_seconds)
@@ -396,7 +394,10 @@ def resolve_release_tag(project_dir: Path, adapter: PlatformAdapter, requested_t
 
 
 def expand_deploy_dir(deploy_dir: str) -> Path:
-    return Path(deploy_dir).expanduser()
+    resolved = Path(deploy_dir).expanduser()
+    if resolved.is_absolute():
+        return resolved
+    return frontend_root() / resolved
 
 
 def resolve_runtime_image(requested_image: str) -> str:
@@ -410,6 +411,8 @@ def remove_container(project_dir: Path, adapter: PlatformAdapter, container_name
         cwd=str(project_dir),
         check=False,
         env=adapter.build_env(),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
 
 
