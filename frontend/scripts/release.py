@@ -3,6 +3,7 @@ import json
 import mimetypes
 import os
 import shlex
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -19,9 +20,10 @@ from urllib.request import Request, urlopen
 
 
 DIST_ARCHIVE_NAME = "dist.tar.gz"
-NGINX_IMAGE = "nginx:1.27-alpine"
-REMOTE_CONTAINER_NAME = "sysfolio-frontend"
 DEFAULT_REPO = "nyml2003/sysfolio"
+DEFAULT_DEPLOY_DIR = "~/apps/sysfolio-frontend"
+DEFAULT_CONTAINER_NAME = "sysfolio-frontend"
+DEFAULT_IMAGE = "m.daocloud.io/docker.io/library/nginx:1.27-alpine"
 
 
 class PlatformAdapter(ABC):
@@ -168,10 +170,11 @@ def create_dist_archive(project_dir: Path, output_file: Path) -> None:
 def github_headers(token: str, extra_headers: dict[str, str] | None = None) -> dict[str, str]:
     headers = {
         "Accept": "application/vnd.github+json",
-        "Authorization": f"Bearer {token}",
         "User-Agent": "sysfolio-release-script",
         "X-GitHub-Api-Version": "2022-11-28",
     }
+    if token != "":
+        headers["Authorization"] = f"Bearer {token}"
     if extra_headers:
         headers.update(extra_headers)
     return headers
@@ -244,6 +247,13 @@ def ensure_github_release(
     )
 
 
+def get_github_release(repo: str, tag: str, token: str) -> dict:
+    if tag == "":
+        return github_request(f"https://api.github.com/repos/{repo}/releases/latest", token)
+
+    return github_request(f"https://api.github.com/repos/{repo}/releases/tags/{tag}", token)
+
+
 def delete_existing_asset(repo: str, release: dict, asset_name: str, token: str) -> None:
     for asset in release.get("assets", []):
         if asset.get("name") != asset_name:
@@ -278,25 +288,15 @@ def upload_release_asset(repo: str, release: dict, asset_path: Path, token: str)
     )
 
 
-def download_release_asset(
-    repo: str,
-    tag: str,
-    token: str,
-    asset_name: str,
-    output_file: Path,
-) -> None:
-    release = github_request(
-        f"https://api.github.com/repos/{repo}/releases/tags/{tag}",
-        token,
-    )
+def download_release_asset(release: dict, asset_name: str, token: str, output_file: Path) -> None:
     assets = release.get("assets", [])
     asset = next((item for item in assets if item.get("name") == asset_name), None)
     if asset is None:
-        raise FileNotFoundError(f"asset not found on release {tag}: {asset_name}")
+        release_name = release.get("tag_name", "<unknown>")
+        raise FileNotFoundError(f"asset not found on release {release_name}: {asset_name}")
 
-    download_url = asset["url"]
     request = Request(
-        download_url,
+        asset["url"],
         headers=github_headers(
             token,
             {
@@ -308,9 +308,8 @@ def download_release_asset(
         output_file.write_bytes(response.read())
 
 
-def write_remote_nginx_conf(temp_dir: Path) -> Path:
-    nginx_conf = temp_dir / "nginx.conf"
-    nginx_conf.write_text(
+def write_runtime_nginx_conf(output_file: Path) -> None:
+    output_file.write_text(
         "\n".join(
             [
                 "server {",
@@ -335,7 +334,6 @@ def write_remote_nginx_conf(temp_dir: Path) -> Path:
         ),
         encoding="utf-8",
     )
-    return nginx_conf
 
 
 def add_common_validation_flags(parser: argparse.ArgumentParser) -> None:
@@ -343,14 +341,6 @@ def add_common_validation_flags(parser: argparse.ArgumentParser) -> None:
         "--skip-validate",
         action="store_true",
         help="Skip pnpm typecheck/test/lint before packaging or deploying.",
-    )
-
-
-def add_optional_validation_flag(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument(
-        "--validate",
-        action="store_true",
-        help="Run pnpm typecheck/test/lint before building and uploading.",
     )
 
 
@@ -369,6 +359,10 @@ def add_dist_archive_flags(parser: argparse.ArgumentParser) -> None:
 
 def resolve_output_archive(project_dir: Path, requested_output: str, asset_name: str) -> Path:
     return Path(requested_output) if requested_output else project_dir / asset_name
+
+
+def resolve_input_archive(project_dir: Path, requested_archive: str, asset_name: str) -> Path:
+    return Path(requested_archive) if requested_archive else project_dir / asset_name
 
 
 def resolve_package_version_tag(project_dir: Path) -> str:
@@ -401,42 +395,90 @@ def resolve_release_tag(project_dir: Path, adapter: PlatformAdapter, requested_t
     return resolve_package_version_tag(project_dir)
 
 
-def run_local_release(args: argparse.Namespace) -> int:
-    project_dir = frontend_root()
-    adapter = current_platform_adapter()
-    compose_base = ["docker", "compose", "--project-directory", str(project_dir)]
-    published_port = str(args.port) if args.port is not None else os.getenv("APP_PORT", "8080")
-    compose_env = {"APP_PORT": published_port}
-
-    if not args.skip_validate:
-        run_validation(project_dir, adapter)
-
-    run_frontend_build(project_dir, adapter)
-
-    run(compose_base + ["build"], project_dir, adapter, compose_env)
-    run(compose_base + ["up", "-d"], project_dir, adapter, compose_env)
-    run(compose_base + ["ps"], project_dir, adapter, compose_env)
-
-    healthz_url = f"http://localhost:{published_port}/healthz"
-    if not check_health(healthz_url, timeout_seconds=args.timeout, interval_seconds=1.5):
-        print(f"healthz failed: {healthz_url}")
-        if args.logs:
-            run(compose_base + ["logs", "--tail=120", "web"], project_dir, adapter, compose_env)
-        return 1
-
-    print(f"platform: {adapter.name}")
-    print(f"app url: http://localhost:{published_port}")
-
-    if args.logs:
-        run(compose_base + ["logs", "--tail=80", "web"], project_dir, adapter, compose_env)
-
-    if args.down:
-        run(compose_base + ["down"], project_dir, adapter, compose_env)
-
-    return 0
+def expand_deploy_dir(deploy_dir: str) -> Path:
+    return Path(deploy_dir).expanduser()
 
 
-def run_package_dist(args: argparse.Namespace) -> int:
+def resolve_runtime_image(requested_image: str) -> str:
+    env_image = os.getenv("SYSFOLIO_RUNTIME_IMAGE", "").strip()
+    return requested_image or env_image or DEFAULT_IMAGE
+
+
+def remove_container(project_dir: Path, adapter: PlatformAdapter, container_name: str) -> None:
+    subprocess.run(
+        adapter.resolve_command(["docker", "rm", "-f", container_name]),
+        cwd=str(project_dir),
+        check=False,
+        env=adapter.build_env(),
+    )
+
+
+def print_container_logs(
+    project_dir: Path,
+    adapter: PlatformAdapter,
+    container_name: str,
+    tail_lines: int,
+) -> None:
+    run(["docker", "logs", f"--tail={tail_lines}", container_name], project_dir, adapter)
+
+
+def stage_runtime_files(
+    archive_path: Path,
+    deploy_dir: Path,
+    asset_name: str,
+    keep_archive: bool,
+) -> None:
+    archive_path = archive_path.resolve()
+    deploy_dir.mkdir(parents=True, exist_ok=True)
+    dist_dir = deploy_dir / "dist"
+    if dist_dir.exists():
+        shutil.rmtree(dist_dir)
+
+    with tarfile.open(archive_path, "r:gz") as tar:
+        tar.extractall(deploy_dir)
+
+    write_runtime_nginx_conf(deploy_dir / "nginx.conf")
+
+    final_archive = (deploy_dir / asset_name).resolve()
+    if keep_archive and final_archive != archive_path:
+        shutil.copyfile(archive_path, final_archive)
+    elif not keep_archive and final_archive.exists() and final_archive != archive_path:
+        final_archive.unlink()
+
+
+def run_runtime_container(
+    project_dir: Path,
+    adapter: PlatformAdapter,
+    deploy_dir: Path,
+    container_name: str,
+    image: str,
+    port: int,
+) -> None:
+    run(["docker", "pull", image], project_dir, adapter)
+    remove_container(project_dir, adapter, container_name)
+    run(
+        [
+            "docker",
+            "run",
+            "-d",
+            "--name",
+            container_name,
+            "--restart",
+            "unless-stopped",
+            "-p",
+            f"{port}:80",
+            "-v",
+            f"{deploy_dir / 'dist'}:/usr/share/nginx/html:ro",
+            "-v",
+            f"{deploy_dir / 'nginx.conf'}:/etc/nginx/conf.d/default.conf:ro",
+            image,
+        ],
+        project_dir,
+        adapter,
+    )
+
+
+def run_build(args: argparse.Namespace) -> int:
     project_dir = frontend_root()
     adapter = current_platform_adapter()
     output_file = resolve_output_archive(project_dir, args.output, args.asset_name)
@@ -451,21 +493,19 @@ def run_package_dist(args: argparse.Namespace) -> int:
     return 0
 
 
-def run_github_release(args: argparse.Namespace) -> int:
+def run_upload(args: argparse.Namespace) -> int:
     project_dir = frontend_root()
     adapter = current_platform_adapter()
     token = args.token or os.getenv("GITHUB_TOKEN", "")
     if token == "":
         print("missing GitHub token: --token or GITHUB_TOKEN")
         return 1
+
     tag = resolve_release_tag(project_dir, adapter, args.tag)
-
-    output_file = resolve_output_archive(project_dir, args.output, args.asset_name)
-    if args.validate:
-        run_validation(project_dir, adapter)
-
-    run_frontend_build(project_dir, adapter)
-    create_dist_archive(project_dir, output_file)
+    archive_path = resolve_input_archive(project_dir, args.archive, args.asset_name)
+    if not archive_path.exists():
+        print(f"archive not found: {archive_path}")
+        return 1
 
     release = ensure_github_release(
         repo=args.repo,
@@ -475,120 +515,87 @@ def run_github_release(args: argparse.Namespace) -> int:
         body=args.body,
         target_commitish=args.target or "main",
     )
-    asset = upload_release_asset(args.repo, release, output_file, token)
+    asset = upload_release_asset(args.repo, release, archive_path, token)
 
     print(f"release: {release.get('html_url', '')}")
     print(f"asset: {asset.get('browser_download_url', '')}")
     return 0
 
 
-def run_remote_release(args: argparse.Namespace) -> int:
+def run_deploy(args: argparse.Namespace) -> int:
     project_dir = frontend_root()
     adapter = current_platform_adapter()
-    host = args.host or os.getenv("UBUNTU_HOST", "")
-    user = args.user or os.getenv("UBUNTU_USER", "")
-    port = str(args.port or os.getenv("UBUNTU_PORT", "22"))
-    ssh_key = args.ssh_key or os.getenv("UBUNTU_SSH_KEY", "")
-    remote_dir = args.remote_dir or os.getenv("UBUNTU_REMOTE_DIR", "~/apps/sysfolio-frontend")
-    app_port = str(args.app_port or os.getenv("APP_PORT", "8080"))
-    token = args.token or os.getenv("GITHUB_TOKEN", "")
-
-    if host == "" or user == "":
-        print("missing deploy target: --host/--user or UBUNTU_HOST/UBUNTU_USER")
-        return 1
-
-    if args.archive == "" and args.release_tag == "":
-        print("remote-release requires either --archive or --release-tag")
-        return 1
-
-    if args.release_tag != "" and (args.repo == "" or token == ""):
-        print("release download requires --repo and --token/GITHUB_TOKEN")
-        return 1
-
-    ssh_target = f"{user}@{host}"
-    ssh_base = ["ssh", "-p", port]
-    scp_base = ["scp", "-P", port]
-    if ssh_key != "":
-        ssh_base.extend(["-i", ssh_key])
-        scp_base.extend(["-i", ssh_key])
+    deploy_dir = expand_deploy_dir(args.deploy_dir)
+    image = resolve_runtime_image(args.image)
+    release_tag = ""
 
     with tempfile.TemporaryDirectory() as temp_dir_name:
         temp_dir = Path(temp_dir_name)
-        archive_path = Path(args.archive) if args.archive != "" else temp_dir / args.asset_name
-        if args.release_tag != "":
-            download_release_asset(
-                repo=args.repo,
-                tag=args.release_tag,
-                token=token,
-                asset_name=args.asset_name,
-                output_file=archive_path,
-            )
+        if args.archive != "":
+            archive_path = Path(args.archive)
+            if not archive_path.exists():
+                print(f"archive not found: {archive_path}")
+                return 1
+        else:
+            archive_path = temp_dir / args.asset_name
+            release = get_github_release(args.repo, args.release_tag, args.token)
+            release_tag = str(release.get("tag_name", ""))
+            if release_tag == "":
+                print("failed to resolve release tag")
+                return 1
+            download_release_asset(release, args.asset_name, args.token, archive_path)
+        stage_runtime_files(archive_path, deploy_dir, args.asset_name, args.keep_archive)
 
-        nginx_conf = write_remote_nginx_conf(temp_dir)
-        remote_archive = "/tmp/sysfolio-frontend-dist.tar.gz"
-        remote_nginx_conf = "/tmp/sysfolio-frontend-nginx.conf"
+    run_runtime_container(
+        project_dir=project_dir,
+        adapter=adapter,
+        deploy_dir=deploy_dir,
+        container_name=args.container_name,
+        image=image,
+        port=args.port,
+    )
 
-        run(scp_base + [str(archive_path), f"{ssh_target}:{remote_archive}"], project_dir, adapter)
-        run(scp_base + [str(nginx_conf), f"{ssh_target}:{remote_nginx_conf}"], project_dir, adapter)
+    healthz_url = f"http://localhost:{args.port}/healthz"
+    if not check_health(healthz_url, timeout_seconds=args.timeout, interval_seconds=1.5):
+        print(f"healthz failed: {healthz_url}")
+        if args.logs:
+            print_container_logs(project_dir, adapter, args.container_name, 120)
+        if args.down:
+            remove_container(project_dir, adapter, args.container_name)
+        return 1
 
-        remote_script = f"""
-set -e
-mkdir -p {shlex.quote(remote_dir)}
-rm -rf {shlex.quote(remote_dir)}/dist
-tar -xzf {shlex.quote(remote_archive)} -C {shlex.quote(remote_dir)}
-mv {shlex.quote(remote_nginx_conf)} {shlex.quote(remote_dir)}/nginx.conf
-docker pull {shlex.quote(NGINX_IMAGE)}
-docker rm -f {shlex.quote(REMOTE_CONTAINER_NAME)} || true
-docker run -d \\
-  --name {shlex.quote(REMOTE_CONTAINER_NAME)} \\
-  --restart unless-stopped \\
-  -p {shlex.quote(app_port)}:80 \\
-  -v {shlex.quote(remote_dir)}/dist:/usr/share/nginx/html:ro \\
-  -v {shlex.quote(remote_dir)}/nginx.conf:/etc/nginx/conf.d/default.conf:ro \\
-  {shlex.quote(NGINX_IMAGE)}
-docker ps --filter name={shlex.quote(REMOTE_CONTAINER_NAME)}
-"""
-        run(ssh_base + [ssh_target, remote_script], project_dir, adapter)
+    if release_tag != "":
+        print(f"release tag: {release_tag}")
+    else:
+        print(f"archive: {Path(args.archive)}")
+    print(f"app url: http://localhost:{args.port}")
+    print(f"healthz: {healthz_url}")
+    print(f"deploy dir: {deploy_dir}")
+    print(f"image: {image}")
 
-    print()
-    print("deploy complete")
-    print(f"http://{host}:{app_port}")
-    print(f"http://{host}:{app_port}/healthz")
+    if args.logs:
+        print_container_logs(project_dir, adapter, args.container_name, 80)
+
+    if args.down:
+        remove_container(project_dir, adapter, args.container_name)
+
     return 0
 
 
-def add_local_subparser(subparsers: argparse._SubParsersAction) -> None:
+def add_build_subparser(subparsers: argparse._SubParsersAction) -> None:
     parser = subparsers.add_parser(
-        "local-release",
-        help="Build dist locally, build the runtime image from dist, run it, and health-check it.",
-    )
-    parser.add_argument("--port", type=int, default=None, help="Published port, default 8080.")
-    parser.add_argument("--down", action="store_true", help="Run docker compose down at the end.")
-    parser.add_argument("--logs", action="store_true", help="Print docker compose logs after startup.")
-    parser.add_argument(
-        "--timeout",
-        type=int,
-        default=60,
-        help="Health check timeout in seconds, default 60.",
-    )
-    add_common_validation_flags(parser)
-    parser.set_defaults(handler=run_local_release)
-
-
-def add_package_subparser(subparsers: argparse._SubParsersAction) -> None:
-    parser = subparsers.add_parser(
-        "package-dist",
-        help="Run validation, build dist/, and package it as dist.tar.gz.",
+        "build",
+        help="Validate, build dist/, and package it as a release archive.",
     )
     add_common_validation_flags(parser)
     add_dist_archive_flags(parser)
-    parser.set_defaults(handler=run_package_dist)
+    parser.set_defaults(handler=run_build)
 
 
-def add_github_release_subparser(subparsers: argparse._SubParsersAction) -> None:
+def add_upload_subparser(subparsers: argparse._SubParsersAction) -> None:
     parser = subparsers.add_parser(
-        "github-release",
-        help="Build dist.tar.gz locally and upload it to a GitHub Release.",
+        "upload",
+        help="Upload a prebuilt release archive to a GitHub Release.",
     )
     parser.add_argument(
         "--repo",
@@ -604,61 +611,96 @@ def add_github_release_subparser(subparsers: argparse._SubParsersAction) -> None
     parser.add_argument("--body", default="", help="Release notes body.")
     parser.add_argument("--target", default="", help="Target branch or commit, defaults to main.")
     parser.add_argument("--token", default="", help="GitHub token, or use GITHUB_TOKEN.")
-    add_optional_validation_flag(parser)
-    add_dist_archive_flags(parser)
-    parser.set_defaults(handler=run_github_release)
-
-
-def add_remote_subparser(subparsers: argparse._SubParsersAction) -> None:
-    parser = subparsers.add_parser(
-        "remote-release",
-        help="Deploy a prebuilt dist.tar.gz to a remote host without building on the server.",
-    )
-    parser.add_argument("--host", default="", help="Remote host, or use UBUNTU_HOST.")
-    parser.add_argument("--user", default="", help="Remote user, or use UBUNTU_USER.")
-    parser.add_argument("--port", default="", help="Remote SSH port, default 22.")
-    parser.add_argument("--ssh-key", default="", help="SSH private key path, or use UBUNTU_SSH_KEY.")
-    parser.add_argument(
-        "--remote-dir",
-        default="",
-        help="Remote deployment directory, or use UBUNTU_REMOTE_DIR.",
-    )
-    parser.add_argument(
-        "--app-port",
-        default="",
-        help="Published port on the remote host, default 8080.",
-    )
     parser.add_argument(
         "--archive",
         default="",
-        help="Local dist.tar.gz path to upload. If omitted, use --release-tag.",
+        help="Local archive path to upload. Defaults to frontend/dist.tar.gz or the selected asset name.",
     )
-    parser.add_argument(
-        "--release-tag",
-        default="",
-        help="GitHub Release tag to download before deployment.",
-    )
-    parser.add_argument("--repo", default="", help="GitHub repo in owner/name format.")
-    parser.add_argument("--token", default="", help="GitHub token, or use GITHUB_TOKEN.")
     parser.add_argument(
         "--asset-name",
         default=DIST_ARCHIVE_NAME,
         help=f"Release asset name, default {DIST_ARCHIVE_NAME}.",
     )
-    parser.set_defaults(handler=run_remote_release)
+    parser.set_defaults(handler=run_upload)
 
 
-def main() -> int:
+def add_deploy_subparser(subparsers: argparse._SubParsersAction) -> None:
+    parser = subparsers.add_parser(
+        "deploy",
+        help="Deploy a release archive to the current machine from a local file or GitHub Release.",
+    )
+    parser.add_argument(
+        "--repo",
+        default=DEFAULT_REPO,
+        help=f"GitHub repo in owner/name format, default {DEFAULT_REPO}. Ignored when --archive is set.",
+    )
+    parser.add_argument(
+        "--release-tag",
+        default="",
+        help="Release tag to deploy. Omit to use the latest release when --archive is not set.",
+    )
+    parser.add_argument(
+        "--archive",
+        default="",
+        help="Local archive path to deploy. If omitted, deploy from GitHub Release.",
+    )
+    parser.add_argument(
+        "--asset-name",
+        default=DIST_ARCHIVE_NAME,
+        help=f"Release asset name, default {DIST_ARCHIVE_NAME}. Used for GitHub download and kept archive naming.",
+    )
+    parser.add_argument(
+        "--deploy-dir",
+        default=DEFAULT_DEPLOY_DIR,
+        help=f"Deployment directory on the current machine, default {DEFAULT_DEPLOY_DIR}.",
+    )
+    parser.add_argument(
+        "--container-name",
+        default=DEFAULT_CONTAINER_NAME,
+        help=f"Docker container name, default {DEFAULT_CONTAINER_NAME}.",
+    )
+    parser.add_argument(
+        "--image",
+        default="",
+        help=f"Runtime image, default {DEFAULT_IMAGE}, or use SYSFOLIO_RUNTIME_IMAGE.",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=int(os.getenv("APP_PORT", "8080")),
+        help="Published HTTP port, default 8080.",
+    )
+    parser.add_argument(
+        "--token",
+        default=os.getenv("GITHUB_TOKEN", ""),
+        help="Optional GitHub token. Recommended to avoid rate limits.",
+    )
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=60,
+        help="Health check timeout seconds, default 60.",
+    )
+    parser.add_argument(
+        "--keep-archive",
+        action="store_true",
+        help="Keep the deployed archive in the deploy directory.",
+    )
+    parser.add_argument("--logs", action="store_true", help="Print container logs after startup.")
+    parser.add_argument("--down", action="store_true", help="Remove the runtime container at the end.")
+    parser.set_defaults(handler=run_deploy)
+
+
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Cross-platform release helpers for packaging and deploying the frontend."
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
-    add_local_subparser(subparsers)
-    add_package_subparser(subparsers)
-    add_github_release_subparser(subparsers)
-    add_remote_subparser(subparsers)
+    add_build_subparser(subparsers)
+    add_upload_subparser(subparsers)
+    add_deploy_subparser(subparsers)
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     return args.handler(args)
 
 

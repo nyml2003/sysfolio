@@ -4,6 +4,17 @@ export const labels = {
   article: {
     restoreNotice: 'Restored your previous reading position.',
   },
+  contextPanel: {
+    placeholderTitle: 'Context',
+    tocTitle: 'Table of contents',
+  },
+  fileTree: {
+    ariaLabel: 'File tree',
+    title: 'Filesystem',
+  },
+  onboarding: {
+    dismiss: 'Dismiss',
+  },
   shell: {
     contextButton: 'Context',
     contextPanel: 'Context panel',
@@ -30,6 +41,17 @@ export async function expectPath(page: Page, path: string) {
   await expect(page).toHaveURL(pattern);
 }
 
+export async function dismissOnboarding(page: Page) {
+  const dismissButton = page.getByRole('button', {
+    exact: true,
+    name: labels.onboarding.dismiss,
+  });
+
+  if ((await dismissButton.count()) > 0) {
+    await dismissButton.click();
+  }
+}
+
 export function articleView(page: Page) {
   return page.getByTestId(testIds.articleView);
 }
@@ -52,6 +74,14 @@ export function filesButton(page: Page) {
 
 export function homeView(page: Page) {
   return page.getByTestId(testIds.homeView);
+}
+
+export function fileTree(scope: Page | Locator) {
+  return scope.getByRole('complementary', { name: labels.fileTree.ariaLabel });
+}
+
+export function fileTreeItem(scope: Page | Locator, name: string) {
+  return scope.getByRole('treeitem', { exact: true, name });
 }
 
 export function navigationDialog(page: Page) {

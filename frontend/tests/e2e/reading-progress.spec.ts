@@ -3,22 +3,28 @@ import { expect, test } from '@playwright/test';
 import {
   articleView,
   contentScrollRegion,
+  dismissOnboarding,
   expectPath,
-  filesButton,
-  navigationDialog,
+  fileTreeItem,
+  labels,
 } from './helpers/routes';
+
+const articlePath = '/audit/demo-content-model';
 
 test.use({
   viewport: {
-    width: 393,
-    height: 480,
+    width: 1440,
+    height: 720,
   },
 });
 
-test('restores the reading position after leaving and reopening an article', async ({ page }) => {
-  await page.goto('/foundation/style-provider');
-  await expectPath(page, '/foundation/style-provider');
+test('restores the reading position after leaving and reopening an article on desktop', async ({
+  page,
+}) => {
+  await page.goto(articlePath);
+  await expectPath(page, articlePath);
   await expect(articleView(page)).toBeVisible();
+  await dismissOnboarding(page);
 
   const region = contentScrollRegion(page);
   const maxScroll = await region.evaluate((element) => element.scrollHeight - element.clientHeight);
@@ -36,16 +42,14 @@ test('restores the reading position after leaving and reopening an article', asy
     .poll(async () => contentScrollRegion(page).evaluate((element) => element.scrollTop))
     .toBe(targetScrollTop);
 
-  await filesButton(page).click();
-  await expect(navigationDialog(page)).toBeVisible();
-  await navigationDialog(page).getByRole('button', { exact: true, name: 'Foundation' }).focus();
-  await page.keyboard.press('Enter');
+  await fileTreeItem(page, 'Audit').click();
 
-  await expectPath(page, '/foundation');
+  await expectPath(page, '/audit');
 
-  await page.goBack();
-  await expectPath(page, '/foundation/style-provider');
+  await page.goto(articlePath);
+  await expectPath(page, articlePath);
   await expect(articleView(page)).toBeVisible();
+  await expect(page.getByText(labels.article.restoreNotice)).toBeVisible();
 
   await expect
     .poll(async () => contentScrollRegion(page).evaluate((element) => element.scrollTop))

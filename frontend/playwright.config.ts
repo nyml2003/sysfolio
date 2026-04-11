@@ -1,6 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const baseURL = 'http://127.0.0.1:4173';
+const desktopViewport = {
+  width: 1440,
+  height: 960,
+};
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -9,10 +13,11 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
-    ...devices['Pixel 5'],
+    ...devices['Desktop Chrome'],
     baseURL,
     headless: true,
     trace: 'on-first-retry',
+    viewport: desktopViewport,
   },
   webServer: {
     command: 'pnpm exec vite --host 127.0.0.1 --port 4173',

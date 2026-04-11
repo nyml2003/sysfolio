@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        RUNTIME_IMAGE: ${SYSFOLIO_RUNTIME_IMAGE:-m.daocloud.io/docker.io/library/nginx:1.27-alpine}
     container_name: sysfolio-frontend
     ports:
       - "${APP_PORT:-8080}:80"
