@@ -3,7 +3,7 @@ import type {
   ArticleSection,
   ContentNode,
   DirectoryContent,
-  DocumentId,
+  ArtifactId,
   HomeContent,
   NodeId,
 } from '@/entities/content';
@@ -17,9 +17,9 @@ export const ROOT_NODE_TITLE = 'system-library';
 export type OverviewFixtures = {
   rootNodeTitle: string;
   contentNodes: ContentNode[];
-  homeContents: Record<DocumentId, HomeContent>;
+  homeContents: Record<ArtifactId, HomeContent>;
   directoryDescriptions: Record<NodeId, DirectoryContent['description']>;
-  articleDocuments: Record<DocumentId, ArticleDocument>;
+  articleDocuments: Record<ArtifactId, ArticleDocument>;
 };
 
 export type OverviewLayer = 'foundation' | 'layout' | 'primitive' | 'pattern' | 'audit';
@@ -35,7 +35,7 @@ export type OverviewGap = {
 };
 
 export type OverviewDocumentMeta = {
-  documentId: DocumentId;
+  artifactId: ArtifactId;
   layer: OverviewLayer;
   status: OverviewDocumentStatus;
   designStatus: OverviewDesignStatus;
@@ -66,14 +66,14 @@ type NodeConfig = {
   ancestorIds: NodeId[];
   pathSegments: string[];
   childrenCount: Option<number>;
-  documentId: Option<DocumentId>;
+  artifactId: Option<ArtifactId>;
   publishedAt: Option<string>;
   updatedAt: Option<string>;
   readingMinutes: Option<number>;
 };
 
 type ArticleConfig = {
-  id: DocumentId;
+  id: ArtifactId;
   title: string;
   summary: string;
   eyebrow: string;
@@ -98,7 +98,7 @@ function createNode(config: NodeConfig): ContentNode {
     pathSegments: config.pathSegments,
     childrenCount,
     hasChildren: childrenCount > 0,
-    documentId: config.documentId,
+    artifactId: config.artifactId,
     publishedAt: config.publishedAt,
     updatedAt: config.updatedAt,
     readingMinutes: config.readingMinutes,
@@ -137,10 +137,10 @@ function createSection(
 
 function createOverviewDocumentMetaByLocale(
   locale: AppLocale
-): Record<DocumentId, OverviewDocumentMeta> {
+): Record<ArtifactId, OverviewDocumentMeta> {
   return {
     'doc-style-provider': {
-      documentId: 'doc-style-provider',
+      artifactId: 'doc-style-provider',
       layer: 'foundation',
       status: 'ready',
       designStatus: 'confirmed',
@@ -150,7 +150,7 @@ function createOverviewDocumentMetaByLocale(
       relatedPaths: ['/foundation/theme-and-density', '/layout/app-shell'],
     },
     'doc-tokens': {
-      documentId: 'doc-tokens',
+      artifactId: 'doc-tokens',
       layer: 'foundation',
       status: 'partial',
       designStatus: 'needs-review',
@@ -171,7 +171,7 @@ function createOverviewDocumentMetaByLocale(
       relatedPaths: ['/foundation/theme-and-density'],
     },
     'doc-theme-density': {
-      documentId: 'doc-theme-density',
+      artifactId: 'doc-theme-density',
       layer: 'foundation',
       status: 'ready',
       designStatus: 'confirmed',
@@ -181,7 +181,7 @@ function createOverviewDocumentMetaByLocale(
       relatedPaths: ['/foundation/style-provider'],
     },
     'doc-layout-primitives': {
-      documentId: 'doc-layout-primitives',
+      artifactId: 'doc-layout-primitives',
       layer: 'layout',
       status: 'ready',
       designStatus: 'confirmed',
@@ -191,7 +191,7 @@ function createOverviewDocumentMetaByLocale(
       relatedPaths: ['/layout/app-shell'],
     },
     'doc-app-shell': {
-      documentId: 'doc-app-shell',
+      artifactId: 'doc-app-shell',
       layer: 'layout',
       status: 'partial',
       designStatus: 'needs-review',
@@ -212,7 +212,7 @@ function createOverviewDocumentMetaByLocale(
       relatedPaths: ['/patterns/navigation/tree-nav'],
     },
     'doc-button': {
-      documentId: 'doc-button',
+      artifactId: 'doc-button',
       layer: 'primitive',
       status: 'partial',
       designStatus: 'needs-design',
@@ -233,7 +233,7 @@ function createOverviewDocumentMetaByLocale(
       relatedPaths: ['/primitives/data-entry/field-and-input'],
     },
     'doc-heading': {
-      documentId: 'doc-heading',
+      artifactId: 'doc-heading',
       layer: 'primitive',
       status: 'partial',
       designStatus: 'needs-review',
@@ -260,7 +260,7 @@ function createOverviewDocumentMetaByLocale(
       ],
     },
     'doc-label': {
-      documentId: 'doc-label',
+      artifactId: 'doc-label',
       layer: 'primitive',
       status: 'partial',
       designStatus: 'needs-review',
@@ -287,7 +287,7 @@ function createOverviewDocumentMetaByLocale(
       ],
     },
     'doc-text': {
-      documentId: 'doc-text',
+      artifactId: 'doc-text',
       layer: 'primitive',
       status: 'partial',
       designStatus: 'needs-review',
@@ -313,7 +313,7 @@ function createOverviewDocumentMetaByLocale(
       ],
     },
     'doc-link': {
-      documentId: 'doc-link',
+      artifactId: 'doc-link',
       layer: 'primitive',
       status: 'partial',
       designStatus: 'needs-review',
@@ -338,7 +338,7 @@ function createOverviewDocumentMetaByLocale(
       ],
     },
     'doc-code-block-surface': {
-      documentId: 'doc-code-block-surface',
+      artifactId: 'doc-code-block-surface',
       layer: 'primitive',
       status: 'partial',
       designStatus: 'needs-review',
@@ -359,7 +359,7 @@ function createOverviewDocumentMetaByLocale(
       relatedPaths: ['/primitives/content/text', '/primitives/actions/button'],
     },
     'doc-field-input': {
-      documentId: 'doc-field-input',
+      artifactId: 'doc-field-input',
       layer: 'primitive',
       status: 'partial',
       designStatus: 'needs-review',
@@ -384,7 +384,7 @@ function createOverviewDocumentMetaByLocale(
       ],
     },
     'doc-search-input': {
-      documentId: 'doc-search-input',
+      artifactId: 'doc-search-input',
       layer: 'primitive',
       status: 'partial',
       designStatus: 'needs-review',
@@ -409,7 +409,7 @@ function createOverviewDocumentMetaByLocale(
       ],
     },
     'doc-number-input': {
-      documentId: 'doc-number-input',
+      artifactId: 'doc-number-input',
       layer: 'primitive',
       status: 'partial',
       designStatus: 'needs-review',
@@ -434,7 +434,7 @@ function createOverviewDocumentMetaByLocale(
       ],
     },
     'doc-tree-nav': {
-      documentId: 'doc-tree-nav',
+      artifactId: 'doc-tree-nav',
       layer: 'pattern',
       status: 'partial',
       designStatus: 'needs-review',
@@ -455,7 +455,7 @@ function createOverviewDocumentMetaByLocale(
       relatedPaths: ['/layout/app-shell'],
     },
     'doc-view-state-layout': {
-      documentId: 'doc-view-state-layout',
+      artifactId: 'doc-view-state-layout',
       layer: 'pattern',
       status: 'partial',
       designStatus: 'needs-review',
@@ -476,7 +476,7 @@ function createOverviewDocumentMetaByLocale(
       relatedPaths: ['/primitives/feedback/status-feedback'],
     },
     'doc-design-gaps': {
-      documentId: 'doc-design-gaps',
+      artifactId: 'doc-design-gaps',
       layer: 'audit',
       status: 'partial',
       designStatus: 'needs-review',
@@ -490,7 +490,7 @@ function createOverviewDocumentMetaByLocale(
 
 export function getOverviewDocumentMetaById(
   locale: AppLocale = DEFAULT_LOCALE
-): Record<DocumentId, OverviewDocumentMeta> {
+): Record<ArtifactId, OverviewDocumentMeta> {
   return createOverviewDocumentMetaByLocale(locale);
 }
 
@@ -557,7 +557,7 @@ export function listOverviewDesignGaps(locale: AppLocale = DEFAULT_LOCALE): Over
   return Object.values(getOverviewDocumentMetaById(locale)).flatMap((meta) => meta.gaps);
 }
 
-function createOverviewArticleDocuments(locale: AppLocale): Record<DocumentId, ArticleDocument> {
+function createOverviewArticleDocuments(locale: AppLocale): Record<ArtifactId, ArticleDocument> {
   return {
     'doc-style-provider': createArticle({
       id: 'doc-style-provider',
@@ -1121,20 +1121,20 @@ function createOverviewArticleDocuments(locale: AppLocale): Record<DocumentId, A
 }
 
 export function getOverviewDocumentMeta(
-  documentId: DocumentId,
+  artifactId: ArtifactId,
   locale: AppLocale = DEFAULT_LOCALE
 ): Option<OverviewDocumentMeta> {
   const documentMetaById = getOverviewDocumentMetaById(locale);
 
-  return Object.prototype.hasOwnProperty.call(documentMetaById, documentId)
-    ? some(documentMetaById[documentId])
+  return Object.prototype.hasOwnProperty.call(documentMetaById, artifactId)
+    ? some(documentMetaById[artifactId])
     : none();
 }
 
 export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtures {
   const baseArticleDocuments = createOverviewArticleDocuments(locale);
   const markdownFixtures = createMarkdownDemoFixtures();
-  const articleDocuments: Record<DocumentId, ArticleDocument> = {
+  const articleDocuments: Record<ArtifactId, ArticleDocument> = {
     ...baseArticleDocuments,
     ...markdownFixtures.articleDocuments,
   };
@@ -1151,7 +1151,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
   const statesTitle = localize(locale, 'States', '状态');
   const defaultNodeMeta = {
     childrenCount: none(),
-    documentId: none(),
+    artifactId: none(),
     publishedAt: none(),
     updatedAt: none(),
     readingMinutes: none(),
@@ -1240,7 +1240,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       pathSegments: [],
       childrenCount: 6,
       hasChildren: true,
-      documentId: none(),
+      artifactId: none(),
       publishedAt: none(),
       updatedAt: none(),
       readingMinutes: none(),
@@ -1254,7 +1254,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: ROOT_NODE_ID,
       ancestorIds: [ROOT_NODE_ID],
       pathSegments: [],
-      documentId: some('home-doc'),
+      artifactId: some('home-doc'),
     }),
     createNode({
       ...defaultNodeMeta,
@@ -1320,7 +1320,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'foundation',
       ancestorIds: [ROOT_NODE_ID, 'foundation'],
       pathSegments: ['foundation', 'style-provider'],
-      documentId: some('doc-style-provider'),
+      artifactId: some('doc-style-provider'),
       publishedAt: some('2026-03-21T08:30:00.000Z'),
       updatedAt: some('2026-03-22T07:30:00.000Z'),
       readingMinutes: some(4),
@@ -1334,7 +1334,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'foundation',
       ancestorIds: [ROOT_NODE_ID, 'foundation'],
       pathSegments: ['foundation', 'token-map'],
-      documentId: some('doc-tokens'),
+      artifactId: some('doc-tokens'),
       publishedAt: some('2026-03-20T08:30:00.000Z'),
       updatedAt: some('2026-03-22T07:15:00.000Z'),
       readingMinutes: some(4),
@@ -1348,7 +1348,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'foundation',
       ancestorIds: [ROOT_NODE_ID, 'foundation'],
       pathSegments: ['foundation', 'theme-and-density'],
-      documentId: some('doc-theme-density'),
+      artifactId: some('doc-theme-density'),
       publishedAt: some('2026-03-19T08:30:00.000Z'),
       updatedAt: some('2026-03-22T06:30:00.000Z'),
       readingMinutes: some(4),
@@ -1362,7 +1362,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'layout',
       ancestorIds: [ROOT_NODE_ID, 'layout'],
       pathSegments: ['layout', 'layout-primitives'],
-      documentId: some('doc-layout-primitives'),
+      artifactId: some('doc-layout-primitives'),
       publishedAt: some('2026-03-20T07:30:00.000Z'),
       updatedAt: some('2026-03-21T11:00:00.000Z'),
       readingMinutes: some(4),
@@ -1376,7 +1376,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'layout',
       ancestorIds: [ROOT_NODE_ID, 'layout'],
       pathSegments: ['layout', 'app-shell'],
-      documentId: some('doc-app-shell'),
+      artifactId: some('doc-app-shell'),
       publishedAt: some('2026-03-21T07:30:00.000Z'),
       updatedAt: some('2026-03-22T06:45:00.000Z'),
       readingMinutes: some(5),
@@ -1423,7 +1423,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'primitives-actions',
       ancestorIds: [ROOT_NODE_ID, 'primitives', 'primitives-actions'],
       pathSegments: ['primitives', 'actions', 'button'],
-      documentId: some('doc-button'),
+      artifactId: some('doc-button'),
       publishedAt: some('2026-03-18T07:45:00.000Z'),
       updatedAt: some('2026-03-22T05:20:00.000Z'),
       readingMinutes: some(4),
@@ -1437,7 +1437,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'primitives-data-entry',
       ancestorIds: [ROOT_NODE_ID, 'primitives', 'primitives-data-entry'],
       pathSegments: ['primitives', 'data-entry', 'field-and-input'],
-      documentId: some('doc-field-input'),
+      artifactId: some('doc-field-input'),
       publishedAt: some('2026-03-18T07:50:00.000Z'),
       updatedAt: some('2026-03-21T16:20:00.000Z'),
       readingMinutes: some(4),
@@ -1451,7 +1451,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'primitives-data-entry',
       ancestorIds: [ROOT_NODE_ID, 'primitives', 'primitives-data-entry'],
       pathSegments: ['primitives', 'data-entry', 'search-input'],
-      documentId: some('doc-search-input'),
+      artifactId: some('doc-search-input'),
       publishedAt: some('2026-03-22T10:00:00.000Z'),
       updatedAt: some('2026-03-22T10:00:00.000Z'),
       readingMinutes: some(3),
@@ -1465,7 +1465,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'primitives-data-entry',
       ancestorIds: [ROOT_NODE_ID, 'primitives', 'primitives-data-entry'],
       pathSegments: ['primitives', 'data-entry', 'number-input'],
-      documentId: some('doc-number-input'),
+      artifactId: some('doc-number-input'),
       publishedAt: some('2026-03-22T10:15:00.000Z'),
       updatedAt: some('2026-03-22T10:15:00.000Z'),
       readingMinutes: some(3),
@@ -1479,7 +1479,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'primitives-content',
       ancestorIds: [ROOT_NODE_ID, 'primitives', 'primitives-content'],
       pathSegments: ['primitives', 'content', 'heading'],
-      documentId: some('doc-heading'),
+      artifactId: some('doc-heading'),
       publishedAt: some('2026-03-22T08:10:00.000Z'),
       updatedAt: some('2026-03-22T08:10:00.000Z'),
       readingMinutes: some(3),
@@ -1493,7 +1493,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'primitives-content',
       ancestorIds: [ROOT_NODE_ID, 'primitives', 'primitives-content'],
       pathSegments: ['primitives', 'content', 'label'],
-      documentId: some('doc-label'),
+      artifactId: some('doc-label'),
       publishedAt: some('2026-03-22T08:25:00.000Z'),
       updatedAt: some('2026-03-22T08:25:00.000Z'),
       readingMinutes: some(3),
@@ -1507,7 +1507,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'primitives-content',
       ancestorIds: [ROOT_NODE_ID, 'primitives', 'primitives-content'],
       pathSegments: ['primitives', 'content', 'text'],
-      documentId: some('doc-text'),
+      artifactId: some('doc-text'),
       publishedAt: some('2026-03-22T09:00:00.000Z'),
       updatedAt: some('2026-03-22T09:00:00.000Z'),
       readingMinutes: some(3),
@@ -1521,7 +1521,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'primitives-content',
       ancestorIds: [ROOT_NODE_ID, 'primitives', 'primitives-content'],
       pathSegments: ['primitives', 'content', 'link'],
-      documentId: some('doc-link'),
+      artifactId: some('doc-link'),
       publishedAt: some('2026-03-22T09:15:00.000Z'),
       updatedAt: some('2026-03-22T09:15:00.000Z'),
       readingMinutes: some(3),
@@ -1535,7 +1535,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'primitives-content',
       ancestorIds: [ROOT_NODE_ID, 'primitives', 'primitives-content'],
       pathSegments: ['primitives', 'content', 'code-block-surface'],
-      documentId: some('doc-code-block-surface'),
+      artifactId: some('doc-code-block-surface'),
       publishedAt: some('2026-03-22T09:30:00.000Z'),
       updatedAt: some('2026-03-22T09:30:00.000Z'),
       readingMinutes: some(3),
@@ -1571,7 +1571,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'patterns-navigation',
       ancestorIds: [ROOT_NODE_ID, 'patterns', 'patterns-navigation'],
       pathSegments: ['patterns', 'navigation', 'tree-nav'],
-      documentId: some('doc-tree-nav'),
+      artifactId: some('doc-tree-nav'),
       publishedAt: some('2026-03-18T08:30:00.000Z'),
       updatedAt: some('2026-03-22T05:45:00.000Z'),
       readingMinutes: some(4),
@@ -1585,7 +1585,7 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'patterns-states',
       ancestorIds: [ROOT_NODE_ID, 'patterns', 'patterns-states'],
       pathSegments: ['patterns', 'states', 'view-state-layout'],
-      documentId: some('doc-view-state-layout'),
+      artifactId: some('doc-view-state-layout'),
       publishedAt: some('2026-03-18T08:40:00.000Z'),
       updatedAt: some('2026-03-21T10:10:00.000Z'),
       readingMinutes: some(4),
@@ -1599,14 +1599,14 @@ export function createOverviewLibraryFixtures(locale: AppLocale): OverviewFixtur
       parentId: 'audit',
       ancestorIds: [ROOT_NODE_ID, 'audit'],
       pathSegments: ['audit', 'design-gaps'],
-      documentId: some('doc-design-gaps'),
+      artifactId: some('doc-design-gaps'),
       publishedAt: some('2026-03-22T04:05:00.000Z'),
       updatedAt: some('2026-03-22T04:25:00.000Z'),
       readingMinutes: some(3),
     }),
     ...markdownFixtures.contentNodes,
   ];
-  const homeContents: Record<DocumentId, HomeContent> = {
+  const homeContents: Record<ArtifactId, HomeContent> = {
     'home-doc': {
       kind: 'home',
       title: homeTitle,

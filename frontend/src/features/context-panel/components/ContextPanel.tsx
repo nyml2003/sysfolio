@@ -1,9 +1,11 @@
 import type {
+  ContentNode,
+  ContextInfo,
   DirectoryChildSummary,
-  RenderableEntryPayload,
+  RenderableArtifact,
   RepositoryError,
 } from '@/entities/content';
-import { isSome, none, unwrapOr } from '@/shared/lib/monads/option';
+import { isSome, none } from '@/shared/lib/monads/option';
 import type { Option } from '@/shared/lib/monads/option';
 import type { ResourceState } from '@/shared/lib/resource/resource-state';
 import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
@@ -11,7 +13,11 @@ import { Stack, Surface } from '@/shared/ui/layout';
 import { ButtonGhostMd, ButtonSecondaryMd, Heading, Tag, Text } from '@/shared/ui/primitives';
 
 type ContextPanelProps = {
-  resource: ResourceState<RenderableEntryPayload, RepositoryError>;
+  artifactResource: ResourceState<
+    { artifact: RenderableArtifact; node: ContentNode },
+    RepositoryError
+  >;
+  contextResource: ResourceState<ContextInfo, RepositoryError>;
   activeHeadingId: string;
   onNavigate: (path: string) => void;
   onScrollToHeading: (headingId: string) => void;
@@ -50,14 +56,15 @@ function renderParentSection(
 }
 
 export function ContextPanel({
-  resource,
+  artifactResource,
+  contextResource,
   activeHeadingId,
   onNavigate,
   onScrollToHeading,
 }: ContextPanelProps) {
   const copy = useUiCopy();
 
-  if (resource.tag !== 'ready') {
+  if (artifactResource.tag !== 'ready' && contextResource.tag !== 'ready') {
     return (
       <Stack as="aside" className="sf-context-panel" gap="md">
         <Surface tone="muted">
@@ -80,13 +87,16 @@ export function ContextPanel({
     );
   }
 
-  const context = unwrapOr(resource.value.context, {
-    breadcrumbs: [],
-    parent: none(),
-    siblings: [],
-    recentEntries: [],
-    stats: none(),
-  });
+  const context =
+    contextResource.tag === 'ready'
+      ? contextResource.value
+      : {
+          breadcrumbs: [],
+          parent: none(),
+          siblings: [],
+          recentEntries: [],
+          stats: none(),
+        };
   const parentSection = renderParentSection(
     context.parent,
     copy.contextPanel.parentTitle,
@@ -96,7 +106,7 @@ export function ContextPanel({
 
   return (
     <Stack as="aside" className="sf-context-panel" gap="md">
-      {resource.value.content.kind === 'article' ? (
+      {artifactResource.tag === 'ready' && artifactResource.value.artifact.kind === 'article' ? (
         <Surface>
           <Stack as="section" gap="sm">
             <Heading
@@ -108,7 +118,7 @@ export function ContextPanel({
             >
               {copy.contextPanel.tocTitle}
             </Heading>
-            {resource.value.content.toc.map((item) => (
+            {artifactResource.value.artifact.toc.map((item) => (
               <ButtonGhostMd
                 aria-current={item.id === activeHeadingId ? 'location' : false}
                 className={[

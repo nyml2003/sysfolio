@@ -2,7 +2,7 @@ import type { Option } from '@/shared/lib/monads/option';
 import type { ResourceState } from '@/shared/lib/resource/resource-state';
 
 export type NodeId = string;
-export type DocumentId = string;
+export type ArtifactId = string;
 export type Timestamp = string;
 
 export type ContentKind = 'folder' | 'home' | 'article' | 'game' | 'media' | 'unknown';
@@ -20,7 +20,7 @@ export type ContentNode = {
   pathSegments: string[];
   childrenCount: number;
   hasChildren: boolean;
-  documentId: Option<DocumentId>;
+  artifactId: Option<ArtifactId>;
   publishedAt: Option<Timestamp>;
   updatedAt: Option<Timestamp>;
   readingMinutes: Option<number>;
@@ -71,7 +71,7 @@ export type ArticleSection = {
 
 export type ArticleDocument = {
   kind: 'article';
-  id: DocumentId;
+  id: ArtifactId;
   title: string;
   summary: string;
   eyebrow: string;
@@ -86,7 +86,7 @@ export type UnsupportedContent = {
   ctaPath: string;
 };
 
-export type RenderableContent =
+export type RenderableArtifact =
   | HomeContent
   | DirectoryContent
   | ArticleDocument
@@ -107,9 +107,9 @@ export type ContextInfo = {
   stats: Option<DirectoryStats>;
 };
 
-export type RenderableEntryPayload = {
+export type RenderableArtifactPayload = {
   node: ContentNode;
-  content: RenderableContent;
+  artifact: RenderableArtifact;
   context: Option<ContextInfo>;
 };
 
@@ -138,4 +138,4 @@ export type ReadingProgress = {
   updatedAt: Timestamp;
 };
 
-export type RenderableEntryResource = ResourceState<RenderableEntryPayload, RepositoryError>;
+export type RenderableArtifactResource = ResourceState<RenderableArtifactPayload, RepositoryError>;

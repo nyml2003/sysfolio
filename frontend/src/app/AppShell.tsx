@@ -1,73 +1,41 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
-import type { ArticleDocument, BreadcrumbSegment } from '@/entities/content';
 import { useArticleDom } from '@/features/article/context/article-dom.context';
-import { useArticleReading } from '@/features/article/hooks/useArticleReading';
 import { ArticleDomProvider } from '@/features/article/providers/ArticleDomProvider';
-import { ContentPane } from '@/features/content-pane/components/ContentPane';
-import { useRenderableEntry } from '@/features/content-pane/hooks/useRenderableEntry';
-import { ContextPanel } from '@/features/context-panel/components/ContextPanel';
-import { FileTree } from '@/features/file-tree/components/FileTree';
 import { OnboardingHints } from '@/features/onboarding/components/OnboardingHints';
 import { PathBar } from '@/features/path-bar/components/PathBar';
+import { ReaderContentPane } from '@/features/reader/components/ReaderContentPane';
+import { ReaderContextPanel } from '@/features/reader/components/ReaderContextPanel';
+import { ReaderFileTree } from '@/features/reader/components/ReaderFileTree';
+import { useReaderActions } from '@/features/reader/hooks/useReaderActions';
+import { useReaderSelector } from '@/features/reader/hooks/useReaderSelector';
+import { ReaderProvider } from '@/features/reader/providers/ReaderProvider';
 import { detachPromise } from '@/shared/lib/async/detach-promise';
 import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
-import { fromNullable, isSome, none, some, type Option } from '@/shared/lib/monads/option';
+import { fromNullable } from '@/shared/lib/monads/option';
 import { normalizePath } from '@/shared/lib/path/content-path';
 import { AppShellLayout } from '@/shared/ui/patterns';
-import { useStyleContext } from '@/shared/ui/foundation';
 
 import { APP_SHELL_ROUTE_PATH } from './constant';
-import { buildFallbackBreadcrumbs } from './app-shell.model';
 
 type ShellContentProps = {
-  currentPath: string;
-  fallbackBreadcrumbs: BreadcrumbSegment[];
-  resource: ReturnType<typeof useRenderableEntry>;
   onNavigate: (path: string) => void;
 };
 
-function ShellContent({
-  currentPath,
-  fallbackBreadcrumbs,
-  resource,
-  onNavigate,
-}: ShellContentProps) {
+function ShellContent({ onNavigate }: ShellContentProps) {
   const copy = useUiCopy();
-  const { layoutMode } = useStyleContext();
   const { registerScrollContainer } = useArticleDom();
-  const [activeOverlay, setActiveOverlay] = useState<'none' | 'navigation' | 'context'>('none');
-  const renderableContent = resource.tag === 'ready' ? resource.value.content : false;
-  const articleDocument = useMemo<Option<ArticleDocument>>(() => {
-    if (renderableContent === false || renderableContent.kind !== 'article') {
-      return none();
-    }
-
-    return some(renderableContent);
-  }, [renderableContent]);
+  const { closeOverlay, openContextOverlay, openNavigationOverlay } = useReaderActions();
+  const activeOverlay = useReaderSelector((state) => state.overlay.activeOverlay);
+  const breadcrumbs = useReaderSelector((state) => state.breadcrumbs);
+  const pathBarLoading = useReaderSelector((state) => state.pathBarLoading);
   const registerScrollContainerElement = useCallback(
     (node: HTMLElement | null) => {
       registerScrollContainer(fromNullable(node));
     },
     [registerScrollContainer]
   );
-  const { activeHeadingId, restoreNoticeVisible, scrollToHeading, scrollToTop } = useArticleReading(
-    {
-      path: currentPath,
-      document: articleDocument,
-    }
-  );
-
-  const breadcrumbs =
-    resource.tag === 'ready' && isSome(resource.value.context)
-      ? resource.value.context.value.breadcrumbs
-      : fallbackBreadcrumbs;
-  const pathBarLoading = resource.tag === 'idle' || resource.tag === 'loading';
-
-  useEffect(() => {
-    setActiveOverlay('none');
-  }, [currentPath, layoutMode]);
 
   return (
     <AppShellLayout
@@ -78,27 +46,13 @@ function ShellContent({
           data-testid="content-scroll-region"
           ref={registerScrollContainerElement}
         >
-          <ContentPane
-            onNavigate={onNavigate}
-            resource={resource}
-            restoreNoticeVisible={restoreNoticeVisible}
-            scrollToTop={scrollToTop}
-          />
+          <ReaderContentPane onNavigate={onNavigate} />
         </div>
       }
-      contextPanel={
-        <ContextPanel
-          activeHeadingId={activeHeadingId}
-          onNavigate={onNavigate}
-          onScrollToHeading={(headingId) => {
-            scrollToHeading(headingId);
-          }}
-          resource={resource}
-        />
-      }
-      navigation={<FileTree currentPath={currentPath} onNavigate={onNavigate} />}
+      contextPanel={<ReaderContextPanel onNavigate={onNavigate} />}
+      navigation={<ReaderFileTree onNavigate={onNavigate} />}
       onDismissOverlay={() => {
-        setActiveOverlay('none');
+        closeOverlay();
       }}
       contextOverlayLabel={copy.appShell.contextPanelLabel}
       dismissOverlayLabel={copy.appShell.dismissOverlay}
@@ -109,10 +63,10 @@ function ShellContent({
           isLoading={pathBarLoading}
           onNavigate={onNavigate}
           onOpenContext={() => {
-            setActiveOverlay('context');
+            openContextOverlay();
           }}
           onOpenNavigation={() => {
-            setActiveOverlay('navigation');
+            openNavigationOverlay();
           }}
         />
       }
@@ -123,24 +77,20 @@ function ShellContent({
 function ShellRoute() {
   const location = useLocation();
   const navigate = useNavigate();
-  const copy = useUiCopy();
   const currentPath = normalizePath(location.pathname);
-  const resource = useRenderableEntry(currentPath);
-  const fallbackBreadcrumbs = buildFallbackBreadcrumbs(currentPath, copy.common.homeTitle);
 
   return (
     <ArticleDomProvider>
-      <>
-        <ShellContent
-          currentPath={currentPath}
-          fallbackBreadcrumbs={fallbackBreadcrumbs}
-          onNavigate={(path) => {
-            detachPromise(navigate(path));
-          }}
-          resource={resource}
-        />
-        <OnboardingHints />
-      </>
+      <ReaderProvider currentPath={currentPath}>
+        <>
+          <ShellContent
+            onNavigate={(path) => {
+              detachPromise(navigate(path));
+            }}
+          />
+          <OnboardingHints />
+        </>
+      </ReaderProvider>
     </ArticleDomProvider>
   );
 }

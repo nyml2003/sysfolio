@@ -4,7 +4,7 @@ import type {
   ContextInfo,
   DirectoryContent,
   HomeContent,
-  RenderableEntryPayload,
+  RenderableArtifactPayload,
 } from '@/entities/content';
 import { useArticleDom } from '@/features/article/context/article-dom.context';
 import {
@@ -28,12 +28,12 @@ type OverviewHomePageProps = {
 };
 
 type OverviewDirectoryPageProps = {
-  payload: RenderableEntryPayload;
+  artifactPayload: RenderableArtifactPayload;
   onNavigate: (path: string) => void;
 };
 
 type OverviewArticlePageProps = {
-  payload: RenderableEntryPayload;
+  artifactPayload: RenderableArtifactPayload;
   restoreNoticeVisible: boolean;
   scrollToTop: () => void;
 };
@@ -87,9 +87,12 @@ export function OverviewHomePage({ content, context, onNavigate }: OverviewHomeP
               <div className="overview-section-title">{collection.title}</div>
               <p className="overview-copy">{collection.description}</p>
               <Stack gap="xs">
-                {collection.entries.map((entry) => (
-                  <ButtonGhostMd key={entry.path} onClick={() => onNavigate(entry.path)}>
-                    {entry.label}
+                {collection.entries.map((artifactLink) => (
+                  <ButtonGhostMd
+                    key={artifactLink.path}
+                    onClick={() => onNavigate(artifactLink.path)}
+                  >
+                    {artifactLink.label}
                   </ButtonGhostMd>
                 ))}
               </Stack>
@@ -101,15 +104,15 @@ export function OverviewHomePage({ content, context, onNavigate }: OverviewHomeP
         <Stack gap="sm">
           <div className="overview-section-title">{copy.home.recentDocsTitle}</div>
           <Grid columns={3}>
-            {context.recentEntries.map((entry) => (
+            {context.recentEntries.map((artifact) => (
               <ButtonGhostMd
                 className="overview-link-card"
-                key={entry.id}
-                onClick={() => onNavigate(entry.path)}
+                key={artifact.id}
+                onClick={() => onNavigate(artifact.path)}
               >
                 <Stack gap="xs">
-                  <strong>{entry.title}</strong>
-                  <div className="overview-copy">{unwrapOr(entry.description, '')}</div>
+                  <strong>{artifact.title}</strong>
+                  <div className="overview-copy">{unwrapOr(artifact.description, '')}</div>
                 </Stack>
               </ButtonGhostMd>
             ))}
@@ -120,8 +123,8 @@ export function OverviewHomePage({ content, context, onNavigate }: OverviewHomeP
   );
 }
 
-export function OverviewDirectoryPage({ payload, onNavigate }: OverviewDirectoryPageProps) {
-  const content = payload.content as DirectoryContent;
+export function OverviewDirectoryPage({ artifactPayload, onNavigate }: OverviewDirectoryPageProps) {
+  const content = artifactPayload.artifact as DirectoryContent;
   const copy = useOverviewCopy();
   const ui = useUiCopy();
 
@@ -129,7 +132,7 @@ export function OverviewDirectoryPage({ payload, onNavigate }: OverviewDirectory
     <Stack className="overview-page" gap="lg">
       <Stack gap="sm">
         <div className="overview-eyebrow">
-          {payload.node.pathSegments.join(' / ') || copy.directory.rootLabel}
+          {artifactPayload.node.pathSegments.join(' / ') || copy.directory.rootLabel}
         </div>
         <h1 className="overview-title">{content.title}</h1>
         <p className="overview-summary">
@@ -137,24 +140,24 @@ export function OverviewDirectoryPage({ payload, onNavigate }: OverviewDirectory
         </p>
       </Stack>
       <Grid columns={3}>
-        {content.children.map((entry) => (
+        {content.children.map((artifactChild) => (
           <ButtonGhostMd
             className="overview-link-card"
-            key={entry.id}
-            onClick={() => onNavigate(entry.path)}
+            key={artifactChild.id}
+            onClick={() => onNavigate(artifactChild.path)}
           >
             <Stack gap="sm">
               <Inline align="between" wrap>
-                <strong>{entry.title}</strong>
-                <Tag>{ui.common.kindLabel(entry.kind)}</Tag>
+                <strong>{artifactChild.title}</strong>
+                <Tag>{ui.common.kindLabel(artifactChild.kind)}</Tag>
               </Inline>
-              {isSome(entry.readingMinutes) ? (
+              {isSome(artifactChild.readingMinutes) ? (
                 <div className="overview-copy">
-                  {ui.common.minuteCount(entry.readingMinutes.value)}
+                  {ui.common.minuteCount(artifactChild.readingMinutes.value)}
                 </div>
               ) : null}
               <div className="overview-copy">
-                {unwrapOr(entry.description, copy.directory.entryFallbackDescription)}
+                {unwrapOr(artifactChild.description, copy.directory.artifactFallbackDescription)}
               </div>
             </Stack>
           </ButtonGhostMd>
@@ -165,7 +168,7 @@ export function OverviewDirectoryPage({ payload, onNavigate }: OverviewDirectory
 }
 
 export function OverviewArticlePage({
-  payload,
+  artifactPayload,
   restoreNoticeVisible,
   scrollToTop,
 }: OverviewArticlePageProps) {
@@ -173,7 +176,7 @@ export function OverviewArticlePage({
   const copy = useOverviewCopy();
   const ui = useUiCopy();
   const { registerArticleBody, registerBottomSentinel, registerHeadingOrder } = useArticleDom();
-  const document = payload.content.kind === 'article' ? payload.content : null;
+  const document = artifactPayload.artifact.kind === 'article' ? artifactPayload.artifact : null;
   const meta = document === null ? none() : getOverviewDocumentMeta(document.id);
   const headingIds = useMemo(
     () => (document === null ? [] : document.sections.map((section) => section.id)),
@@ -217,8 +220,10 @@ export function OverviewArticlePage({
               <Tag tone="accent">{copy.meta.layerLabel(meta.value.layer)}</Tag>
             ) : null}
             {isSome(meta) ? <Tag>{copy.meta.statusLabel(meta.value.status)}</Tag> : null}
-            {isSome(payload.node.updatedAt) ? (
-              <Tag>{ui.article.updatedAt(formatDate(payload.node.updatedAt.value, locale))}</Tag>
+            {isSome(artifactPayload.node.updatedAt) ? (
+              <Tag>
+                {ui.article.updatedAt(formatDate(artifactPayload.node.updatedAt.value, locale))}
+              </Tag>
             ) : null}
           </Inline>
           <p className="overview-summary">{document.summary}</p>

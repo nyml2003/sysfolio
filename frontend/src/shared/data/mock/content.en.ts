@@ -1,7 +1,7 @@
-import type { ArticleDocument, ArticleSection, DocumentId, NodeId } from '@/entities/content';
+import type { ArticleDocument, ArticleSection, ArtifactId, NodeId } from '@/entities/content';
 
 function createArticle(
-  id: DocumentId,
+  id: ArtifactId,
   title: string,
   summary: string,
   eyebrow: string,
@@ -41,7 +41,7 @@ export const englishDirectoryDescriptions: Record<NodeId, string> = {
     'A dedicated branch for long lists, tree windowing, and partial rendering experiments.',
 };
 
-export const englishArticleDocuments: Record<DocumentId, ArticleDocument> = {
+export const englishArticleDocuments: Record<ArtifactId, ArticleDocument> = {
   'doc-filesystem-reading': createArticle(
     'doc-filesystem-reading',
     'Filesystem-Style Reading',

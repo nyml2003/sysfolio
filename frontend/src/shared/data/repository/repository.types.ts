@@ -1,5 +1,6 @@
 import type {
   ArticleDocument,
+  ArtifactId,
   ChildrenPagePayload,
   ContentNode,
   ContextInfo,
@@ -7,7 +8,7 @@ import type {
   HomeContent,
   OnboardingState,
   ReadingProgress,
-  RenderableEntryResource,
+  RenderableArtifactResource,
   RepositoryError,
   TreeRootPayload,
 } from '@/entities/content';
@@ -18,19 +19,19 @@ import type { DensityPreference } from '@/shared/lib/style/style.types';
 import type { ThemePreference } from '@/shared/lib/theme/theme.types';
 
 export interface ContentRepository {
-  getRenderableEntryByPath(path: string): Promise<RenderableEntryResource>;
+  getRenderableArtifactByPath(path: string): Promise<RenderableArtifactResource>;
   getTreeRoot(): Promise<ResourceState<TreeRootPayload, RepositoryError>>;
   loadChildren(
     nodeId: string,
     page: number
   ): Promise<ResourceState<ChildrenPagePayload, RepositoryError>>;
   getNodeByPath(path: string): Promise<ResourceState<ContentNode, RepositoryError>>;
-  getHomeContentById(documentId: string): Promise<ResourceState<HomeContent, RepositoryError>>;
+  getHomeContentById(artifactId: ArtifactId): Promise<ResourceState<HomeContent, RepositoryError>>;
   getDirectoryContentByNodeId(
     nodeId: string
   ): Promise<ResourceState<DirectoryContent, RepositoryError>>;
   getArticleDocumentById(
-    documentId: string
+    artifactId: ArtifactId
   ): Promise<ResourceState<ArticleDocument, RepositoryError>>;
   getContextInfoByPath(path: string): Promise<ResourceState<ContextInfo, RepositoryError>>;
   getThemePreference(): Promise<ResourceState<ThemePreference, RepositoryError>>;
@@ -46,10 +47,10 @@ export interface ContentRepository {
   getOnboardingState(): Promise<ResourceState<OnboardingState, RepositoryError>>;
   dismissOnboarding(): Promise<ResourceState<OnboardingState, RepositoryError>>;
   getSavedReadingProgress(
-    path: string
+    artifactIdentity: string
   ): Promise<ResourceState<Option<ReadingProgress>, RepositoryError>>;
   saveReadingProgress(
-    path: string,
+    artifactIdentity: string,
     position: ReadingProgress
   ): Promise<ResourceState<ReadingProgress, RepositoryError>>;
 }

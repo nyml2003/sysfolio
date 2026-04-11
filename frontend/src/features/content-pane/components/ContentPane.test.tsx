@@ -89,9 +89,11 @@ describe('ContentPane', () => {
     const repository = createRepository();
     const onNavigate = vi.fn();
     const user = userEvent.setup();
-    const homeResource = await repository.getRenderableEntryByPath('/');
-    const directoryResource = await repository.getRenderableEntryByPath('/foundation');
-    const articleResource = await repository.getRenderableEntryByPath('/foundation/style-provider');
+    const homeResource = await repository.getRenderableArtifactByPath('/');
+    const directoryResource = await repository.getRenderableArtifactByPath('/foundation');
+    const articleResource = await repository.getRenderableArtifactByPath(
+      '/foundation/style-provider'
+    );
 
     if (
       homeResource.tag !== 'ready' ||
@@ -102,14 +104,14 @@ describe('ContentPane', () => {
     }
 
     if (
-      homeResource.value.content.kind !== 'home' ||
-      directoryResource.value.content.kind !== 'directory' ||
-      articleResource.value.content.kind !== 'article'
+      homeResource.value.artifact.kind !== 'home' ||
+      directoryResource.value.artifact.kind !== 'directory' ||
+      articleResource.value.artifact.kind !== 'article'
     ) {
       throw new Error('Expected home, directory, and article renderable content.');
     }
 
-    const firstDirectoryEntry = directoryResource.value.content.children[0];
+    const firstDirectoryEntry = directoryResource.value.artifact.children[0];
 
     if (firstDirectoryEntry === undefined) {
       throw new Error('Expected at least one directory entry in the foundation fixture.');
@@ -127,7 +129,7 @@ describe('ContentPane', () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: homeResource.value.content.title,
+        name: homeResource.value.artifact.title,
       })
     ).toBeTruthy();
 
@@ -147,7 +149,7 @@ describe('ContentPane', () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: directoryResource.value.content.title,
+        name: directoryResource.value.artifact.title,
       })
     ).toBeTruthy();
 
@@ -175,7 +177,7 @@ describe('ContentPane', () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: articleResource.value.content.title,
+        name: articleResource.value.artifact.title,
       })
     ).toBeTruthy();
   });

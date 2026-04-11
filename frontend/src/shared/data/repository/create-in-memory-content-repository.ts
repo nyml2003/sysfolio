@@ -1,5 +1,6 @@
 import type {
   ArticleDocument,
+  ArtifactId,
   ChildrenPagePayload,
   ContentNode,
   ContextInfo,
@@ -8,8 +9,8 @@ import type {
   DirectoryStats,
   HomeContent,
   OnboardingState,
-  RenderableContent,
-  RenderableEntryPayload,
+  RenderableArtifact,
+  RenderableArtifactPayload,
   RepositoryError,
   TreeRootPayload,
   UnsupportedContent,
@@ -102,11 +103,15 @@ function getNodePath(node: ContentNode): string {
   return node.kind === 'home' ? ROOT_PATH : pathFromSegments(node.pathSegments);
 }
 
+function getNodeArtifactId(node: ContentNode): Option<ArtifactId> {
+  return node.artifactId;
+}
+
 function getArticleSummary(
   articleDocuments: Record<string, ArticleDocument>,
-  documentId: string
+  artifactId: string
 ): string {
-  const document = articleDocuments[documentId];
+  const document = articleDocuments[artifactId];
 
   return document === undefined ? '' : document.summary;
 }
@@ -120,8 +125,10 @@ function getNodeDescription(
     return dataset.directoryDescriptions[node.id] ?? none();
   }
 
-  if (node.kind === 'article' && isSome(node.documentId)) {
-    return some(getArticleSummary(dataset.articleDocuments, node.documentId.value));
+  const artifactId = getNodeArtifactId(node);
+
+  if (node.kind === 'article' && isSome(artifactId)) {
+    return some(getArticleSummary(dataset.articleDocuments, artifactId.value));
   }
 
   if (node.kind === 'game') {
@@ -370,21 +377,23 @@ export function createInMemoryContentRepository(
     };
   }
 
-  function getRenderableContent(
+  function resolveRenderableArtifact(
     dataset: LocalizedRepositoryData,
     node: ContentNode,
     locale: AppLocale
-  ): Option<RenderableContent> {
-    if (node.kind === 'home' && isSome(node.documentId)) {
-      return fromNullable(dataset.homeContents[node.documentId.value]);
+  ): Option<RenderableArtifact> {
+    const artifactId = getNodeArtifactId(node);
+
+    if (node.kind === 'home' && isSome(artifactId)) {
+      return fromNullable(dataset.homeContents[artifactId.value]);
     }
 
     if (node.kind === 'folder') {
       return some(buildDirectoryContent(dataset, node, locale));
     }
 
-    if (node.kind === 'article' && isSome(node.documentId)) {
-      return fromNullable(dataset.articleDocuments[node.documentId.value]);
+    if (node.kind === 'article' && isSome(artifactId)) {
+      return fromNullable(dataset.articleDocuments[artifactId.value]);
     }
 
     if (node.kind === 'game' || node.kind === 'media') {
@@ -403,9 +412,9 @@ export function createInMemoryContentRepository(
     return none();
   }
 
-  async function getRenderableEntry(
+  async function loadRenderableArtifactByPath(
     path: string
-  ): Promise<ResourceState<RenderableEntryPayload, RepositoryError>> {
+  ): Promise<ResourceState<RenderableArtifactPayload, RepositoryError>> {
     const locale = getResolvedLocale();
     const dataset = getDataset(locale);
     const normalizedPath = normalizePath(path);
@@ -423,9 +432,9 @@ export function createInMemoryContentRepository(
       );
     }
 
-    const content = getRenderableContent(dataset, node, locale);
+    const artifact = resolveRenderableArtifact(dataset, node, locale);
 
-    if (isNone(content)) {
+    if (isNone(artifact)) {
       return withLatency(
         emptyState(
           some(
@@ -440,15 +449,16 @@ export function createInMemoryContentRepository(
     return withLatency(
       readyState({
         node,
-        content: content.value,
+        artifact: artifact.value,
+        content: artifact.value,
         context: some(buildContextInfo(dataset, node, locale)),
       })
     );
   }
 
   return {
-    getRenderableEntryByPath(path) {
-      return getRenderableEntry(path);
+    getRenderableArtifactByPath(path) {
+      return loadRenderableArtifactByPath(path);
     },
     async getTreeRoot() {
       const locale = getResolvedLocale();
@@ -517,18 +527,18 @@ export function createInMemoryContentRepository(
           )
         : withLatency(readyState(node));
     },
-    async getHomeContentById(documentId) {
+    async getHomeContentById(artifactId) {
       const locale = getResolvedLocale();
       const dataset = getDataset(locale);
-      const content = dataset.homeContents[documentId];
+      const content = dataset.homeContents[artifactId];
 
       return content === undefined
         ? withLatency(
             errorState(
               notFound(
                 locale === 'en-US'
-                  ? `Home document ${documentId} was not found.`
-                  : `首页文档 ${documentId} 未找到。`
+                  ? `Home artifact ${artifactId} was not found.`
+                  : `首页 artifact ${artifactId} 未找到。`
               )
             )
           )
@@ -555,18 +565,18 @@ export function createInMemoryContentRepository(
         )
       );
     },
-    async getArticleDocumentById(documentId) {
+    async getArticleDocumentById(artifactId) {
       const locale = getResolvedLocale();
       const dataset = getDataset(locale);
-      const document = dataset.articleDocuments[documentId];
+      const document = dataset.articleDocuments[artifactId];
 
       return document === undefined
         ? withLatency(
             errorState(
               notFound(
                 locale === 'en-US'
-                  ? `Article ${documentId} was not found.`
-                  : `文章 ${documentId} 未找到。`
+                  ? `Article ${artifactId} was not found.`
+                  : `文章 ${artifactId} 未找到。`
               )
             )
           )
@@ -648,17 +658,15 @@ export function createInMemoryContentRepository(
         ? withLatency(errorState(result.error))
         : withLatency(readyState<OnboardingState, RepositoryError>(result.value));
     },
-    async getSavedReadingProgress(path) {
-      const normalizedPath = normalizePath(path);
-      const result = browserPreferencesAdapter.getSavedReadingProgress(normalizedPath);
+    async getSavedReadingProgress(artifactIdentity) {
+      const result = browserPreferencesAdapter.getSavedReadingProgress(artifactIdentity);
 
       return isErr(result)
         ? withLatency(errorState(result.error))
         : withLatency(readyState(result.value));
     },
-    async saveReadingProgress(path, position) {
-      const normalizedPath = normalizePath(path);
-      const result = browserPreferencesAdapter.saveReadingProgress(normalizedPath, position);
+    async saveReadingProgress(artifactIdentity, position) {
+      const result = browserPreferencesAdapter.saveReadingProgress(artifactIdentity, position);
 
       return isErr(result)
         ? withLatency(errorState(result.error))

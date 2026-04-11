@@ -1,4 +1,4 @@
-import { startTransition, useCallback, useState } from 'react';
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useVirtualizer } from '@tanstack/react-virtual';
 
@@ -31,6 +31,29 @@ import { useFileTree } from '../hooks/useFileTree';
 
 type FileTreeProps = {
   currentPath: string;
+  onNavigate: (path: string) => void;
+};
+
+export type FileTreeViewProps = Pick<
+  ReturnType<typeof useFileTree>,
+  | 'expandedIds'
+  | 'focusChildNode'
+  | 'focusFirstNode'
+  | 'focusLastNode'
+  | 'focusNextNode'
+  | 'focusNode'
+  | 'focusParentNode'
+  | 'focusPreviousNode'
+  | 'focusedNodeId'
+  | 'loadingNodeIds'
+  | 'nodeErrorsById'
+  | 'appendTypeaheadCharacter'
+  | 'retryNode'
+  | 'rootState'
+  | 'rows'
+  | 'typeaheadBuffer'
+  | 'toggleNode'
+> & {
   onNavigate: (path: string) => void;
 };
 
@@ -78,11 +101,29 @@ function toStableElementOption(
   return nextOption;
 }
 
-export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
+export function FileTreeView({
+  appendTypeaheadCharacter,
+  expandedIds,
+  focusChildNode,
+  focusFirstNode,
+  focusLastNode,
+  focusNextNode,
+  focusNode,
+  focusParentNode,
+  focusPreviousNode,
+  focusedNodeId,
+  loadingNodeIds,
+  nodeErrorsById,
+  onNavigate,
+  retryNode,
+  rootState,
+  rows,
+  typeaheadBuffer,
+  toggleNode,
+}: FileTreeViewProps) {
   const [scrollElement, setScrollElement] = useState<Option<HTMLDivElement>>(none());
+  const rowButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const copy = useUiCopy();
-  const { rows, rootState, loadingNodeIds, expandedIds, nodeErrorsById, retryNode, toggleNode } =
-    useFileTree(currentPath);
   const registerScrollElement = useCallback((node: HTMLDivElement | null) => {
     setScrollElement((currentElement) => toStableElementOption(currentElement, node));
   }, []);
@@ -92,6 +133,56 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
     getScrollElement: () => (isSome(scrollElement) ? scrollElement.value : null),
     overscan: FILE_TREE_OVERSCAN,
   });
+  const hasMeasuredViewport = isSome(scrollElement) && scrollElement.value.clientHeight > 0;
+  const virtualRows = useMemo(
+    () =>
+      hasMeasuredViewport
+        ? virtualizer.getVirtualItems()
+        : rows.map((row, index) => ({
+            index,
+            key: row.node.id,
+            start: index * FILE_TREE_ROW_HEIGHT,
+          })),
+    [hasMeasuredViewport, rows, virtualizer]
+  );
+  const totalSize = hasMeasuredViewport
+    ? virtualizer.getTotalSize()
+    : rows.length * FILE_TREE_ROW_HEIGHT;
+
+  useEffect(() => {
+    if (focusedNodeId === '') {
+      return;
+    }
+
+    const focusedElement = rowButtonRefs.current[focusedNodeId];
+
+    if (focusedElement !== null && focusedElement !== undefined) {
+      if (document.activeElement !== focusedElement) {
+        focusedElement.focus();
+      }
+
+      return;
+    }
+
+    const focusedIndex = rows.findIndex((row) => row.node.id === focusedNodeId);
+
+    if (focusedIndex >= 0) {
+      virtualizer.scrollToIndex(focusedIndex, {
+        align: 'auto',
+      });
+    }
+  }, [focusedNodeId, rows, virtualizer]);
+
+  const registerRowButton = useCallback(
+    (nodeId: string, node: HTMLButtonElement | null) => {
+      rowButtonRefs.current[nodeId] = node;
+
+      if (node !== null && focusedNodeId === nodeId && document.activeElement !== node) {
+        node.focus();
+      }
+    },
+    [focusedNodeId]
+  );
 
   return (
     <Stack as="aside" aria-label={copy.fileTree.ariaLabel} className="sf-file-tree" gap="sm">
@@ -122,13 +213,12 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
       <div
         aria-busy={rootState.tag === 'loading' || loadingNodeIds.length > 0}
         className="sf-file-tree__list"
+        data-typeahead-buffer={typeaheadBuffer === '' ? undefined : typeaheadBuffer}
         ref={registerScrollElement}
+        role="tree"
       >
-        <div
-          className="sf-file-tree__viewport"
-          style={{ height: `${virtualizer.getTotalSize()}px` }}
-        >
-          {virtualizer.getVirtualItems().map((virtualRow) => {
+        <div className="sf-file-tree__viewport" style={{ height: `${totalSize}px` }}>
+          {virtualRows.map((virtualRow) => {
             const row = rows[virtualRow.index];
             const nodePath = getNodePath(row.node);
             const isFolder = row.node.kind === 'folder';
@@ -136,11 +226,13 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
             const nodeError = nodeErrorsById[row.node.id];
             const showDisclosure = isFolder && row.node.hasChildren;
             const isExpanded = row.isExpanded || expandedIds.includes(row.node.id);
+            const isFocused = row.node.id === focusedNodeId;
 
             return (
               <div
                 className={[
                   'sf-file-tree__row',
+                  isFocused ? 'is-focused' : '',
                   row.isSelected ? 'is-selected' : '',
                   nodeError !== undefined ? 'is-error' : '',
                   row.node.status !== 'available' ? 'is-muted' : '',
@@ -171,6 +263,7 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
 
                     toggleNode(row.node.id);
                   }}
+                  tabIndex={-1}
                 >
                   {showDisclosure ? (
                     isExpanded ? (
@@ -185,12 +278,78 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
                 {renderNodeIcon(row.node)}
                 <ButtonGhostMd
                   aria-current={row.isSelected ? 'page' : false}
+                  aria-expanded={showDisclosure ? isExpanded : undefined}
+                  aria-level={row.depth + 1}
+                  aria-selected={row.isSelected}
                   className="sf-file-tree__label"
+                  onFocus={() => {
+                    if (!isFocused) {
+                      focusNode(row.node.id);
+                    }
+                  }}
                   onClick={() => {
                     startTransition(() => {
                       onNavigate(nodePath);
                     });
                   }}
+                  onKeyDown={(event) => {
+                    if (event.altKey || event.ctrlKey || event.metaKey) {
+                      return;
+                    }
+
+                    if (event.key === 'ArrowDown') {
+                      event.preventDefault();
+                      focusNextNode();
+                      return;
+                    }
+
+                    if (event.key === 'ArrowUp') {
+                      event.preventDefault();
+                      focusPreviousNode();
+                      return;
+                    }
+
+                    if (event.key === 'Home') {
+                      event.preventDefault();
+                      focusFirstNode();
+                      return;
+                    }
+
+                    if (event.key === 'End') {
+                      event.preventDefault();
+                      focusLastNode();
+                      return;
+                    }
+
+                    if (event.key === 'ArrowLeft') {
+                      event.preventDefault();
+                      focusParentNode();
+                      return;
+                    }
+
+                    if (event.key === 'ArrowRight') {
+                      event.preventDefault();
+                      focusChildNode();
+                      return;
+                    }
+
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      startTransition(() => {
+                        onNavigate(nodePath);
+                      });
+                      return;
+                    }
+
+                    if (event.key.length === 1) {
+                      appendTypeaheadCharacter(event.key);
+                    }
+                  }}
+                  ref={(node) => {
+                    registerRowButton(row.node.id, node);
+                  }}
+                  role="treeitem"
+                  tabIndex={isFocused ? 0 : -1}
                 >
                   {row.node.title}
                 </ButtonGhostMd>
@@ -216,4 +375,10 @@ export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
       </div>
     </Stack>
   );
+}
+
+export function FileTree({ currentPath, onNavigate }: FileTreeProps) {
+  const tree = useFileTree(currentPath);
+
+  return <FileTreeView {...tree} onNavigate={onNavigate} />;
 }

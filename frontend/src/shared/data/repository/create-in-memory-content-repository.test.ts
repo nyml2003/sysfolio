@@ -13,10 +13,12 @@ function createRepository() {
 describe('createInMemoryContentRepository', () => {
   it('returns the expected renderable kinds for home, directory, article, and unknown paths', async () => {
     const repository = createRepository();
-    const homeResource = await repository.getRenderableEntryByPath('/');
-    const directoryResource = await repository.getRenderableEntryByPath('/foundation');
-    const articleResource = await repository.getRenderableEntryByPath('/foundation/style-provider');
-    const missingResource = await repository.getRenderableEntryByPath('/missing');
+    const homeResource = await repository.getRenderableArtifactByPath('/');
+    const directoryResource = await repository.getRenderableArtifactByPath('/foundation');
+    const articleResource = await repository.getRenderableArtifactByPath(
+      '/foundation/style-provider'
+    );
+    const missingResource = await repository.getRenderableArtifactByPath('/missing');
 
     expect(homeResource.tag).toBe('ready');
     expect(directoryResource.tag).toBe('ready');
@@ -31,9 +33,9 @@ describe('createInMemoryContentRepository', () => {
       throw new Error('Expected ready resources for known fixture paths.');
     }
 
-    expect(homeResource.value.content.kind).toBe('home');
-    expect(directoryResource.value.content.kind).toBe('directory');
-    expect(articleResource.value.content.kind).toBe('article');
+    expect(homeResource.value.artifact.kind).toBe('home');
+    expect(directoryResource.value.artifact.kind).toBe('directory');
+    expect(articleResource.value.artifact.kind).toBe('article');
   });
 
   it('keeps tree root payload limited to the first two levels', async () => {
@@ -59,8 +61,8 @@ describe('createInMemoryContentRepository', () => {
       scrollTop: 320,
       updatedAt: '2026-03-22T08:00:00.000Z',
     };
-    const saveResult = await repository.saveReadingProgress('/foundation/style-provider', position);
-    const restoredResult = await repository.getSavedReadingProgress('/foundation/style-provider');
+    const saveResult = await repository.saveReadingProgress('article-style-provider', position);
+    const restoredResult = await repository.getSavedReadingProgress('article-style-provider');
 
     expect(saveResult.tag).toBe('ready');
     expect(restoredResult.tag).toBe('ready');

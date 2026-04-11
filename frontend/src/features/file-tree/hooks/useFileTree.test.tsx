@@ -57,7 +57,7 @@ function createRootNode(): ContentNode {
     pathSegments: [],
     childrenCount: 1,
     hasChildren: true,
-    documentId: none(),
+    artifactId: none(),
     publishedAt: none(),
     updatedAt: none(),
     readingMinutes: none(),
@@ -76,7 +76,7 @@ function createDirectoryNode(title: string): ContentNode {
     pathSegments: ['docs'],
     childrenCount: 1,
     hasChildren: true,
-    documentId: none(),
+    artifactId: none(),
     publishedAt: none(),
     updatedAt: none(),
     readingMinutes: none(),
@@ -95,7 +95,7 @@ function createArticleNode(title: string): ContentNode {
     pathSegments: ['docs', 'article'],
     childrenCount: 0,
     hasChildren: false,
-    documentId: some('article'),
+    artifactId: some('article'),
     publishedAt: none(),
     updatedAt: none(),
     readingMinutes: some(5),
@@ -111,12 +111,16 @@ function createChildrenPayload(title: string) {
 }
 
 function UseFileTreeHarness({ currentPath }: { currentPath: string }) {
-  const { nodeErrorsById, retryNode, rows } = useFileTree(currentPath);
+  const { nodeErrorsById, nodeFreshnessById, nodeQueryStatusById, retryNode, rows, selectedPath } =
+    useFileTree(currentPath);
 
   return (
     <div>
+      <div data-testid="selected-path">{selectedPath}</div>
       <div data-testid="rows">{rows.map((row) => row.node.title).join('|')}</div>
       <div data-testid="errors">{Object.keys(nodeErrorsById).join('|')}</div>
+      <div data-testid="query-status">{nodeQueryStatusById.docs ?? ''}</div>
+      <div data-testid="freshness">{nodeFreshnessById.docs ?? ''}</div>
       <button
         onClick={() => {
           retryNode('docs');
@@ -171,6 +175,9 @@ describe('useFileTree', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('rows').textContent).toContain('Docs');
+      expect(screen.getByTestId('selected-path').textContent).toBe('/docs');
+      expect(screen.getByTestId('query-status').textContent).toBe('loading');
+      expect(screen.getByTestId('freshness').textContent).toBe('stale');
     });
 
     currentLocale = 'zh-CN';
@@ -200,6 +207,8 @@ describe('useFileTree', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('rows').textContent).toContain('中文子项');
+      expect(screen.getByTestId('query-status').textContent).toBe('ready');
+      expect(screen.getByTestId('freshness').textContent).toBe('fresh');
     });
 
     await act(async () => {
@@ -248,6 +257,8 @@ describe('useFileTree', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('errors').textContent).toBe('docs');
+      expect(screen.getByTestId('query-status').textContent).toBe('error');
+      expect(screen.getByTestId('freshness').textContent).toBe('stale');
     });
 
     await user.click(screen.getByRole('button', { name: 'Retry docs' }));
@@ -255,6 +266,8 @@ describe('useFileTree', () => {
     await waitFor(() => {
       expect(screen.getByTestId('errors').textContent).toBe('');
       expect(screen.getByTestId('rows').textContent).toContain('Recovered child');
+      expect(screen.getByTestId('query-status').textContent).toBe('ready');
+      expect(screen.getByTestId('freshness').textContent).toBe('fresh');
     });
   });
 });

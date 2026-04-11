@@ -23,9 +23,11 @@ type PreferencesAdapter = {
   setLocalePreference(locale: AppLocale): Result<RepositoryError, AppLocale>;
   getOnboardingState(): Result<RepositoryError, OnboardingState>;
   dismissOnboarding(): Result<RepositoryError, OnboardingState>;
-  getSavedReadingProgress(path: string): Result<RepositoryError, Option<ReadingProgress>>;
+  getSavedReadingProgress(
+    artifactIdentity: string
+  ): Result<RepositoryError, Option<ReadingProgress>>;
   saveReadingProgress(
-    path: string,
+    artifactIdentity: string,
     progress: ReadingProgress
   ): Result<RepositoryError, ReadingProgress>;
 };
@@ -184,7 +186,7 @@ export function createBrowserPreferencesAdapter(): PreferencesAdapter {
 
       return isErr(writeResult) ? writeResult : ok({ dismissed: true });
     },
-    getSavedReadingProgress(path) {
+    getSavedReadingProgress(artifactIdentity) {
       const storedProgressResult = readStorage(READING_PROGRESS_KEY);
 
       if (isErr(storedProgressResult)) {
@@ -201,11 +203,11 @@ export function createBrowserPreferencesAdapter(): PreferencesAdapter {
         return parsedProgressResult;
       }
 
-      const entry = parsedProgressResult.value[path];
+      const entry = parsedProgressResult.value[artifactIdentity];
 
       return entry === undefined ? ok(none()) : ok(some(entry));
     },
-    saveReadingProgress(path, progress) {
+    saveReadingProgress(artifactIdentity, progress) {
       const storedProgressResult = readStorage(READING_PROGRESS_KEY);
 
       if (isErr(storedProgressResult)) {
@@ -222,7 +224,7 @@ export function createBrowserPreferencesAdapter(): PreferencesAdapter {
 
       const nextProgressMap = {
         ...progressMapResult.value,
-        [path]: progress,
+        [artifactIdentity]: progress,
       };
 
       const writeResult = writeStorage(READING_PROGRESS_KEY, JSON.stringify(nextProgressMap));

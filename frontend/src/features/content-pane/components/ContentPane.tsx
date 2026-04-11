@@ -1,4 +1,4 @@
-import type { ContextInfo, RenderableEntryPayload, RepositoryError } from '@/entities/content';
+import type { ContextInfo, RenderableArtifactPayload, RepositoryError } from '@/entities/content';
 import { ArticleView } from '@/features/article/components/ArticleView';
 import { HomeView } from '@/features/home/components/HomeView';
 import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
@@ -10,7 +10,7 @@ import { ArticleIcon, FolderIcon, GameIcon, MediaIcon } from '@/shared/ui/primit
 import { ButtonGhostMd, ButtonSecondaryMd, Heading, Tag, Text } from '@/shared/ui/primitives';
 
 type ContentPaneProps = {
-  resource: ResourceState<RenderableEntryPayload, RepositoryError>;
+  resource: ResourceState<RenderableArtifactPayload, RepositoryError>;
   onNavigate: (path: string) => void;
   restoreNoticeVisible: boolean;
   scrollToTop: () => void;
@@ -33,11 +33,11 @@ function renderDirectoryIcon(kind: string) {
 }
 
 function renderDirectoryView(
-  payload: RenderableEntryPayload,
+  payload: RenderableArtifactPayload,
   onNavigate: (path: string) => void,
   copy: ReturnType<typeof useUiCopy>
 ) {
-  if (payload.content.kind !== 'directory') {
+  if (payload.artifact.kind !== 'directory') {
     return null;
   }
 
@@ -54,20 +54,20 @@ function renderDirectoryView(
           trailingMeta={none()}
           variant="display"
         >
-          {payload.content.title}
+          {payload.artifact.title}
         </Heading>
-        {unwrapOr(payload.content.description, '') === '' ? null : (
+        {unwrapOr(payload.artifact.description, '') === '' ? null : (
           <Text tone="muted" variant="body">
-            {unwrapOr(payload.content.description, '')}
+            {unwrapOr(payload.artifact.description, '')}
           </Text>
         )}
       </Stack>
       <Inline gap="sm" wrap>
-        <Tag>{copy.common.itemCount(payload.content.children.length)}</Tag>
+        <Tag>{copy.common.itemCount(payload.artifact.children.length)}</Tag>
         <Tag>{copy.contentPane.directorySharedMeta}</Tag>
       </Inline>
       <Stack gap="sm">
-        {payload.content.children.map((entry) => (
+        {payload.artifact.children.map((entry) => (
           <Surface key={entry.id}>
             <ButtonGhostMd
               className="sf-content-pane-directory__entry"
@@ -200,18 +200,18 @@ export function ContentPane({
     stats: none(),
   });
 
-  if (resource.value.content.kind === 'home') {
-    return <HomeView content={resource.value.content} context={context} onNavigate={onNavigate} />;
+  if (resource.value.artifact.kind === 'home') {
+    return <HomeView content={resource.value.artifact} context={context} onNavigate={onNavigate} />;
   }
 
-  if (resource.value.content.kind === 'directory') {
+  if (resource.value.artifact.kind === 'directory') {
     return renderDirectoryView(resource.value, onNavigate, copy);
   }
 
-  if (resource.value.content.kind === 'article') {
+  if (resource.value.artifact.kind === 'article') {
     return (
       <ArticleView
-        document={resource.value.content}
+        document={resource.value.artifact}
         node={resource.value.node}
         restoreNoticeVisible={restoreNoticeVisible}
         scrollToTop={scrollToTop}

@@ -2,7 +2,7 @@ import type {
   ArticleDocument,
   ArticleSection,
   ContentNode,
-  DocumentId,
+  ArtifactId,
   NodeId,
 } from '@/entities/content';
 import { none, some } from '@/shared/lib/monads/option';
@@ -18,7 +18,7 @@ type MarkdownArticleSource = {
 
 type MarkdownFixtureBundle = {
   contentNodes: ContentNode[];
-  articleDocuments: Record<DocumentId, ArticleDocument>;
+  articleDocuments: Record<ArtifactId, ArticleDocument>;
 };
 
 const MARKDOWN_DEMO_SOURCES: MarkdownArticleSource[] = [
@@ -181,7 +181,7 @@ function parseMarkdownArticle(
 
 function createMarkdownFixtureNode(
   source: MarkdownArticleSource,
-  articleId: DocumentId,
+  articleId: ArtifactId,
   articleTitle: string
 ): ContentNode {
   const nodeId: NodeId = `article-${source.key}`;
@@ -197,7 +197,7 @@ function createMarkdownFixtureNode(
     pathSegments: source.pathSegments,
     childrenCount: 0,
     hasChildren: false,
-    documentId: some(articleId),
+    artifactId: some(articleId),
     publishedAt: none(),
     updatedAt: none(),
     readingMinutes: none(),
@@ -205,11 +205,11 @@ function createMarkdownFixtureNode(
 }
 
 export function createMarkdownDemoFixtures(): MarkdownFixtureBundle {
-  const articleDocuments: Record<DocumentId, ArticleDocument> = {};
+  const articleDocuments: Record<ArtifactId, ArticleDocument> = {};
   const contentNodes: ContentNode[] = [];
 
   for (const source of MARKDOWN_DEMO_SOURCES) {
-    const articleId: DocumentId = `doc-${source.key}`;
+    const articleId: ArtifactId = `doc-${source.key}`;
     const parsedArticle = parseMarkdownArticle(source.markdown, source.key);
     const article: ArticleDocument = {
       ...parsedArticle,

@@ -63,7 +63,7 @@ type OverviewCopy = {
   };
   directory: {
     fallbackDescription: string;
-    entryFallbackDescription: string;
+    artifactFallbackDescription: string;
     rootLabel: string;
   };
   rail: {
@@ -79,7 +79,7 @@ type OverviewCopy = {
   context: {
     panelTitle: string;
     onThisPageTitle: string;
-    recentEntriesTitle: string;
+    recentArtifactsTitle: string;
     placeholderBody: string;
     runtimeTitle: string;
     coverageTitle: string;
@@ -390,24 +390,24 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
     },
     directory: {
       fallbackDescription: '先浏览当前这一层组件库切片，再决定往下钻到哪条契约。',
-      entryFallbackDescription: '打开这条入口，查看当前契约的实现、演示和缺口。',
+      artifactFallbackDescription: '打开这条 artifact，查看当前契约的实现、演示和缺口。',
       rootLabel: '根',
     },
     rail: {
       fileTreeTitle: '文件树',
     },
     shellViewState: {
-      loadingTitle: '正在加载文档',
+      loadingTitle: '正在加载 artifact',
       loadingBody: '总览站正在解析当前路径。',
-      emptyTitle: '暂无可渲染内容',
-      notRenderableBody: '这条路径暂时没有可渲染内容。',
+      emptyTitle: '暂无 artifact 内容',
+      notRenderableBody: '这条路径暂时没有 artifact 内容。',
       errorTitle: '路径未找到',
     },
     context: {
       panelTitle: '上下文',
       onThisPageTitle: '本页',
-      recentEntriesTitle: '最近',
-      placeholderBody: '当前文档解析完成后会显示上下文。',
+      recentArtifactsTitle: '最近 artifact',
+      placeholderBody: '当前 artifact 解析完成后会显示上下文。',
       runtimeTitle: '运行时',
       coverageTitle: '覆盖情况',
       noOpenDesignGaps: '当前页面没有待处理的设计缺口。',
@@ -913,25 +913,25 @@ const overviewCopyByLocale: Record<AppLocale, OverviewCopy> = {
     directory: {
       fallbackDescription:
         'Browse the current slice of the UI library before drilling into a specific contract.',
-      entryFallbackDescription:
-        'Open this entry to inspect the current contract, its demos, and the remaining gaps.',
+      artifactFallbackDescription:
+        'Open this artifact to inspect the current contract, its demos, and the remaining gaps.',
       rootLabel: 'root',
     },
     rail: {
       fileTreeTitle: 'Filesystem',
     },
     shellViewState: {
-      loadingTitle: 'Loading document',
+      loadingTitle: 'Loading artifact',
       loadingBody: 'The overview station is resolving the current path.',
       emptyTitle: 'Nothing to render',
-      notRenderableBody: 'This path does not have renderable content yet.',
+      notRenderableBody: 'This path does not have artifact content yet.',
       errorTitle: 'Path not found',
     },
     context: {
       panelTitle: 'Context',
       onThisPageTitle: 'On this page',
-      recentEntriesTitle: 'Recent',
-      placeholderBody: 'Context appears once the current document is resolved.',
+      recentArtifactsTitle: 'Recent artifacts',
+      placeholderBody: 'Context appears once the current artifact is resolved.',
       runtimeTitle: 'Runtime',
       coverageTitle: 'Coverage',
       noOpenDesignGaps: 'No open design gaps on this page.',

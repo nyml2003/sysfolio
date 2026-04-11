@@ -5,7 +5,7 @@ import type { ArticleDocument, BreadcrumbSegment } from '@/entities/content';
 import { useArticleDom } from '@/features/article/context/article-dom.context';
 import { ArticleDomProvider } from '@/features/article/providers/ArticleDomProvider';
 import { useArticleReading } from '@/features/article/hooks/useArticleReading';
-import { useRenderableEntry } from '@/features/content-pane/hooks/useRenderableEntry';
+import { useRenderableArtifact } from '@/features/content-pane/hooks/useRenderableArtifact';
 import { detachPromise } from '@/shared/lib/async/detach-promise';
 import { useUiCopy } from '@/shared/lib/i18n/use-ui-copy';
 import { fromNullable, isSome, none, some, type Option } from '@/shared/lib/monads/option';
@@ -90,16 +90,17 @@ function OverviewContent({
   const copy = useOverviewCopy();
   const uiCopy = useUiCopy();
   const { registerScrollContainer } = useArticleDom();
-  const resource = useRenderableEntry(currentPath);
+  const artifactResource = useRenderableArtifact(currentPath);
   const [activeOverlay, setActiveOverlay] = useState<'none' | 'navigation' | 'context'>('none');
-  const renderableContent = resource.tag === 'ready' ? resource.value.content : false;
+  const artifactContent =
+    artifactResource.tag === 'ready' ? artifactResource.value.artifact : false;
   const articleDocument = useMemo<Option<ArticleDocument>>(() => {
-    if (renderableContent === false || renderableContent.kind !== 'article') {
+    if (artifactContent === false || artifactContent.kind !== 'article') {
       return none();
     }
 
-    return some(renderableContent);
-  }, [renderableContent]);
+    return some(artifactContent);
+  }, [artifactContent]);
   const registerScrollContainerElement = useCallback(
     (node: HTMLElement | null) => {
       registerScrollContainer(fromNullable(node));
@@ -113,8 +114,8 @@ function OverviewContent({
     }
   );
   const breadcrumbs =
-    resource.tag === 'ready' && isSome(resource.value.context)
-      ? resource.value.context.value.breadcrumbs
+    artifactResource.tag === 'ready' && isSome(artifactResource.value.context)
+      ? artifactResource.value.context.value.breadcrumbs
       : buildFallbackBreadcrumbs(currentPath);
 
   useEffect(() => {
@@ -128,50 +129,55 @@ function OverviewContent({
         <div className="overview-scroll-region" ref={registerScrollContainerElement}>
           <ViewStateLayout
             body={some(
-              resource.tag === 'error'
-                ? resource.error.message
-                : resource.tag === 'loading'
+              artifactResource.tag === 'error'
+                ? artifactResource.error.message
+                : artifactResource.tag === 'loading'
                   ? copy.shellViewState.loadingBody
                   : copy.shellViewState.notRenderableBody
             )}
             state={
-              resource.tag === 'ready'
+              artifactResource.tag === 'ready'
                 ? 'ready'
-                : resource.tag === 'error'
+                : artifactResource.tag === 'error'
                   ? 'error'
-                  : resource.tag === 'empty'
+                  : artifactResource.tag === 'empty'
                     ? 'empty'
                     : 'loading'
             }
             title={
-              resource.tag === 'error'
+              artifactResource.tag === 'error'
                 ? some(copy.shellViewState.errorTitle)
-                : resource.tag === 'empty'
+                : artifactResource.tag === 'empty'
                   ? some(copy.shellViewState.emptyTitle)
-                  : resource.tag === 'ready'
+                  : artifactResource.tag === 'ready'
                     ? none()
                     : some(copy.shellViewState.loadingTitle)
             }
             actionLabel={none()}
             onAction={none()}
           >
-            {resource.tag === 'ready' && resource.value.content.kind === 'home' ? (
+            {artifactResource.tag === 'ready' && artifactResource.value.artifact.kind === 'home' ? (
               <OverviewHomePage
-                content={resource.value.content}
+                content={artifactResource.value.artifact}
                 context={
-                  resource.value.context.tag === 'some'
-                    ? resource.value.context.value
+                  artifactResource.value.context.tag === 'some'
+                    ? artifactResource.value.context.value
                     : getDefaultContext()
                 }
                 onNavigate={onNavigate}
               />
             ) : null}
-            {resource.tag === 'ready' && resource.value.content.kind === 'directory' ? (
-              <OverviewDirectoryPage onNavigate={onNavigate} payload={resource.value} />
+            {artifactResource.tag === 'ready' &&
+            artifactResource.value.artifact.kind === 'directory' ? (
+              <OverviewDirectoryPage
+                onNavigate={onNavigate}
+                artifactPayload={artifactResource.value}
+              />
             ) : null}
-            {resource.tag === 'ready' && resource.value.content.kind === 'article' ? (
+            {artifactResource.tag === 'ready' &&
+            artifactResource.value.artifact.kind === 'article' ? (
               <OverviewArticlePage
-                payload={resource.value}
+                artifactPayload={artifactResource.value}
                 restoreNoticeVisible={restoreNoticeVisible}
                 scrollToTop={scrollToTop}
               />
@@ -182,9 +188,9 @@ function OverviewContent({
       contextPanel={
         <OverviewContextPanel
           activeHeadingId={activeHeadingId}
+          artifactResource={artifactResource}
           onNavigate={onNavigate}
           onScrollToHeading={scrollToHeading}
-          resource={resource}
         />
       }
       navigation={<OverviewFileTree currentPath={currentPath} onNavigate={onNavigate} />}

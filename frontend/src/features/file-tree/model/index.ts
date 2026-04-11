@@ -5,4 +5,15 @@ export { createTreeIndex } from './create-tree-index';
 export { getDefaultExpandedIds } from './get-default-expanded-ids';
 export { mergeExpandedIds } from './merge-expanded-ids';
 export { mergeNodes } from './merge-nodes';
+export {
+  getFirstChildRowId,
+  getFirstRowId,
+  getLastRowId,
+  getNextRowId,
+  getParentRowId,
+  getPreviousRowId,
+  getRowIndex,
+  getSelectedOrFirstRowId,
+  resolveTypeaheadMatch,
+} from './tree-navigation';
 export { toggleExpanded } from './toggle-expanded';

@@ -28,7 +28,12 @@ function AppShellLayoutHarness() {
         contextOverlayLabel="Context panel"
         contextPanel={<button type="button">Context action</button>}
         dismissOverlayLabel="Dismiss panel"
-        navigation={<button type="button">Nav action</button>}
+        navigation={
+          <>
+            <button type="button">Nav action</button>
+            <button type="button">Second nav action</button>
+          </>
+        }
         navigationOverlayLabel="File navigation"
         onDismissOverlay={() => {
           setActiveOverlay('none');
@@ -69,5 +74,38 @@ describe('AppShellLayout', () => {
       expect(screen.queryByRole('dialog', { name: 'File navigation' })).toBeNull();
       expect(document.activeElement).toBe(openButton);
     });
+  });
+
+  it('traps tab focus within the overlay and marks the background as inert', async () => {
+    const user = userEvent.setup();
+
+    render(<AppShellLayoutHarness />);
+
+    const openButton = screen.getByRole('button', { name: 'Open navigation' });
+
+    await user.click(openButton);
+
+    const dialog = await screen.findByRole('dialog', { name: 'File navigation' });
+    const firstAction = screen.getByRole('button', { name: 'Nav action' });
+    const lastAction = screen.getByRole('button', { name: 'Second nav action' });
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(firstAction);
+      expect(
+        screen.getByText('Content').closest('.sf-app-shell__body')?.getAttribute('inert')
+      ).toBe('');
+      expect(openButton.closest('.sf-app-shell__topbar')?.getAttribute('inert')).toBe('');
+    });
+
+    await user.keyboard('{Tab}');
+    expect(document.activeElement).toBe(lastAction);
+
+    await user.keyboard('{Tab}');
+    expect(document.activeElement).toBe(firstAction);
+
+    await user.keyboard('{Shift>}{Tab}{/Shift}');
+    expect(document.activeElement).toBe(lastAction);
+
+    expect(dialog).toBeTruthy();
   });
 });

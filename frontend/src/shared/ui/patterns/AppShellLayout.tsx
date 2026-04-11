@@ -119,10 +119,10 @@ export function AppShellLayout({
 
   return (
     <div className="sf-app-shell">
-      <div aria-hidden={showOverlay} className="sf-app-shell__topbar">
+      <div aria-hidden={showOverlay} className="sf-app-shell__topbar" inert={showOverlay}>
         {topBar}
       </div>
-      <div aria-hidden={showOverlay} className="sf-app-shell__body">
+      <div aria-hidden={showOverlay} className="sf-app-shell__body" inert={showOverlay}>
         {navigationInline ? (
           <aside className="sf-app-shell__rail sf-app-shell__rail--navigation">{navigation}</aside>
         ) : null}

@@ -4,7 +4,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 
 import type {
   BreadcrumbSegment,
-  RenderableEntryPayload,
+  RenderableArtifactPayload,
   RepositoryError,
 } from '@/entities/content';
 import { useFileTree } from '@/features/file-tree/hooks/useFileTree';
@@ -227,14 +227,14 @@ export function OverviewFileTree({ currentPath, onNavigate }: OverviewFileTreePr
 }
 
 type OverviewContextPanelProps = {
-  resource: ResourceState<RenderableEntryPayload, RepositoryError>;
+  artifactResource: ResourceState<RenderableArtifactPayload, RepositoryError>;
   activeHeadingId: string;
   onNavigate: (path: string) => void;
   onScrollToHeading: (headingId: string) => void;
 };
 
 export function OverviewContextPanel({
-  resource,
+  artifactResource,
   activeHeadingId,
   onNavigate,
   onScrollToHeading,
@@ -242,7 +242,7 @@ export function OverviewContextPanel({
   const style = useStyleContext();
   const copy = useOverviewCopy();
 
-  if (resource.tag !== 'ready') {
+  if (artifactResource.tag !== 'ready') {
     return (
       <Stack className="overview-rail" gap="sm">
         <div className="overview-rail__title">{copy.context.panelTitle}</div>
@@ -251,7 +251,7 @@ export function OverviewContextPanel({
     );
   }
 
-  const context = unwrapOr(resource.value.context, {
+  const context = unwrapOr(artifactResource.value.context, {
     breadcrumbs: [],
     parent: none(),
     siblings: [],
@@ -259,9 +259,10 @@ export function OverviewContextPanel({
     stats: none(),
   });
   const articleMeta =
-    resource.value.content.kind === 'article'
-      ? getOverviewDocumentMeta(resource.value.content.id)
+    artifactResource.value.artifact.kind === 'article'
+      ? getOverviewDocumentMeta(artifactResource.value.artifact.id)
       : none();
+  const recentArtifacts = context.recentEntries;
 
   return (
     <Stack className="overview-rail" gap="sm">
@@ -277,11 +278,11 @@ export function OverviewContextPanel({
           </Grid>
         </Stack>
       </Surface>
-      {resource.value.content.kind === 'article' ? (
+      {artifactResource.value.artifact.kind === 'article' ? (
         <Surface>
           <Stack gap="sm">
             <div className="overview-section-title">{copy.context.onThisPageTitle}</div>
-            {resource.value.content.toc.map((item) => (
+            {artifactResource.value.artifact.toc.map((item) => (
               <ButtonGhostMd
                 className={[
                   'overview-context-link',
@@ -323,19 +324,19 @@ export function OverviewContextPanel({
           </Stack>
         </Surface>
       ) : null}
-      {context.recentEntries.length > 0 ? (
+      {recentArtifacts.length > 0 ? (
         <Surface>
           <Stack gap="sm">
-            <div className="overview-section-title">{copy.context.recentEntriesTitle}</div>
-            {context.recentEntries.map((entry) => (
+            <div className="overview-section-title">{copy.context.recentArtifactsTitle}</div>
+            {recentArtifacts.map((artifact) => (
               <ButtonGhostMd
                 className="overview-context-link"
-                key={entry.id}
+                key={artifact.id}
                 onClick={() => {
-                  onNavigate(entry.path);
+                  onNavigate(artifact.path);
                 }}
               >
-                {entry.title}
+                {artifact.title}
               </ButtonGhostMd>
             ))}
           </Stack>
